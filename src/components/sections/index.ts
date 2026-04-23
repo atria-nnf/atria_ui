@@ -1,0 +1,5 @@
+export { HeroSection } from './HeroSection'
+export { FeaturedServices } from './FeaturedServices'
+export { WhyChooseUs } from './WhyChooseUs'
+export { CTASection } from './CTASection'
+export { LocationSection } from './LocationSection'
