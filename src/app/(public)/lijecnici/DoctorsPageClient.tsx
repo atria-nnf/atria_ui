@@ -262,7 +262,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                 onClick={() => setSelectedSpecialty(specialty.id)}
                 className={`px-6 py-3 rounded-full text-sm font-medium transition-all ${
                   selectedSpecialty === specialty.id
-                    ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-lg'
+                    ? 'bg-orangeCTA text-white shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -285,7 +285,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="text-5xl font-bold mb-2 bg-gradient-to-br from-orange-500 to-rose-500 bg-clip-text text-transparent font-serif">
+                <div className="text-5xl font-bold mb-2 text-orangeCTA font-serif">
                   {stat.number}
                 </div>
                 <div className="text-gray-600">{stat.label}</div>
@@ -307,7 +307,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
               className="mb-16"
             >
               <div className="flex items-center gap-3 mb-8">
-                <div className="h-px w-12 bg-gradient-to-r from-orange-500 to-rose-500" />
+                <div className="h-px w-12 bg-orangeCTA" />
                 <span className="text-sm tracking-widest text-orange-500 font-semibold">
                   {locale === 'hr-HR'
                     ? 'ISTAKNUTI LIJEČNICI'
@@ -365,7 +365,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                             aria-label={`Play video for ${doctor.name}`}
                           >
                             <div className="w-20 h-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-                              <Play className="w-8 h-8 text-pink-500 ml-1" />
+                              <Play className="w-8 h-8 text-orangeCTA ml-1" />
                             </div>
                           </button>
                         )}
@@ -375,7 +375,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                     {/* Content */}
                     <div className={`${index % 2 === 1 ? 'lg:order-1' : ''}`}>
                       {doctor.title && (
-                        <div className="inline-block px-4 py-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full text-sm font-semibold mb-6">
+                        <div className="inline-block px-4 py-2 bg-orangeCTA text-white rounded-full text-sm font-semibold mb-6">
                           {getLocalizedContent(doctor.title, locale)}
                         </div>
                       )}
@@ -405,7 +405,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                           <Link
                             href={`/kontakt?doctor=${doctor.slug}`}
-                            className="px-8 py-3 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full font-semibold text-center shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                            className="px-8 py-3 bg-orangeCTA text-white rounded-full font-semibold text-center shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                           >
                             <Calendar className="w-5 h-5" />
                             {locale === 'hr-HR' ? 'Zakaži pregled' : locale === 'en-US' ? 'Schedule Appointment' : 'Termin vereinbaren'}
@@ -495,7 +495,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                         aria-label={`Play video for ${doctor.name}`}
                       >
                         <div className="w-16 h-16 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
-                          <Play className="w-6 h-6 text-pink-500 ml-1" />
+                          <Play className="w-6 h-6 text-orangeCTA ml-1" />
                         </div>
                       </button>
                     )}
@@ -536,7 +536,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                       >
                         <Link
                           href={`/kontakt?doctor=${doctor.slug}`}
-                          className="block py-3 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-xl font-semibold text-center text-sm shadow-lg hover:shadow-xl transition-all"
+                          className="block py-3 bg-orangeCTA text-white rounded-xl font-semibold text-center text-sm shadow-lg hover:shadow-xl transition-all"
                         >
                           {locale === 'hr-HR' ? 'Rezerviraj' : locale === 'en-US' ? 'Book' : 'Buchen'}
                         </Link>
@@ -586,7 +586,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all text-center"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 bg-orangeCTA rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <item.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">{item.title}</h3>
@@ -598,7 +598,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-32 bg-gradient-to-br from-orange-500 via-rose-500 to-pink-500 text-white overflow-hidden">
+      <section className="relative py-32 bg-orangeCTA text-white overflow-hidden">
         <div className="absolute inset-0 opacity-30">
           <div
             className="absolute inset-0"

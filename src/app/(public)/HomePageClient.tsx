@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Play } from 'lucide-react'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -10,111 +10,21 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import VideoModal from '@/components/VideoModal'
+import { getImageUrl } from '@/lib/utils/image'
+import type { Service, Doctor, Testimonial } from '@/types'
 
-// Placeholder data - in production, this would come from Supabase
+interface HomePageClientProps {
+  services: Service[]
+  doctors: Doctor[]
+  testimonials: Testimonial[]
+}
+
+// Static data
 const statsData = [
   { number: '5000+', label: 'Zadovoljnih pacijenata godišnje', delay: 0.1 },
   { number: '10+', label: 'Godina stručnog iskustva', delay: 0.2 },
   { number: '7', label: 'Specijaliziranih liječnika', delay: 0.3 },
   { number: '4.9', label: 'Prosječna ocjena', delay: 0.4 },
-]
-
-const servicesData = [
-  {
-    id: 1,
-    name: 'Ginekologija',
-    tagline: 'Briga za žene u svakoj fazi života',
-    description: 'Kompletna ginekološka skrb od preventivnih pregleda do praćenja trudnoće. Najnovija dijagnostika i individualan pristup.',
-    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&h=1000&fit=crop',
-    price: 'Od 250€',
-    isPopular: true,
-  },
-  {
-    id: 2,
-    name: 'Kardiologija',
-    tagline: 'Vaše srce u sigurnim rukama',
-    description: 'Prevencija i liječenje srčanih bolesti. EKG, ultrazvuk srca, Holter monitoring i stručne konzultacije.',
-    image: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=800&h=1000&fit=crop',
-    price: 'Od 300€',
-    isPopular: false,
-  },
-  {
-    id: 3,
-    name: 'Dermatologija',
-    tagline: 'Zdravlje i ljepota vaše kože',
-    description: 'Dijagnostika i liječenje kožnih bolesti. Dermatoskopija, estetski tretmani i savjetovanje o njezi kože.',
-    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&h=1000&fit=crop',
-    price: 'Od 200€',
-    isPopular: false,
-  },
-]
-
-const doctorsData = [
-  {
-    id: 1,
-    fullName: 'Dr. Ana Horvat',
-    title: 'Spec. ginekologije i opstetricije',
-    experience: '15+ godina',
-    image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=800&fit=crop',
-    videoUrl: null,
-  },
-  {
-    id: 2,
-    fullName: 'Dr. Marko Novak',
-    title: 'Spec. kardiologije',
-    experience: '12+ godina',
-    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&h=800&fit=crop',
-    videoUrl: null,
-  },
-  {
-    id: 3,
-    fullName: 'Dr. Ivana Babić',
-    title: 'Spec. dermatologije',
-    experience: '10+ godina',
-    image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=600&h=800&fit=crop',
-    videoUrl: null,
-  },
-  {
-    id: 4,
-    fullName: 'Dr. Petar Jurić',
-    title: 'Spec. interne medicine',
-    experience: '18+ godina',
-    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=600&h=800&fit=crop',
-    videoUrl: null,
-  },
-  {
-    id: 5,
-    fullName: 'Dr. Maja Kovač',
-    title: 'Spec. radiologije',
-    experience: '8+ godina',
-    image: 'https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=600&h=800&fit=crop',
-    videoUrl: null,
-  },
-  {
-    id: 6,
-    fullName: 'Dr. Luka Matić',
-    title: 'Spec. laboratorijske dijagnostike',
-    experience: '11+ godina',
-    image: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=600&h=800&fit=crop',
-    videoUrl: null,
-  },
-]
-
-const testimonialsData = [
-  {
-    id: 1,
-    content: 'Profesionalan pristup i topla atmosfera. Dr. Horvat me je odmah smirila i sve detaljno objasnila. Preporučujem svima!',
-    patientName: 'Marina K.',
-    serviceRelated: 'Ginekologija',
-    rating: 5,
-  },
-  {
-    id: 2,
-    content: 'Nakon godina traženja pravog kardiologa, konačno sam pronašla polikliniku gdje se osjećam sigurno. Hvala cijelom timu!',
-    patientName: 'Tomislav B.',
-    serviceRelated: 'Kardiologija',
-    rating: 5,
-  },
 ]
 
 const processSteps = [
@@ -124,24 +34,6 @@ const processSteps = [
   { step: '04', title: 'Nastavi praćenje', desc: 'Rezultati u 24h. Online pristup. Kontinuirana podrška.' },
 ]
 
-const pricingPlans = [
-  {
-    name: 'Osnovni',
-    price: '200',
-    features: ['Kompletna anamneza', 'Osnovni pregled', 'Konzultacija', 'Preporuke'],
-  },
-  {
-    name: 'Kompletan',
-    price: '450',
-    popular: true,
-    features: ['Sve iz osnovnog', 'Laboratorijske pretrage', 'EKG ili ultrazvuk', 'Pisani nalaz', 'Praćenje 30 dana'],
-  },
-  {
-    name: 'Premium',
-    price: '800',
-    features: ['Sve iz kompletnog', 'Prioritetni termini', 'Video konzultacije', 'Direktan kontakt', '24/7 podrška'],
-  },
-]
 
 const galleryImages = [
   { image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&h=600&fit=crop', span: 'col-span-2 row-span-2' },
@@ -185,7 +77,17 @@ const blogPosts = [
   },
 ]
 
-export default function HomePageClient() {
+// Helper to get localized content
+function getLocalizedContent(content: unknown, locale: string = 'hr-HR'): string {
+  if (!content) return ''
+  if (typeof content === 'string') return content
+  if (typeof content === 'object' && content !== null) {
+    return (content as Record<string, string>)[locale] || (content as Record<string, string>)['hr-HR'] || ''
+  }
+  return ''
+}
+
+export default function HomePageClient({ services, doctors, testimonials }: HomePageClientProps) {
   const [videoModalOpen, setVideoModalOpen] = useState(false)
   const [selectedDoctorVideo, setSelectedDoctorVideo] = useState<string | null>(null)
 
@@ -194,6 +96,41 @@ export default function HomePageClient() {
     target: containerRef,
     offset: ['start start', 'end end'],
   })
+
+  // Transform services data for display
+  const servicesData = useMemo(() => {
+    return services.slice(0, 3).map((service) => ({
+      id: service.id,
+      name: getLocalizedContent(service.name),
+      slug: service.slug,
+      tagline: getLocalizedContent(service.short_description) || 'Stručna medicinska skrb',
+      description: getLocalizedContent(service.description),
+      image: getImageUrl(service.featured_image) || 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&h=1000&fit=crop',
+    }))
+  }, [services])
+
+  // Transform doctors data for display
+  const doctorsData = useMemo(() => {
+    return doctors.map((doctor) => ({
+      id: doctor.id,
+      fullName: doctor.name,
+      title: getLocalizedContent(doctor.title) || getLocalizedContent(doctor.specialty),
+      experience: '10+ godina',
+      image: getImageUrl(doctor.profile_image) || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=800&fit=crop',
+      videoUrl: doctor.video_preview,
+    }))
+  }, [doctors])
+
+  // Transform testimonials data for display
+  const testimonialsData = useMemo(() => {
+    return testimonials.slice(0, 4).map((testimonial) => ({
+      id: testimonial.id,
+      content: getLocalizedContent(testimonial.content),
+      patientName: testimonial.author_name,
+      serviceRelated: '',
+      rating: testimonial.rating || 5,
+    }))
+  }, [testimonials])
 
   // Load custom fonts
   useEffect(() => {
@@ -230,10 +167,10 @@ export default function HomePageClient() {
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_rgba(0,0,0,0.4)_100%)]"></div>
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-30"></div>
           </div>
-          <img src="/images/heroImage.webp" alt="Clinic" className="w-full h-full object-cover" />
+          <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920&h=1080&fit=crop" alt="Clinic" className="w-full h-full object-cover" />
         </motion.div>
 
-        <div className="relative z-20 text-center px-6 max-w-5xl">
+        <div className="relative z-20 text-center px-4 sm:px-6 max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -241,12 +178,12 @@ export default function HomePageClient() {
             className="mb-8"
           >
             <h1
-              className="text-7xl md:text-9xl font-bold leading-none mb-6 whitespace-pre-line"
+              className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-bold leading-tight mb-4 sm:mb-6 whitespace-pre-line"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               {heroTitle}
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto font-light">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 max-w-2xl mx-auto font-light px-4">
               {heroSubtitle}
             </p>
           </motion.div>
@@ -255,19 +192,13 @@ export default function HomePageClient() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex justify-center"
           >
             <Link
-              href="/lijecnici"
-              className="px-10 py-4 bg-orangeCTA text-white rounded-full font-medium hover:bg-gray-100 hover:text-black transition-all"
+              href="/kontakt"
+              className="inline-block px-8 sm:px-10 py-3 sm:py-4 bg-orangeCTA text-white rounded-full font-medium hover:bg-gray-100 hover:text-black transition-all text-sm sm:text-base"
             >
-              Upoznaj naše doktore
-            </Link>
-            <Link
-              href="/usluge"
-              className="px-10 py-4 border border-white rounded-full font-medium hover:bg-white hover:text-black transition-all"
-            >
-              Istraži usluge
+              Rezerviraj termin
             </Link>
           </motion.div>
         </div>
@@ -318,14 +249,14 @@ export default function HomePageClient() {
                 className="group"
               >
                 <div
-                  className="text-7xl font-bold mb-4 bg-gradient-to-br from-orange-500 to-rose-500 bg-clip-text text-transparent"
+                  className="text-7xl font-bold mb-4 text-orangeCTA"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
                   {stat.number}
                 </div>
                 <div className="text-gray-600 text-lg leading-relaxed">{stat.label}</div>
                 <motion.div
-                  className="h-1 bg-gradient-to-r from-orange-500 to-rose-500 mt-4"
+                  className="h-1 bg-orangeCTA mt-4"
                   initial={{ width: 0 }}
                   whileInView={{ width: '100%' }}
                   viewport={{ once: true }}
@@ -383,7 +314,7 @@ export default function HomePageClient() {
                   <p className="text-xl text-gray-300 mb-8 leading-relaxed">{service.description}</p>
                   <motion.div whileHover={{ x: 10 }}>
                     <Link
-                      href={`/usluge/${service.name.toLowerCase()}`}
+                      href={`/usluge/${service.slug}`}
                       className="flex items-center gap-3 text-lg group text-white"
                     >
                       <span className="border-b border-blue-400 pb-1">Saznaj više</span>
@@ -405,10 +336,6 @@ export default function HomePageClient() {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-blue-950/80 to-transparent"></div>
-                  <div className="absolute bottom-8 left-8 right-8">
-                    {service.isPopular && <div className="text-sm text-blue-200 mb-2">Najpopularnije</div>}
-                    <div className="text-3xl font-bold text-white">{service.price}</div>
-                  </div>
                 </motion.div>
               </motion.div>
             )
@@ -445,6 +372,9 @@ export default function HomePageClient() {
               640: { slidesPerView: 2 },
               1024: { slidesPerView: 3 },
             }}
+            touchReleaseOnEdges={true}
+            threshold={10}
+            resistanceRatio={0}
             className="!pb-16"
           >
             {doctorsData.map((doctor, index) => (
@@ -474,7 +404,7 @@ export default function HomePageClient() {
                         aria-label={`Play video for ${doctor.fullName}`}
                       >
                         <div className="w-20 h-20 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
-                          <Play className="w-8 h-8 text-pink-500 ml-1" />
+                          <Play className="w-8 h-8 text-orangeCTA ml-1" />
                         </div>
                       </button>
                     )}
@@ -581,81 +511,12 @@ export default function HomePageClient() {
                   &ldquo;{testimonial.content}&rdquo;
                 </p>
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-rose-500"></div>
+                  <div className="w-16 h-16 rounded-full bg-orangeCTA"></div>
                   <div>
                     <div className="font-bold text-xl">{testimonial.patientName}</div>
                     <div className="text-gray-600">{testimonial.serviceRelated}</div>
                   </div>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing - Bold Cards */}
-      <section className="bg-gradient-to-br from-slate-900 via-blue-950 to-purple-950 py-32">
-        <div className="max-w-7xl mx-auto px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <div className="text-sm tracking-widest text-gray-500 mb-4">CIJENE</div>
-            <h2 className="text-6xl md:text-8xl font-bold mb-6" style={{ fontFamily: 'Playfair Display, serif' }}>
-              Transparentno
-              <br />& Pristupačno
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {pricingPlans.map((plan, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 60 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                whileHover={{ y: -10 }}
-                className={`relative rounded-3xl p-12 ${
-                  plan.popular
-                    ? 'bg-gradient-to-br from-orange-500 to-rose-500 text-white'
-                    : 'bg-white/5 border border-white/10'
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full text-sm font-bold">
-                    NAJPOPULARNIJE
-                  </div>
-                )}
-
-                <div className="text-center mb-8">
-                  <div className="text-lg mb-4 opacity-80">{plan.name}</div>
-                  <div className="flex items-baseline justify-center gap-2">
-                    <span className="text-7xl font-bold" style={{ fontFamily: 'Playfair Display, serif' }}>
-                      {plan.price}
-                    </span>
-                    <span className="text-2xl opacity-80">€</span>
-                  </div>
-                </div>
-
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <span className={plan.popular ? 'text-white' : 'text-orange-500'}>✓</span>
-                      <span className="opacity-90">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-full py-4 rounded-full font-medium transition-all bg-white text-black hover:bg-gray-100"
-                >
-                  Odaberi paket
-                </motion.button>
               </motion.div>
             ))}
           </div>
@@ -828,7 +689,7 @@ export default function HomePageClient() {
       </section>
 
       {/* Interactive CTA */}
-      <section className="min-h-screen bg-gradient-to-br from-orange-500 via-rose-500 to-pink-500 flex items-center justify-center relative overflow-hidden">
+      <section className="min-h-screen bg-gradient-to-br from-orangeCTA via-orange-500 to-amber-500 flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-30">
           <div
             className="absolute inset-0"

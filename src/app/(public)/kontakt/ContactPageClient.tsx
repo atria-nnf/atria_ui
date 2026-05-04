@@ -120,7 +120,7 @@ export function ContactPageClient({ contactInfo, services }: ContactPageClientPr
       details: [contactInfo.address, `${contactInfo.postalCode} ${contactInfo.city}`],
       action: locale === 'hr-HR' ? 'Otvori mapu' : locale === 'en-US' ? 'Open map' : 'Karte öffnen',
       href: '#map',
-      color: 'from-rose-500 to-rose-600',
+      color: 'from-orangeCTA to-orange-600',
     },
     {
       icon: Calendar,
@@ -392,7 +392,7 @@ export function ContactPageClient({ contactInfo, services }: ContactPageClientPr
                   className={`w-full py-4 rounded-lg font-semibold text-white flex items-center justify-center gap-3 transition-all ${
                     isSubmitting
                       ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-orange-500 to-rose-500 hover:shadow-xl'
+                      : 'bg-orangeCTA hover:shadow-xl'
                   }`}
                 >
                   {isSubmitting ? (
@@ -676,7 +676,7 @@ export function ContactPageClient({ contactInfo, services }: ContactPageClientPr
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-br from-orange-500 via-rose-500 to-pink-500 py-20 text-white">
+      <section className="bg-orangeCTA py-20 text-white">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}

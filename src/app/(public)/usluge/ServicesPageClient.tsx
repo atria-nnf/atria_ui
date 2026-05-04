@@ -17,6 +17,10 @@ import {
   Zap,
   Building2,
   DollarSign,
+  Baby,
+  Activity,
+  Radio,
+  Droplets,
 } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
@@ -51,20 +55,31 @@ const CATEGORY_DISPLAY_NAMES: Record<string, Record<string, string>> = {
   },
 }
 
-// Category colors
+// Category colors - all blue/purple
 const CATEGORY_COLORS: Record<string, string> = {
-  specialist: 'from-pink-500 to-rose-500',
-  diagnostics: 'from-blue-500 to-cyan-500',
-  preventive: 'from-indigo-500 to-purple-500',
-  aesthetic: 'from-rose-500 to-pink-500',
+  specialist: 'from-blue-600 to-indigo-600',
+  diagnostics: 'from-indigo-600 to-purple-600',
+  preventive: 'from-blue-500 to-indigo-500',
+  aesthetic: 'from-purple-500 to-indigo-500',
 }
 
-// Category icons
+// Category icons (fallback)
 const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   specialist: Heart,
   diagnostics: TestTube,
   preventive: Stethoscope,
   aesthetic: Sparkles,
+}
+
+// Service-specific icons by slug
+const SERVICE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  kardiologija: Heart,
+  ginekologija: Baby,
+  'intimno-zdravlje': Baby,
+  endokrinologija: Activity,
+  ultrazvuk: Radio,
+  'color-doppler': Radio,
+  laboratorij: TestTube,
 }
 
 export function ServicesPageClient({ initialServices }: ServicesPageClientProps) {
@@ -89,14 +104,14 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
     return initialServices.filter((service) => service.category === selectedCategory)
   }, [initialServices, selectedCategory])
 
-  // Get icon component for category
-  const getIconForCategory = (category: string | null) => {
-    return CATEGORY_ICONS[category || ''] || Stethoscope
+  // Get icon component for service (by slug first, then category fallback)
+  const getIconForService = (slug: string, category: string | null) => {
+    return SERVICE_ICONS[slug] || CATEGORY_ICONS[category || ''] || Stethoscope
   }
 
-  // Get color gradient for category
-  const getColorForCategory = (category: string | null) => {
-    return CATEGORY_COLORS[category || ''] || 'from-gray-500 to-gray-600'
+  // Get color gradient for category (all blue/purple now)
+  const getColorForCategory = () => {
+    return 'from-blue-600 to-indigo-600'
   }
 
   // Parse pricing from JSON
@@ -164,7 +179,7 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
         ? 'State-of-the-art medical technology for precise diagnostics.'
         : 'Modernste Medizintechnik für präzise Diagnostik.',
       icon: Microscope,
-      color: 'from-purple-500 to-pink-500',
+      color: 'from-blue-500 to-indigo-500',
     },
     {
       title: locale === 'hr-HR' ? 'Personalizirani pristup' : locale === 'en-US' ? 'Personalized Approach' : 'Personalisierter Ansatz',
@@ -174,7 +189,7 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
         ? 'Every patient is unique - we treat you as a person, not a number.'
         : 'Jeder Patient ist einzigartig - wir behandeln Sie als Person, nicht als Nummer.',
       icon: User,
-      color: 'from-rose-500 to-pink-500',
+      color: 'from-blue-600 to-indigo-600',
     },
     {
       title: locale === 'hr-HR' ? 'Brzi termini' : locale === 'en-US' ? 'Quick Appointments' : 'Schnelle Termine',
@@ -229,13 +244,13 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
             transition={{ duration: 0.8 }}
             className="text-center max-w-4xl mx-auto"
           >
-            <div className="text-sm tracking-widest text-blue-300 mb-6">
+            <div className="text-sm tracking-widest text-white/80 mb-6">
               {locale === 'hr-HR' ? 'NAŠE USLUGE' : locale === 'en-US' ? 'OUR SERVICES' : 'UNSERE LEISTUNGEN'}
             </div>
             <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight font-serif">
               {locale === 'hr-HR' ? (
                 <>
-                  Sveobuhvatna<br />zdravstvena skrb
+                  Sveobuhvatna<br />briga o zdravlju
                 </>
               ) : locale === 'en-US' ? (
                 <>
@@ -268,7 +283,7 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-6 py-3 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === category.id
-                    ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-lg'
+                    ? 'bg-orangeCTA text-white shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -291,7 +306,7 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="text-5xl font-bold mb-2 bg-gradient-to-br from-orange-500 to-rose-500 bg-clip-text text-transparent font-serif">
+                <div className="text-5xl font-bold mb-2 text-orangeCTA font-serif">
                   {stat.number}
                 </div>
                 <div className="text-gray-600">{stat.label}</div>
@@ -323,7 +338,7 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
           {/* Services Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
             {filteredServices.map((service, index) => {
-              const ServiceIcon = getIconForCategory(service.category)
+              const ServiceIcon = getIconForService(service.slug, service.category)
               const features = getFeatures(service.pricing)
               const price = getPriceDisplay(service.pricing)
 
@@ -360,7 +375,7 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
 
                       {/* Icon */}
                       <div
-                        className={`absolute top-6 left-6 w-16 h-16 rounded-2xl bg-gradient-to-br ${getColorForCategory(service.category)} flex items-center justify-center shadow-xl`}
+                        className={`absolute top-6 left-6 w-16 h-16 rounded-2xl bg-gradient-to-br ${getColorForCategory()} flex items-center justify-center shadow-xl`}
                       >
                         <ServiceIcon className="w-8 h-8 text-white" />
                       </div>
@@ -418,7 +433,7 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
                         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
                           <Link
                             href={`/usluge/${service.slug}`}
-                            className={`block py-3 rounded-xl font-semibold text-white text-center bg-gradient-to-r ${getColorForCategory(service.category)} hover:shadow-lg transition-all`}
+                            className={`block py-3 rounded-xl font-semibold text-white text-center bg-gradient-to-r ${getColorForCategory()} hover:shadow-lg transition-all`}
                           >
                             {locale === 'hr-HR' ? 'Saznaj više' : locale === 'en-US' ? 'Learn More' : 'Mehr erfahren'}
                           </Link>
@@ -488,7 +503,7 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-32 bg-gradient-to-br from-orange-500 via-rose-500 to-pink-500 text-white overflow-hidden">
+      <section className="relative py-32 bg-orangeCTA text-white overflow-hidden">
         <div className="absolute inset-0 opacity-30">
           <div
             className="absolute inset-0"

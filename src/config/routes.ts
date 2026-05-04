@@ -32,23 +32,24 @@ export function getRoute(route: RouteName, params?: Record<string, string>): str
 
 /**
  * Navigation items for NavBar
+ * Note: 'Usluge' dropdown is populated dynamically from Supabase
  */
 export const NAV_ITEMS = [
   { name: 'Naslovnica', href: ROUTES.HOME },
   {
     name: 'Usluge',
     href: ROUTES.SERVICES,
+    dynamicDropdown: 'services' as const,
+  },
+  {
+    name: 'O nama',
+    href: ROUTES.ABOUT_US,
     dropdown: [
-      { name: 'Ginekologija', href: '/usluge/ginekologija' },
-      { name: 'Kardiologija', href: '/usluge/kardiologija' },
-      { name: 'Dermatologija', href: '/usluge/dermatologija' },
-      { name: 'Ultrazvuk', href: '/usluge/ultrazvuk' },
-      { name: 'Laboratorij', href: '/usluge/laboratorij' },
+      { name: 'O nama', href: ROUTES.ABOUT_US },
+      { name: 'Naši Doktori', href: ROUTES.DOCTORS },
+      { name: 'Karijere', href: ROUTES.CAREERS },
     ],
   },
-  { name: 'Naši Doktori', href: ROUTES.DOCTORS },
-  { name: 'O nama', href: ROUTES.ABOUT_US },
   { name: 'Kontakt', href: ROUTES.CONTACT },
   { name: 'Novosti', href: ROUTES.BLOG },
-  { name: 'Karijere', href: ROUTES.CAREERS },
 ]

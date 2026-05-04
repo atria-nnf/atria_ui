@@ -489,7 +489,7 @@ export function CareersPageClient({ jobs }: CareersPageClientProps) {
                     type="submit"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full py-4 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-orangeCTA text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                   >
                     <Send className="w-5 h-5" />
                     {t.sendApplication}
@@ -536,7 +536,7 @@ export function CareersPageClient({ jobs }: CareersPageClientProps) {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all"
                 >
-                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-rose-500 rounded-xl flex items-center justify-center mb-6">
+                  <div className="w-14 h-14 bg-orangeCTA rounded-xl flex items-center justify-center mb-6">
                     <benefit.icon className="w-7 h-7 text-white" />
                   </div>
                   <h3 className="text-xl font-bold mb-3">{benefit.title}</h3>
@@ -613,7 +613,7 @@ export function CareersPageClient({ jobs }: CareersPageClientProps) {
                   onClick={() => setSelectedDepartment(dept.id)}
                   className={`px-4 py-3 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                     selectedDepartment === dept.id
-                      ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white'
+                      ? 'bg-orangeCTA text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -693,7 +693,7 @@ export function CareersPageClient({ jobs }: CareersPageClientProps) {
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          className="flex-1 lg:flex-none px-8 py-3 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+                          className="flex-1 lg:flex-none px-8 py-3 bg-orangeCTA text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
                         >
                           {t.apply}
                         </motion.button>
@@ -791,7 +791,7 @@ export function CareersPageClient({ jobs }: CareersPageClientProps) {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all"
               >
-                <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-rose-500 rounded-xl flex items-center justify-center mb-6">
+                <div className="w-14 h-14 bg-orangeCTA rounded-xl flex items-center justify-center mb-6">
                   <benefit.icon className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">{benefit.title}</h3>
@@ -826,7 +826,7 @@ export function CareersPageClient({ jobs }: CareersPageClientProps) {
                 className="text-center"
               >
                 <div
-                  className="text-6xl font-bold mb-4 bg-gradient-to-br from-orange-500 to-rose-500 bg-clip-text text-transparent font-serif"
+                  className="text-6xl font-bold mb-4 text-orangeCTA font-serif"
                 >
                   {index + 1}
                 </div>
@@ -839,7 +839,7 @@ export function CareersPageClient({ jobs }: CareersPageClientProps) {
       </section>
 
       {/* CTA */}
-      <section className="relative py-32 bg-gradient-to-br from-orange-500 via-rose-500 to-pink-500 text-white overflow-hidden">
+      <section className="relative py-32 bg-orangeCTA text-white overflow-hidden">
         <div className="absolute inset-0 opacity-30">
           <div
             className="absolute inset-0"

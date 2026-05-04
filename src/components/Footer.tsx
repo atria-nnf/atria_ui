@@ -1,18 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, ArrowRight } from 'lucide-react'
 import { FaInstagram, FaFacebookF, FaLinkedinIn } from 'react-icons/fa'
+import type { Service } from '@/types'
 
-const services = [
-  { name: 'Ginekologija', href: '/usluge/ginekologija' },
-  { name: 'Kardiologija', href: '/usluge/kardiologija' },
-  { name: 'Dermatologija', href: '/usluge/dermatologija' },
-  { name: 'Ultrazvuk', href: '/usluge/ultrazvuk' },
-  { name: 'Laboratorij', href: '/usluge/laboratorij' },
-]
+interface FooterProps {
+  services?: Service[]
+}
 
 const quickLinks = [
   { name: 'O nama', href: '/o-nama' },
@@ -28,7 +25,16 @@ const legal = [
   { name: 'Kolačići', href: '/politika-kolacica' },
 ]
 
-export function Footer() {
+export function Footer({ services: servicesProp = [] }: FooterProps) {
+  // Build services list from props
+  const services = useMemo(() => {
+    return servicesProp.map((service) => ({
+      name: typeof service.name === 'string'
+        ? service.name
+        : (service.name as Record<string, string>)?.['hr-HR'] || service.slug,
+      href: `/usluge/${service.slug}`,
+    }))
+  }, [servicesProp])
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('')
 
@@ -45,7 +51,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="bg-black text-white">
+    <footer className="bg-gradient-to-br from-slate-900 via-blue-950 to-purple-950 text-white">
       <div className="max-w-7xl mx-auto px-8">
         {/* Main Footer Content */}
         <div className="py-20">
@@ -123,7 +129,7 @@ export function Footer() {
                   type="submit"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-gradient-to-r from-orange-500 to-rose-500 hover:shadow-lg rounded-full flex items-center justify-center transition-all"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-orangeCTA hover:shadow-lg rounded-full flex items-center justify-center transition-all"
                 >
                   <ArrowRight className="w-5 h-5 text-white" />
                 </motion.button>
@@ -232,7 +238,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.1, y: -2 }}
-                  className="w-10 h-10 bg-white/5 hover:bg-gradient-to-r hover:from-orange-500 hover:to-rose-500 rounded-full flex items-center justify-center transition-all"
+                  className="w-10 h-10 bg-white/5 hover:bg-orangeCTA rounded-full flex items-center justify-center transition-all"
                 >
                   <FaInstagram className="w-5 h-5" />
                 </motion.a>
@@ -242,7 +248,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.1, y: -2 }}
-                  className="w-10 h-10 bg-white/5 hover:bg-gradient-to-r hover:from-orange-500 hover:to-rose-500 rounded-full flex items-center justify-center transition-all"
+                  className="w-10 h-10 bg-white/5 hover:bg-orangeCTA rounded-full flex items-center justify-center transition-all"
                 >
                   <FaFacebookF className="w-5 h-5" />
                 </motion.a>
@@ -252,7 +258,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.1, y: -2 }}
-                  className="w-10 h-10 bg-white/5 hover:bg-gradient-to-r hover:from-orange-500 hover:to-rose-500 rounded-full flex items-center justify-center transition-all"
+                  className="w-10 h-10 bg-white/5 hover:bg-orangeCTA rounded-full flex items-center justify-center transition-all"
                 >
                   <FaLinkedinIn className="w-5 h-5" />
                 </motion.a>

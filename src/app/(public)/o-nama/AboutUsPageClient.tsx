@@ -38,7 +38,7 @@ export function AboutUsPageClient({ aboutData, doctors }: AboutUsPageClientProps
           : locale === 'en-US'
           ? 'Every patient is unique and deserves personal attention and understanding.'
           : 'Jeder Patient ist einzigartig und verdient persönliche Aufmerksamkeit und Verständnis.',
-      color: 'from-rose-500 to-rose-600',
+      color: 'from-orangeCTA to-orange-600',
     },
     {
       icon: Lightbulb,
@@ -134,7 +134,7 @@ export function AboutUsPageClient({ aboutData, doctors }: AboutUsPageClientProps
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="text-5xl font-bold mb-2 bg-gradient-to-br from-orange-500 to-rose-500 bg-clip-text text-transparent font-serif">
+                <div className="text-5xl font-bold mb-2 text-orangeCTA font-serif">
                   {stat.number}
                 </div>
                 <div className="text-gray-600">{stat.label}</div>
@@ -155,7 +155,7 @@ export function AboutUsPageClient({ aboutData, doctors }: AboutUsPageClientProps
               transition={{ duration: 0.8 }}
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-px w-12 bg-gradient-to-r from-orange-500 to-rose-500" />
+                <div className="h-px w-12 bg-orangeCTA" />
                 <span className="text-sm tracking-widest text-orange-500 font-semibold">
                   {locale === 'hr-HR' ? 'NAŠA PRIČA' : locale === 'en-US' ? 'OUR STORY' : 'UNSERE GESCHICHTE'}
                 </span>
@@ -324,7 +324,7 @@ export function AboutUsPageClient({ aboutData, doctors }: AboutUsPageClientProps
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   href="/lijecnici"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-orangeCTA text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
                 >
                   {locale === 'hr-HR' ? 'Svi liječnici' : locale === 'en-US' ? 'All Doctors' : 'Alle Ärzte'}
                   <ArrowRight className="w-5 h-5" />
@@ -336,7 +336,7 @@ export function AboutUsPageClient({ aboutData, doctors }: AboutUsPageClientProps
       )}
 
       {/* CTA Section */}
-      <section className="py-32 bg-gradient-to-br from-orange-500 via-rose-500 to-pink-500 text-white">
+      <section className="py-32 bg-orangeCTA text-white">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}

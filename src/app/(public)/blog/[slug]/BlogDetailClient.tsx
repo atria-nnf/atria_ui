@@ -87,7 +87,7 @@ export function BlogDetailClient({ post, relatedPosts }: BlogDetailClientProps) 
               {/* Category */}
               {post.category && (
                 <div className="mb-6">
-                  <span className="px-4 py-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full text-sm font-semibold">
+                  <span className="px-4 py-2 bg-orangeCTA text-white rounded-full text-sm font-semibold">
                     {post.category}
                   </span>
                 </div>

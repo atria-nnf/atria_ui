@@ -174,7 +174,7 @@ export function BlogPageClient({ initialPosts, featuredPosts }: BlogPageClientPr
                   onClick={() => setSelectedCategory(category.id)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                     selectedCategory === category.id
-                      ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white'
+                      ? 'bg-orangeCTA text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -197,7 +197,7 @@ export function BlogPageClient({ initialPosts, featuredPosts }: BlogPageClientPr
               transition={{ duration: 0.8 }}
             >
               <div className="flex items-center gap-3 mb-8">
-                <div className="h-px w-12 bg-gradient-to-r from-orange-500 to-rose-500" />
+                <div className="h-px w-12 bg-orangeCTA" />
                 <span className="text-sm tracking-widest text-orange-500 font-semibold">
                   {locale === 'hr-HR' ? 'IZDVOJENO' : locale === 'en-US' ? 'FEATURED' : 'HERVORGEHOBEN'}
                 </span>
@@ -460,7 +460,7 @@ export function BlogPageClient({ initialPosts, featuredPosts }: BlogPageClientPr
               type="submit"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-rose-500 rounded-full font-medium"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-orangeCTA rounded-full font-medium"
             >
               {locale === 'hr-HR' ? 'Pretplati se' : locale === 'en-US' ? 'Subscribe' : 'Abonnieren'}
             </motion.button>

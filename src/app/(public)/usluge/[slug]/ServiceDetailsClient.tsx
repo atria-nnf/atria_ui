@@ -37,10 +37,10 @@ const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>
 
 // Category colors
 const CATEGORY_COLORS: Record<string, string> = {
-  specialist: 'from-pink-500 to-rose-500',
+  specialist: 'from-blue-600 to-indigo-600',
   diagnostics: 'from-blue-500 to-cyan-500',
   preventive: 'from-indigo-500 to-purple-500',
-  aesthetic: 'from-rose-500 to-pink-500',
+  aesthetic: 'from-blue-600 to-indigo-600',
 }
 
 export function ServiceDetailsClient({
@@ -221,20 +221,8 @@ export function ServiceDetailsClient({
 
   return (
     <div className="bg-white text-black font-sans">
-      {/* Back Button */}
-      <div className="bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-8 py-4">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <Link href="/usluge" className="inline-flex items-center gap-2 text-gray-600 hover:text-black transition-colors">
-              <ChevronLeft className="w-5 h-5" />
-              <span>{locale === 'hr-HR' ? 'Natrag na usluge' : locale === 'en-US' ? 'Back to services' : 'Zurück zu den Diensten'}</span>
-            </Link>
-          </motion.div>
-        </div>
-      </div>
-
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-slate-900 via-blue-950 to-purple-950 text-white overflow-hidden">
+      <section className="relative pt-40 pb-32 bg-gradient-to-br from-slate-900 via-blue-950 to-purple-950 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div
             className="absolute inset-0"
@@ -370,7 +358,7 @@ export function ServiceDetailsClient({
               >
                 {pkg.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="px-4 py-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full text-sm font-bold shadow-lg">
+                    <span className="px-4 py-2 bg-orangeCTA text-white rounded-full text-sm font-bold shadow-lg">
                       {locale === 'hr-HR' ? 'NAJPOPULARNIJE' : locale === 'en-US' ? 'MOST POPULAR' : 'AM BELIEBTESTEN'}
                     </span>
                   </div>
@@ -399,7 +387,7 @@ export function ServiceDetailsClient({
                   whileTap={{ scale: 0.95 }}
                   className={`w-full py-4 rounded-full font-semibold transition-all ${
                     pkg.popular
-                      ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-lg'
+                      ? 'bg-orangeCTA text-white shadow-lg'
                       : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                   }`}
                 >
@@ -631,7 +619,7 @@ export function ServiceDetailsClient({
       {/* CTA Section */}
       <section
         id="booking"
-        className="relative py-32 bg-gradient-to-br from-orange-500 via-rose-500 to-pink-500 text-white overflow-hidden"
+        className="relative py-32 bg-orangeCTA text-white overflow-hidden"
       >
         <div className="absolute inset-0 opacity-30">
           <div
