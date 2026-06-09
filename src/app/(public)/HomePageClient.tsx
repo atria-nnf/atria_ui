@@ -11,38 +11,43 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import VideoModal from '@/components/VideoModal'
 import { getImageUrl } from '@/lib/utils/image'
-import type { Service, Doctor, Testimonial } from '@/types'
+import type { Service, Doctor, Testimonial, HomepageSettings } from '@/types'
 
 interface HomePageClientProps {
   services: Service[]
   doctors: Doctor[]
   testimonials: Testimonial[]
+  settings: HomepageSettings | null
 }
 
-// Static data
-const statsData = [
-  { number: '5000+', label: 'Zadovoljnih pacijenata godišnje', delay: 0.1 },
-  { number: '10+', label: 'Godina stručnog iskustva', delay: 0.2 },
-  { number: '7', label: 'Specijaliziranih liječnika', delay: 0.3 },
-  { number: '4.9', label: 'Prosječna ocjena', delay: 0.4 },
+// Default static data (fallbacks when settings not configured)
+const defaultStatsData = [
+  { number: '5000+', label: { 'hr-HR': 'Zadovoljnih pacijenata godišnje', 'en-US': 'Satisfied patients yearly', 'de-DE': 'Zufriedene Patienten jährlich' } },
+  { number: '10+', label: { 'hr-HR': 'Godina stručnog iskustva', 'en-US': 'Years of expertise', 'de-DE': 'Jahre Erfahrung' } },
+  { number: '7', label: { 'hr-HR': 'Specijaliziranih liječnika', 'en-US': 'Specialized doctors', 'de-DE': 'Spezialisierte Ärzte' } },
+  { number: '4.9', label: { 'hr-HR': 'Prosječna ocjena', 'en-US': 'Average rating', 'de-DE': 'Durchschnittliche Bewertung' } },
 ]
 
-const processSteps = [
-  { step: '01', title: 'Rezerviraj online', desc: 'Odaberi uslugu i termin koji ti odgovara. Potvrda odmah.' },
-  { step: '02', title: 'Upoznaj doktora', desc: 'Pogledaj video predstavljanje prije posjete. Bez iznenađenja.' },
-  { step: '03', title: 'Dođi na pregled', desc: 'Ugodna atmosfera, moderno okruženje. Osjeti razliku.' },
-  { step: '04', title: 'Nastavi praćenje', desc: 'Rezultati u 24h. Online pristup. Kontinuirana podrška.' },
+const defaultProcessSteps = [
+  { step: '01', title: { 'hr-HR': 'Rezerviraj online', 'en-US': 'Book online', 'de-DE': 'Online buchen' }, description: { 'hr-HR': 'Odaberi uslugu i termin koji ti odgovara. Potvrda odmah.', 'en-US': 'Choose a service and time that suits you. Instant confirmation.', 'de-DE': 'Wählen Sie einen Service und eine Zeit. Sofortige Bestätigung.' } },
+  { step: '02', title: { 'hr-HR': 'Upoznaj doktora', 'en-US': 'Meet the doctor', 'de-DE': 'Lernen Sie den Arzt kennen' }, description: { 'hr-HR': 'Pogledaj video predstavljanje prije posjete. Bez iznenađenja.', 'en-US': 'Watch video introductions before your visit. No surprises.', 'de-DE': 'Sehen Sie sich Videovorstellungen vor Ihrem Besuch an.' } },
+  { step: '03', title: { 'hr-HR': 'Dođi na pregled', 'en-US': 'Visit us', 'de-DE': 'Besuchen Sie uns' }, description: { 'hr-HR': 'Ugodna atmosfera, moderno okruženje. Osjeti razliku.', 'en-US': 'Pleasant atmosphere, modern environment. Feel the difference.', 'de-DE': 'Angenehme Atmosphäre, moderne Umgebung.' } },
+  { step: '04', title: { 'hr-HR': 'Nastavi praćenje', 'en-US': 'Follow up', 'de-DE': 'Nachsorge' }, description: { 'hr-HR': 'Rezultati u 24h. Online pristup. Kontinuirana podrška.', 'en-US': 'Results in 24h. Online access. Continuous support.', 'de-DE': 'Ergebnisse in 24h. Online-Zugang. Kontinuierliche Unterstützung.' } },
 ]
 
-
-const galleryImages = [
-  { image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&h=600&fit=crop', span: 'col-span-2 row-span-2' },
-  { image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=400&h=400&fit=crop', span: 'col-span-1' },
-  { image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=400&h=400&fit=crop', span: 'col-span-1' },
-  { image: 'https://images.unsplash.com/photo-1582560475093-ba66accbc424?w=400&h=400&fit=crop', span: 'col-span-1' },
-  { image: 'https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=400&h=400&fit=crop', span: 'col-span-1' },
-  { image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=800&h=400&fit=crop', span: 'col-span-2' },
+const defaultGalleryImages = [
+  { image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&h=600&fit=crop', span: 'col-span-2 row-span-2' as const },
+  { image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=400&h=400&fit=crop', span: 'col-span-1' as const },
+  { image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=400&h=400&fit=crop', span: 'col-span-1' as const },
+  { image: 'https://images.unsplash.com/photo-1582560475093-ba66accbc424?w=400&h=400&fit=crop', span: 'col-span-1' as const },
+  { image: 'https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=400&h=400&fit=crop', span: 'col-span-1' as const },
+  { image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=800&h=400&fit=crop', span: 'col-span-2' as const },
 ]
+
+const defaultHeroTitle = { 'hr-HR': 'Zdravlje.\nRedizajnirano.', 'en-US': 'Health.\nRedesigned.', 'de-DE': 'Gesundheit.\nNeu gestaltet.' }
+const defaultHeroSubtitle = { 'hr-HR': 'Moderna medicina koja vas razumije. Iskustvo koje pamtite.', 'en-US': 'Modern medicine that understands you. An experience you remember.', 'de-DE': 'Moderne Medizin, die Sie versteht. Ein Erlebnis, das Sie sich merken.' }
+const defaultCtaButtonText = { 'hr-HR': 'Rezerviraj termin', 'en-US': 'Book appointment', 'de-DE': 'Termin buchen' }
+const defaultHeroImage = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920&h=1080&fit=crop'
 
 const blogPosts = [
   {
@@ -87,7 +92,7 @@ function getLocalizedContent(content: unknown, locale: string = 'hr-HR'): string
   return ''
 }
 
-export default function HomePageClient({ services, doctors, testimonials }: HomePageClientProps) {
+export default function HomePageClient({ services, doctors, testimonials, settings }: HomePageClientProps) {
   const [videoModalOpen, setVideoModalOpen] = useState(false)
   const [selectedDoctorVideo, setSelectedDoctorVideo] = useState<string | null>(null)
 
@@ -96,6 +101,36 @@ export default function HomePageClient({ services, doctors, testimonials }: Home
     target: containerRef,
     offset: ['start start', 'end end'],
   })
+
+  // Use settings with fallbacks
+  const statsData = useMemo(() => {
+    const stats = settings?.stats && settings.stats.length > 0 ? settings.stats : defaultStatsData
+    return stats.map((stat, index) => ({
+      number: stat.number,
+      label: getLocalizedContent(stat.label),
+      delay: 0.1 + index * 0.1,
+    }))
+  }, [settings?.stats])
+
+  const processSteps = useMemo(() => {
+    const steps = settings?.processSteps && settings.processSteps.length > 0 ? settings.processSteps : defaultProcessSteps
+    return steps.map((step) => ({
+      step: step.step,
+      title: getLocalizedContent(step.title),
+      desc: getLocalizedContent(step.description),
+    }))
+  }, [settings?.processSteps])
+
+  const galleryImages = useMemo(() => {
+    return settings?.galleryImages && settings.galleryImages.length > 0
+      ? settings.galleryImages.map(img => ({ image: getImageUrl(img.image) || img.image, span: img.span }))
+      : defaultGalleryImages
+  }, [settings?.galleryImages])
+
+  const heroTitle = getLocalizedContent(settings?.heroTitle) || getLocalizedContent(defaultHeroTitle)
+  const heroSubtitle = getLocalizedContent(settings?.heroSubtitle) || getLocalizedContent(defaultHeroSubtitle)
+  const heroImage = settings?.heroBackgroundImage ? getImageUrl(settings.heroBackgroundImage) || settings.heroBackgroundImage : defaultHeroImage
+  const ctaButtonText = getLocalizedContent(settings?.ctaButtonText) || getLocalizedContent(defaultCtaButtonText)
 
   // Transform services data for display
   const servicesData = useMemo(() => {
@@ -146,9 +181,6 @@ export default function HomePageClient({ services, doctors, testimonials }: Home
   const opacity1 = useTransform(scrollYProgress, [0, 0.2], [1, 0])
   const scale1 = useTransform(scrollYProgress, [0, 0.2], [1, 0.8])
 
-  const heroTitle = 'Zdravlje.\nRedizajnirano.'
-  const heroSubtitle = 'Moderna medicina koja vas razumije. Iskustvo koje pamtite.'
-
   return (
     <div
       ref={containerRef}
@@ -167,7 +199,7 @@ export default function HomePageClient({ services, doctors, testimonials }: Home
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_rgba(0,0,0,0.4)_100%)]"></div>
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-30"></div>
           </div>
-          <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920&h=1080&fit=crop" alt="Clinic" className="w-full h-full object-cover" />
+          <img src={heroImage} alt="Clinic" className="w-full h-full object-cover" />
         </motion.div>
 
         <div className="relative z-20 text-center px-4 sm:px-6 max-w-5xl mx-auto">
@@ -198,7 +230,7 @@ export default function HomePageClient({ services, doctors, testimonials }: Home
               href="/kontakt"
               className="inline-block px-8 sm:px-10 py-3 sm:py-4 bg-orangeCTA text-white rounded-full font-medium hover:bg-gray-100 hover:text-black transition-all text-sm sm:text-base"
             >
-              Rezerviraj termin
+              {ctaButtonText}
             </Link>
           </motion.div>
         </div>

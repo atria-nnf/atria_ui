@@ -9,6 +9,7 @@ import {
   MapPin,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import type { ContactInfo } from '@/types'
 
 interface Amenity {
   icon: LucideIcon
@@ -30,7 +31,7 @@ const amenities: Amenity[] = [
   },
   {
     icon: Phone,
-    text: 'Telefonsko naručivanje',
+    text: 'Telefonsko narucivanje',
   },
 ]
 
@@ -40,7 +41,15 @@ const workingHours = [
   { day: 'Nedjelja', hours: 'Zatvoreno' },
 ]
 
-export function LocationSection() {
+interface LocationSectionProps {
+  contactInfo?: ContactInfo
+}
+
+export function LocationSection({ contactInfo }: LocationSectionProps) {
+  const address = contactInfo?.address || 'Trg kralja Tomislava 1'
+  const postalCode = contactInfo?.postalCode || '10370'
+  const city = contactInfo?.city || 'Dugo Selo'
+  const clinicName = contactInfo?.clinicName || 'Poliklinika Atria'
   return (
     <section className="py-24 md:py-32 bg-white">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-12">
@@ -56,12 +65,12 @@ export function LocationSection() {
             </span>
 
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight font-serif">
-              Posjetite nas u Dugom Selu
+              Posjetite nas u {city}
             </h2>
 
             <p className="text-lg text-gray-700 leading-relaxed mb-8">
-              Poliklinika Atria smještena je u centru Dugog Sela, s odličnom
-              prometnom povezanošću i besplatnim parkiralištem za naše
+              {clinicName} smjestena je u centru grada {city}, s odlicnom
+              prometnom povezanoscu i besplatnim parkingom za nase
               pacijente.
             </p>
 
@@ -70,9 +79,9 @@ export function LocationSection() {
               <MapPin className="w-6 h-6 text-brand-color flex-shrink-0 mt-1" />
               <div>
                 <p className="font-bold text-gray-900">
-                  Trg kralja Tomislava 1
+                  {address}
                 </p>
-                <p className="text-gray-600">10370 Dugo Selo, Hrvatska</p>
+                <p className="text-gray-600">{postalCode} {city}, Hrvatska</p>
               </div>
             </div>
 
@@ -128,14 +137,14 @@ export function LocationSection() {
             className="relative rounded-2xl overflow-hidden shadow-2xl h-[600px]"
           >
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2780.123456789!2d16.2167!3d45.8!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDXCsDQ4JzAwLjAiTiAxNsKwMTMnMDAuMCJF!5e0!3m2!1shr!2shr!4v1234567890"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d44493.5711845768!2d16.119063106998336!3d45.814298470552195!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47667aba94930067%3A0x11e28535ece6bde!2sPoliklinika%20Atria!5e0!3m2!1shr!2shr!4v1780995760985!5m2!1shr!2shr"
               width="100%"
               height="100%"
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Poliklinika Atria Location"
+              title={`${clinicName} Location`}
             ></iframe>
           </motion.div>
         </div>

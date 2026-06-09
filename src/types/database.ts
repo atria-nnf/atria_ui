@@ -31,6 +31,8 @@ export type Database = {
           icon: string | null
           pricing: Json | null
           duration: string | null
+          partner_logos: Json | null
+          steps: Json | null
           is_featured: boolean
           order_index: number
           seo: Json | null
@@ -48,6 +50,8 @@ export type Database = {
           icon?: string | null
           pricing?: Json | null
           duration?: string | null
+          partner_logos?: Json | null
+          steps?: Json | null
           is_featured?: boolean
           order_index?: number
           seo?: Json | null
@@ -65,6 +69,8 @@ export type Database = {
           icon?: string | null
           pricing?: Json | null
           duration?: string | null
+          partner_logos?: Json | null
+          steps?: Json | null
           is_featured?: boolean
           order_index?: number
           seo?: Json | null
@@ -136,6 +142,7 @@ export type Database = {
           category: string | null
           tags: Json | null
           author_id: string | null
+          service_id: string | null
           views: number
           is_featured: boolean
           is_published: boolean
@@ -153,6 +160,7 @@ export type Database = {
           category?: string | null
           tags?: Json | null
           author_id?: string | null
+          service_id?: string | null
           views?: number
           is_featured?: boolean
           is_published?: boolean
@@ -170,6 +178,7 @@ export type Database = {
           category?: string | null
           tags?: Json | null
           author_id?: string | null
+          service_id?: string | null
           views?: number
           is_featured?: boolean
           is_published?: boolean

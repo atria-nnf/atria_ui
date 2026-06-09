@@ -1,24 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Input } from '@/components/admin/ui/Input'
+import { Select } from '@/components/admin/ui/Select'
 import { Button } from '@/components/admin/ui/Button'
 import { Switch } from '@/components/admin/ui/Switch'
 import { LocalizedInput } from '@/components/admin/ui/LocalizedInput'
 import { createPost, updatePost } from '@/lib/api/admin/posts'
-import type { Post } from '@/types'
+import { createClient } from '@/lib/supabase/client'
+import type { Post, Service } from '@/types'
 import { ArrowLeft, Save, Plus, X } from 'lucide-react'
 import Link from 'next/link'
+import { getLocalizedContent } from '@/lib/utils/locale'
 
 const postSchema = z.object({
   slug: z.string().min(1, 'Slug je obavezan').regex(/^[a-z0-9-]+$/, 'Slug može sadržavati samo mala slova, brojeve i crtice'),
   category: z.string().optional(),
   featured_image: z.string().optional(),
   author_id: z.string().optional().nullable(),
+  service_id: z.string().optional().nullable(),
   is_featured: z.boolean(),
   is_published: z.boolean(),
 })
@@ -45,6 +49,22 @@ export function PostForm({ post, isEditing }: PostFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [services, setServices] = useState<Service[]>([])
+
+  // Fetch services for the dropdown
+  useEffect(() => {
+    async function fetchServices() {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('services')
+        .select('*')
+        .order('name->hr-HR', { ascending: true })
+      if (data) {
+        setServices(data as Service[])
+      }
+    }
+    fetchServices()
+  }, [])
 
   // Localized fields state
   const [title, setTitle] = useState<Record<string, string>>(
@@ -76,6 +96,7 @@ export function PostForm({ post, isEditing }: PostFormProps) {
       category: post?.category || '',
       featured_image: post?.featured_image || '',
       author_id: post?.author_id || null,
+      service_id: post?.service_id || null,
       is_featured: post?.is_featured || false,
       is_published: post?.is_published || false,
     },
@@ -278,6 +299,17 @@ export function PostForm({ post, isEditing }: PostFormProps) {
               placeholder="Npr. Zdravlje"
               {...register('category')}
               error={errors.category?.message}
+            />
+
+            <Select
+              label="Povezana usluga"
+              placeholder="Odaberi uslugu (opcionalno)"
+              options={services.map((s) => ({
+                value: s.id,
+                label: getLocalizedContent(s.name, 'hr-HR'),
+              }))}
+              {...register('service_id')}
+              hint="Post će se prikazati na stranici odabrane usluge"
             />
           </div>
 

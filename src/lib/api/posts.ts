@@ -103,6 +103,30 @@ export async function getPostsByCategory(
 }
 
 /**
+ * Get posts by service ID
+ */
+export async function getPostsByService(
+  serviceId: string,
+  locale?: Locale
+): Promise<Post[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('service_id', serviceId)
+    .eq('is_published', true)
+    .order('published_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching posts by service:', error)
+    return []
+  }
+
+  return (data as Post[]) || []
+}
+
+/**
  * Get all post slugs (for static generation)
  */
 export async function getAllPostSlugs(): Promise<string[]> {

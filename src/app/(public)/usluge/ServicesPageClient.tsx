@@ -25,10 +25,11 @@ import {
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
 import { getImageUrl } from '@/lib/utils/image'
-import type { Service } from '@/types'
+import type { Service, ServicesPageSettings } from '@/types'
 
 interface ServicesPageClientProps {
   initialServices: Service[]
+  settings: ServicesPageSettings | null
 }
 
 // Category display names
@@ -82,7 +83,19 @@ const SERVICE_ICONS: Record<string, React.ComponentType<{ className?: string }>>
   laboratorij: TestTube,
 }
 
-export function ServicesPageClient({ initialServices }: ServicesPageClientProps) {
+// Default icon mapping for "why choose us" items
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Users,
+  Microscope,
+  User,
+  Zap,
+  Building2,
+  DollarSign,
+  Heart,
+  Stethoscope,
+}
+
+export function ServicesPageClient({ initialServices, settings }: ServicesPageClientProps) {
   const { locale } = useLocale()
   const [selectedCategory, setSelectedCategory] = useState('all')
 
@@ -111,7 +124,7 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
 
   // Get color gradient for category (all blue/purple now)
   const getColorForCategory = () => {
-    return 'from-blue-600 to-indigo-600'
+    return 'from-slate-900 to-blue-950'
   }
 
   // Parse pricing from JSON
@@ -139,89 +152,65 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
     }
   }
 
-  // Stats data
-  const stats = [
-    {
-      number: '8+',
-      label: locale === 'hr-HR' ? 'Specijaliziranih usluga' : locale === 'en-US' ? 'Specialized Services' : 'Spezialisierte Dienste'
-    },
-    {
-      number: '5000+',
-      label: locale === 'hr-HR' ? 'Zadovoljnih pacijenata' : locale === 'en-US' ? 'Satisfied Patients' : 'Zufriedene Patienten'
-    },
-    {
-      number: '10+',
-      label: locale === 'hr-HR' ? 'Godina iskustva' : locale === 'en-US' ? 'Years of Experience' : 'Jahre Erfahrung'
-    },
-    {
-      number: '24/7',
-      label: locale === 'hr-HR' ? 'Online rezervacija' : locale === 'en-US' ? 'Online Booking' : 'Online-Buchung'
-    },
+  // Default stats data
+  const defaultStats = [
+    { number: '8+', label: { 'hr-HR': 'Specijaliziranih usluga', 'en-US': 'Specialized Services', 'de-DE': 'Spezialisierte Dienste' } },
+    { number: '5000+', label: { 'hr-HR': 'Zadovoljnih pacijenata', 'en-US': 'Satisfied Patients', 'de-DE': 'Zufriedene Patienten' } },
+    { number: '10+', label: { 'hr-HR': 'Godina iskustva', 'en-US': 'Years of Experience', 'de-DE': 'Jahre Erfahrung' } },
+    { number: '24/7', label: { 'hr-HR': 'Online rezervacija', 'en-US': 'Online Booking', 'de-DE': 'Online-Buchung' } },
   ]
 
-  // Why choose us items
-  const whyChooseUsItems = [
-    {
-      title: locale === 'hr-HR' ? 'Stručni tim' : locale === 'en-US' ? 'Expert Team' : 'Expertenteam',
-      description: locale === 'hr-HR'
-        ? 'Iskusni liječnici s godinama specijalizacije i kontinuiranom edukacijom.'
-        : locale === 'en-US'
-        ? 'Experienced doctors with years of specialization and continuous education.'
-        : 'Erfahrene Ärzte mit jahrelanger Spezialisierung und kontinuierlicher Weiterbildung.',
-      icon: Users,
-      color: 'from-blue-500 to-cyan-500',
-    },
-    {
-      title: locale === 'hr-HR' ? 'Moderna oprema' : locale === 'en-US' ? 'Modern Equipment' : 'Moderne Ausstattung',
-      description: locale === 'hr-HR'
-        ? 'Najsuvremenija medicinska tehnologija za preciznu dijagnostiku.'
-        : locale === 'en-US'
-        ? 'State-of-the-art medical technology for precise diagnostics.'
-        : 'Modernste Medizintechnik für präzise Diagnostik.',
-      icon: Microscope,
-      color: 'from-blue-500 to-indigo-500',
-    },
-    {
-      title: locale === 'hr-HR' ? 'Personalizirani pristup' : locale === 'en-US' ? 'Personalized Approach' : 'Personalisierter Ansatz',
-      description: locale === 'hr-HR'
-        ? 'Svaki pacijent je jedinstven - tretiramo vas kao osobu, ne broj.'
-        : locale === 'en-US'
-        ? 'Every patient is unique - we treat you as a person, not a number.'
-        : 'Jeder Patient ist einzigartig - wir behandeln Sie als Person, nicht als Nummer.',
-      icon: User,
-      color: 'from-blue-600 to-indigo-600',
-    },
-    {
-      title: locale === 'hr-HR' ? 'Brzi termini' : locale === 'en-US' ? 'Quick Appointments' : 'Schnelle Termine',
-      description: locale === 'hr-HR'
-        ? 'Online rezervacija 24/7 i kraći vremenski razmaci do pregleda.'
-        : locale === 'en-US'
-        ? 'Online booking 24/7 and shorter waiting times for appointments.'
-        : 'Online-Buchung rund um die Uhr und kürzere Wartezeiten.',
-      icon: Zap,
-      color: 'from-yellow-500 to-orange-500',
-    },
-    {
-      title: locale === 'hr-HR' ? 'Sveobuhvatna skrb' : locale === 'en-US' ? 'Comprehensive Care' : 'Umfassende Versorgung',
-      description: locale === 'hr-HR'
-        ? 'Sve usluge na jednom mjestu - od prevencije do liječenja.'
-        : locale === 'en-US'
-        ? 'All services in one place - from prevention to treatment.'
-        : 'Alle Leistungen an einem Ort - von der Prävention bis zur Behandlung.',
-      icon: Building2,
-      color: 'from-green-500 to-emerald-500',
-    },
-    {
-      title: locale === 'hr-HR' ? 'Transparentne cijene' : locale === 'en-US' ? 'Transparent Prices' : 'Transparente Preise',
-      description: locale === 'hr-HR'
-        ? 'Jasne cijene bez skrivenih troškova. Znate što plaćate.'
-        : locale === 'en-US'
-        ? 'Clear prices with no hidden costs. You know what you pay.'
-        : 'Klare Preise ohne versteckte Kosten. Sie wissen, was Sie bezahlen.',
-      icon: DollarSign,
-      color: 'from-indigo-500 to-purple-500',
-    },
+  // Use settings stats or defaults
+  const stats = useMemo(() => {
+    const statsData = settings?.stats && settings.stats.length > 0 ? settings.stats : defaultStats
+    return statsData.map((stat) => ({
+      number: stat.number,
+      label: getLocalizedContent(stat.label, locale),
+    }))
+  }, [settings?.stats, locale])
+
+  // Default why choose us items
+  const defaultWhyChooseUs = [
+    { title: { 'hr-HR': 'Strucni tim', 'en-US': 'Expert Team', 'de-DE': 'Expertenteam' }, description: { 'hr-HR': 'Iskusni lijecnici s godinama specijalizacije i kontinuiranom edukacijom.', 'en-US': 'Experienced doctors with years of specialization and continuous education.', 'de-DE': 'Erfahrene Ärzte mit jahrelanger Spezialisierung und kontinuierlicher Weiterbildung.' }, icon: 'Users' },
+    { title: { 'hr-HR': 'Moderna oprema', 'en-US': 'Modern Equipment', 'de-DE': 'Moderne Ausstattung' }, description: { 'hr-HR': 'Najsuvremenija medicinska tehnologija za preciznu dijagnostiku.', 'en-US': 'State-of-the-art medical technology for precise diagnostics.', 'de-DE': 'Modernste Medizintechnik für präzise Diagnostik.' }, icon: 'Microscope' },
+    { title: { 'hr-HR': 'Personalizirani pristup', 'en-US': 'Personalized Approach', 'de-DE': 'Personalisierter Ansatz' }, description: { 'hr-HR': 'Svaki pacijent je jedinstven - tretiramo vas kao osobu, ne broj.', 'en-US': 'Every patient is unique - we treat you as a person, not a number.', 'de-DE': 'Jeder Patient ist einzigartig - wir behandeln Sie als Person, nicht als Nummer.' }, icon: 'User' },
+    { title: { 'hr-HR': 'Brzi termini', 'en-US': 'Quick Appointments', 'de-DE': 'Schnelle Termine' }, description: { 'hr-HR': 'Online rezervacija 24/7 i kraci vremenski razmaci do pregleda.', 'en-US': 'Online booking 24/7 and shorter waiting times for appointments.', 'de-DE': 'Online-Buchung rund um die Uhr und kürzere Wartezeiten.' }, icon: 'Zap' },
+    { title: { 'hr-HR': 'Sveobuhvatna skrb', 'en-US': 'Comprehensive Care', 'de-DE': 'Umfassende Versorgung' }, description: { 'hr-HR': 'Sve usluge na jednom mjestu - od prevencije do lijecenja.', 'en-US': 'All services in one place - from prevention to treatment.', 'de-DE': 'Alle Leistungen an einem Ort - von der Prävention bis zur Behandlung.' }, icon: 'Building2' },
+    { title: { 'hr-HR': 'Transparentne cijene', 'en-US': 'Transparent Prices', 'de-DE': 'Transparente Preise' }, description: { 'hr-HR': 'Jasne cijene bez skrivenih troskova. Znate sto placate.', 'en-US': 'Clear prices with no hidden costs. You know what you pay.', 'de-DE': 'Klare Preise ohne versteckte Kosten. Sie wissen, was Sie bezahlen.' }, icon: 'DollarSign' },
   ]
+
+  // Color mapping for why choose us items
+  const ITEM_COLORS = [
+    'from-blue-500 to-cyan-500',
+    'from-blue-500 to-indigo-500',
+    'from-blue-600 to-indigo-600',
+    'from-yellow-500 to-orange-500',
+    'from-green-500 to-emerald-500',
+    'from-indigo-500 to-purple-500',
+  ]
+
+  // Use settings whyChooseUs or defaults
+  const whyChooseUsItems = useMemo(() => {
+    const items = settings?.whyChooseUs && settings.whyChooseUs.length > 0 ? settings.whyChooseUs : defaultWhyChooseUs
+    return items.map((item, index) => ({
+      title: getLocalizedContent(item.title, locale),
+      description: getLocalizedContent(item.description, locale),
+      icon: ICON_MAP[item.icon] || Stethoscope,
+      color: ITEM_COLORS[index % ITEM_COLORS.length],
+    }))
+  }, [settings?.whyChooseUs, locale])
+
+  // Hero text with fallbacks
+  const defaultHeroTitle = { 'hr-HR': 'Sveobuhvatna\nbriga o zdravlju', 'en-US': 'Comprehensive\nHealthcare', 'de-DE': 'Umfassende\nGesundheitsversorgung' }
+  const defaultHeroSubtitle = { 'hr-HR': 'Od preventivnih pregleda do specijaliziranih tretmana - sve sto vam treba za zdravlje na jednom mjestu.', 'en-US': 'From preventive examinations to specialized treatments - everything you need for your health in one place.', 'de-DE': 'Von Vorsorgeuntersuchungen bis zu spezialisierten Behandlungen - alles, was Sie für Ihre Gesundheit brauchen, an einem Ort.' }
+  const heroTitle = getLocalizedContent(settings?.heroTitle, locale) || getLocalizedContent(defaultHeroTitle, locale)
+  const heroSubtitle = getLocalizedContent(settings?.heroSubtitle, locale) || getLocalizedContent(defaultHeroSubtitle, locale)
+
+  // CTA text with fallbacks
+  const defaultCtaTitle = { 'hr-HR': 'Spremni za prvi korak?', 'en-US': 'Ready for the first step?', 'de-DE': 'Bereit für den ersten Schritt?' }
+  const defaultCtaSubtitle = { 'hr-HR': 'Zakazite svoj pregled danas i zapocnite put prema boljem zdravlju', 'en-US': 'Schedule your examination today and start your journey to better health', 'de-DE': 'Vereinbaren Sie noch heute Ihre Untersuchung und beginnen Sie Ihren Weg zu besserer Gesundheit' }
+  const ctaTitle = getLocalizedContent(settings?.ctaTitle, locale) || getLocalizedContent(defaultCtaTitle, locale)
+  const ctaSubtitle = getLocalizedContent(settings?.ctaSubtitle, locale) || getLocalizedContent(defaultCtaSubtitle, locale)
 
   return (
     <div className="bg-white text-black font-sans">
@@ -247,27 +236,11 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
             <div className="text-sm tracking-widest text-white/80 mb-6">
               {locale === 'hr-HR' ? 'NAŠE USLUGE' : locale === 'en-US' ? 'OUR SERVICES' : 'UNSERE LEISTUNGEN'}
             </div>
-            <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight font-serif">
-              {locale === 'hr-HR' ? (
-                <>
-                  Sveobuhvatna<br />briga o zdravlju
-                </>
-              ) : locale === 'en-US' ? (
-                <>
-                  Comprehensive<br />Healthcare
-                </>
-              ) : (
-                <>
-                  Umfassende<br />Gesundheitsversorgung
-                </>
-              )}
+            <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight font-serif whitespace-pre-line">
+              {heroTitle}
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">
-              {locale === 'hr-HR'
-                ? 'Od preventivnih pregleda do specijaliziranih tretmana - sve što vam treba za zdravlje na jednom mjestu.'
-                : locale === 'en-US'
-                ? 'From preventive examinations to specialized treatments - everything you need for your health in one place.'
-                : 'Von Vorsorgeuntersuchungen bis zu spezialisierten Behandlungen - alles, was Sie für Ihre Gesundheit brauchen, an einem Ort.'}
+              {heroSubtitle}
             </p>
           </motion.div>
         </div>
@@ -522,18 +495,10 @@ export function ServicesPageClient({ initialServices }: ServicesPageClientProps)
           className="max-w-4xl mx-auto px-8 text-center relative z-10"
         >
           <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight font-serif">
-            {locale === 'hr-HR'
-              ? 'Spremni za prvi korak?'
-              : locale === 'en-US'
-              ? 'Ready for the first step?'
-              : 'Bereit für den ersten Schritt?'}
+            {ctaTitle}
           </h2>
           <p className="text-2xl mb-10 text-white/90">
-            {locale === 'hr-HR'
-              ? 'Zakažite svoj pregled danas i započnite put prema boljem zdravlju'
-              : locale === 'en-US'
-              ? 'Schedule your examination today and start your journey to better health'
-              : 'Vereinbaren Sie noch heute Ihre Untersuchung und beginnen Sie Ihren Weg zu besserer Gesundheit'}
+            {ctaSubtitle}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

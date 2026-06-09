@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { getServices } from '@/lib/api'
+import { getServices, getServicesPageSettings } from '@/lib/api'
 import { ServicesPageClient } from './ServicesPageClient'
 
 export const metadata: Metadata = {
@@ -9,7 +9,10 @@ export const metadata: Metadata = {
 }
 
 export default async function ServicesPage() {
-  const services = await getServices()
+  const [services, settings] = await Promise.all([
+    getServices(),
+    getServicesPageSettings(),
+  ])
 
-  return <ServicesPageClient initialServices={services} />
+  return <ServicesPageClient initialServices={services} settings={settings} />
 }

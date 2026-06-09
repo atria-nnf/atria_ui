@@ -14,6 +14,7 @@ export {
   getDoctorBySlug,
   getFeaturedDoctors,
   getDoctorsBySpecialty,
+  getDoctorsByService,
   getAllDoctorSlugs,
   getDoctorsWithServices,
 } from './doctors'
@@ -25,6 +26,7 @@ export {
   getRecentPosts,
   getFeaturedPosts,
   getPostsByCategory,
+  getPostsByService,
   getAllPostSlugs,
   getPostCategories,
   incrementPostViews,
@@ -69,6 +71,7 @@ export {
 export {
   getSetting,
   getHomepageSettings,
+  getServicesPageSettings,
   getContactInfo,
   getAboutUsPage,
   getPrivacyPolicy,

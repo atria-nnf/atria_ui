@@ -2,12 +2,14 @@ import HomePageClient from './HomePageClient'
 import { getServices, getFeaturedServices } from '@/lib/api/services'
 import { getDoctors } from '@/lib/api/doctors'
 import { getTestimonials } from '@/lib/api/testimonials'
+import { getHomepageSettings } from '@/lib/api/settings'
 
 export default async function HomePage() {
-  const [services, doctors, testimonials] = await Promise.all([
+  const [services, doctors, testimonials, settings] = await Promise.all([
     getFeaturedServices(),
     getDoctors(),
     getTestimonials(),
+    getHomepageSettings(),
   ])
 
   // If no featured services, get all services
@@ -18,6 +20,7 @@ export default async function HomePage() {
       services={displayServices}
       doctors={doctors}
       testimonials={testimonials}
+      settings={settings}
     />
   )
 }

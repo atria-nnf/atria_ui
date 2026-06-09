@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import type {
   Setting,
   HomepageSettings,
+  ServicesPageSettings,
   ContactInfo,
   AboutUsSettings,
   LegalPageSettings,
@@ -33,6 +34,13 @@ export async function getSetting<T = object>(key: SettingKey): Promise<T | null>
  */
 export async function getHomepageSettings(): Promise<HomepageSettings | null> {
   return getSetting<HomepageSettings>('homepage')
+}
+
+/**
+ * Get services page settings
+ */
+export async function getServicesPageSettings(): Promise<ServicesPageSettings | null> {
+  return getSetting<ServicesPageSettings>('services_page')
 }
 
 /**

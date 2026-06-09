@@ -4,8 +4,16 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { BsArrowRight } from 'react-icons/bs'
+import type { ContactInfo } from '@/types'
 
-export function CTASection() {
+interface CTASectionProps {
+  contactInfo?: ContactInfo
+}
+
+export function CTASection({ contactInfo }: CTASectionProps) {
+  const email = contactInfo?.email || 'info@atria.hr'
+  const phone = contactInfo?.phone || '+385 1 123 4567'
+  const phoneHref = `tel:${phone.replace(/\s/g, '')}`
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       {/* Background Image */}
@@ -74,17 +82,17 @@ export function CTASection() {
           <p className="text-white/70 mb-4">Ili nas kontaktirajte direktno</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center text-white">
             <a
-              href="mailto:info@atria.hr"
+              href={`mailto:${email}`}
               className="hover:text-white/80 transition-colors"
             >
-              info@atria.hr
+              {email}
             </a>
             <span className="hidden sm:inline text-white/40">|</span>
             <a
-              href="tel:+38511234567"
+              href={phoneHref}
               className="hover:text-white/80 transition-colors"
             >
-              +385 1 123 4567
+              {phone}
             </a>
           </div>
         </motion.div>

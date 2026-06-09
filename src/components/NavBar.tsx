@@ -4,12 +4,20 @@ import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ChevronDown, Phone, ArrowRight } from 'lucide-react'
+import { Menu, X, ChevronDown, Phone, ArrowRight, Globe } from 'lucide-react'
 import { NAV_ITEMS, ROUTES } from '@/config/routes'
-import type { Service } from '@/types'
+import { useLocale } from '@/config/locale-context'
+import type { Service, Locale, ContactInfo } from '@/types'
+
+const LANGUAGE_OPTIONS: { code: Locale; label: string; short: string }[] = [
+  { code: 'hr-HR', label: 'Hrvatski', short: 'HR' },
+  { code: 'en-US', label: 'English', short: 'EN' },
+  { code: 'de-DE', label: 'Deutsch', short: 'DE' },
+]
 
 interface NavBarProps {
   services?: Service[]
+  contactInfo?: ContactInfo
 }
 
 interface DropdownItem {
@@ -24,11 +32,30 @@ interface NavItem {
   dynamicDropdown?: 'services'
 }
 
-export function NavBar({ services = [] }: NavBarProps) {
+export function NavBar({ services = [], contactInfo }: NavBarProps) {
+  // Format phone number for display (add spaces)
+  const formatPhoneDisplay = (phone: string) => {
+    // Remove all non-digits
+    const digits = phone.replace(/\D/g, '')
+    // Format as XX XXX XXXX for Croatian numbers
+    if (digits.startsWith('385')) {
+      const local = digits.slice(3)
+      return `0${local.slice(0, 1)} ${local.slice(1, 4)} ${local.slice(4)}`
+    }
+    return phone
+  }
+
+  const phoneNumber = contactInfo?.phone || '+385 1 234 5678'
+  const phoneHref = `tel:${phoneNumber.replace(/\s/g, '')}`
+  const phoneDisplay = formatPhoneDisplay(phoneNumber)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [mobileDropdown, setMobileDropdown] = useState<string | null>(null)
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false)
+  const { locale, setLocale } = useLocale()
+
+  const currentLang = LANGUAGE_OPTIONS.find((l) => l.code === locale) || LANGUAGE_OPTIONS[0]
 
   // Build navigation items with dynamic dropdowns
   const navItems = useMemo(() => {
@@ -152,15 +179,62 @@ export function NavBar({ services = [] }: NavBarProps) {
                 ))}
               </div>
 
-              {/* Right Side - Phone & CTA */}
+              {/* Right Side - Language, Phone & CTA */}
               <div className="hidden lg:flex items-center gap-3">
+                {/* Language Switcher */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setLangDropdownOpen(true)}
+                  onMouseLeave={() => setLangDropdownOpen(false)}
+                >
+                  <button
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 text-gray-600 hover:text-orangeCTA hover:bg-orange-50"
+                  >
+                    <Globe className="w-4 h-4" />
+                    <span className="text-xs font-semibold">{currentLang.short}</span>
+                    <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${langDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {langDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        className="absolute top-full right-0 mt-2 w-40 bg-white/90 backdrop-blur-xl rounded-xl shadow-2xl shadow-black/10 border border-gray-100 overflow-hidden"
+                      >
+                        <div className="p-1.5">
+                          {LANGUAGE_OPTIONS.map((lang) => (
+                            <button
+                              key={lang.code}
+                              onClick={() => {
+                                setLocale(lang.code)
+                                setLangDropdownOpen(false)
+                              }}
+                              className={`flex items-center justify-between w-full px-3 py-2.5 text-sm rounded-lg transition-all duration-200 ${
+                                locale === lang.code
+                                  ? 'bg-orange-50 text-orangeCTA font-medium'
+                                  : 'text-gray-700 hover:bg-gray-50'
+                              }`}
+                            >
+                              <span>{lang.label}</span>
+                              <span className="text-xs text-gray-400 font-medium">{lang.short}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
                 {/* Phone Number */}
                 <a
-                  href="tel:+38512345678"
+                  href={phoneHref}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 text-gray-600 hover:text-orangeCTA hover:bg-orange-50"
                 >
                   <Phone className="w-4 h-4" />
-                  <span>01 234 5678</span>
+                  <span>{phoneDisplay}</span>
                 </a>
 
                 {/* Divider */}
@@ -282,19 +356,38 @@ export function NavBar({ services = [] }: NavBarProps) {
                   ))}
                 </div>
 
+                {/* Language Switcher - Mobile */}
+                <div className="p-2">
+                  <div className="flex gap-1 bg-gray-50 p-1 rounded-xl">
+                    {LANGUAGE_OPTIONS.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => setLocale(lang.code)}
+                        className={`flex-1 flex items-center justify-center py-2.5 rounded-lg text-sm font-medium transition-all ${
+                          locale === lang.code
+                            ? 'bg-white text-orangeCTA shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        {lang.short}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Divider */}
                 <div className="mx-3 border-t border-gray-100" />
 
                 {/* Phone & CTA Row */}
                 <div className="p-2 flex gap-2">
                   <a
-                    href="tel:+38512345678"
+                    href={phoneHref}
                     className="flex items-center gap-2 flex-1 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-all"
                   >
                     <div className="p-1.5 bg-orangeCTA rounded-lg">
                       <Phone className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <span className="font-semibold text-gray-900 text-sm">01 234 5678</span>
+                    <span className="font-semibold text-gray-900 text-sm">{phoneDisplay}</span>
                   </a>
 
                   <Link

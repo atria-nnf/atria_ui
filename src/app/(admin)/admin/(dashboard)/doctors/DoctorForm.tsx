@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -9,9 +9,12 @@ import { Input } from '@/components/admin/ui/Input'
 import { Button } from '@/components/admin/ui/Button'
 import { Switch } from '@/components/admin/ui/Switch'
 import { LocalizedInput } from '@/components/admin/ui/LocalizedInput'
-import { createDoctor, updateDoctor } from '@/lib/api/admin/doctors'
-import type { Doctor } from '@/types'
-import { ArrowLeft, Save, Plus, X } from 'lucide-react'
+import { ImageUpload } from '@/components/admin/ui/ImageUpload'
+import { createDoctor, updateDoctor, getDoctorServices, updateDoctorServices } from '@/lib/api/admin/doctors'
+import { createClient } from '@/lib/supabase/client'
+import { getLocalizedContent } from '@/lib/utils/locale'
+import type { Doctor, Service } from '@/types'
+import { ArrowLeft, Save, Plus, X, Check } from 'lucide-react'
 import Link from 'next/link'
 
 const doctorSchema = z.object({
@@ -48,6 +51,42 @@ export function DoctorForm({ doctor, isEditing }: DoctorFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Services state
+  const [services, setServices] = useState<Service[]>([])
+  const [selectedServices, setSelectedServices] = useState<string[]>([])
+
+  // Profile image state
+  const [profileImage, setProfileImage] = useState(doctor?.profile_image || '')
+
+  // Fetch services and current doctor's services
+  useEffect(() => {
+    async function fetchData() {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('services')
+        .select('*')
+        .order('name->hr-HR', { ascending: true })
+      if (data) {
+        setServices(data as Service[])
+      }
+
+      // Fetch current doctor's services if editing
+      if (isEditing && doctor?.id) {
+        const doctorServices = await getDoctorServices(doctor.id)
+        setSelectedServices(doctorServices)
+      }
+    }
+    fetchData()
+  }, [isEditing, doctor?.id])
+
+  const toggleService = (serviceId: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(serviceId)
+        ? prev.filter((id) => id !== serviceId)
+        : [...prev, serviceId]
+    )
+  }
 
   // Localized fields state
   const [title, setTitle] = useState<Record<string, string>>(
@@ -120,20 +159,33 @@ export function DoctorForm({ doctor, isEditing }: DoctorFormProps) {
       bio,
       credentials,
       email: data.email || null,
+      profile_image: profileImage || null,
     }
 
     const result = isEditing && doctor
       ? await updateDoctor(doctor.id, doctorData)
       : await createDoctor(doctorData as any)
 
-    setLoading(false)
-
     if (result.error) {
+      setLoading(false)
       setError(result.error)
-    } else {
-      router.push('/admin/doctors')
-      router.refresh()
+      return
     }
+
+    // Save service relationships
+    const doctorId = result.data?.id || doctor?.id
+    if (doctorId) {
+      const servicesResult = await updateDoctorServices(doctorId, selectedServices)
+      if (servicesResult.error) {
+        setLoading(false)
+        setError(servicesResult.error)
+        return
+      }
+    }
+
+    setLoading(false)
+    router.push('/admin/doctors')
+    router.refresh()
   }
 
   return (
@@ -269,12 +321,14 @@ export function DoctorForm({ doctor, isEditing }: DoctorFormProps) {
               Mediji
             </h2>
 
-            <Input
-              label="URL profilne slike"
-              placeholder="https://..."
-              hint="URL profilne fotografije liječnika"
-              {...register('profile_image')}
-              error={errors.profile_image?.message}
+            <ImageUpload
+              label="Profilna slika"
+              value={profileImage}
+              onChange={setProfileImage}
+              bucket="images"
+              folder="doctors"
+              aspectRatio="square"
+              hint="Profilna fotografija liječnika"
             />
 
             <Input
@@ -289,6 +343,45 @@ export function DoctorForm({ doctor, isEditing }: DoctorFormProps) {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Services Card */}
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">
+              Usluge
+            </h2>
+            <p className="text-sm text-gray-500">Odaberite usluge koje ovaj liječnik pruža</p>
+
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {services.map((service) => (
+                <button
+                  key={service.id}
+                  type="button"
+                  onClick={() => toggleService(service.id)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
+                    selectedServices.includes(service.id)
+                      ? 'bg-orange-50 border-2 border-orangeCTA'
+                      : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 ${
+                      selectedServices.includes(service.id)
+                        ? 'bg-orangeCTA text-white'
+                        : 'bg-white border-2 border-gray-300'
+                    }`}
+                  >
+                    {selectedServices.includes(service.id) && <Check className="w-3 h-3" />}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">
+                    {getLocalizedContent(service.name, 'hr-HR')}
+                  </span>
+                </button>
+              ))}
+              {services.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-4">Nema dostupnih usluga</p>
+              )}
+            </div>
+          </div>
+
           {/* Status Card */}
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
             <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">

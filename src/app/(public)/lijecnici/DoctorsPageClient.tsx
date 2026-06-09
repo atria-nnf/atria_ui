@@ -266,7 +266,7 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {specialty.name} ({specialty.count})
+                {specialty.name}
               </button>
             ))}
           </div>

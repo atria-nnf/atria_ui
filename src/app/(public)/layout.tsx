@@ -1,20 +1,23 @@
 import { NavBar } from '@/components/NavBar'
 import { Footer } from '@/components/Footer'
 import { ScrollToTop } from '@/components/ScrollToTop'
-import { getServices } from '@/lib/api'
+import { getServices, getContactInfo } from '@/lib/api'
 
 export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const services = await getServices()
+  const [services, contactInfo] = await Promise.all([
+    getServices(),
+    getContactInfo(),
+  ])
 
   return (
     <>
-      <NavBar services={services} />
+      <NavBar services={services} contactInfo={contactInfo} />
       <main className="bg-white flex-1">{children}</main>
-      <Footer services={services} />
+      <Footer services={services} contactInfo={contactInfo} />
       <ScrollToTop />
     </>
   )

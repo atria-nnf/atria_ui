@@ -1,8 +1,10 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getServiceBySlug } from '@/lib/api'
-import { getDoctors } from '@/lib/api'
+import { getDoctorsByService } from '@/lib/api'
 import { getTestimonialsByService } from '@/lib/api'
+import { getPostsByService } from '@/lib/api'
+import { getFAQsByService } from '@/lib/api'
 import { getLocalizedContent } from '@/lib/utils/locale'
 import { ServiceDetailsClient } from './ServiceDetailsClient'
 
@@ -34,21 +36,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ServiceDetailsPage({ params }: Props) {
   const { slug } = await params
-  const [service, doctors, testimonials] = await Promise.all([
-    getServiceBySlug(slug),
-    getDoctors(),
-    getServiceBySlug(slug).then((s) => (s ? getTestimonialsByService(s.id) : [])),
-  ])
+  const service = await getServiceBySlug(slug)
 
   if (!service) {
     notFound()
   }
+
+  const [doctors, testimonials, relatedPosts, faqs] = await Promise.all([
+    getDoctorsByService(service.id),
+    getTestimonialsByService(service.id),
+    getPostsByService(service.id),
+    getFAQsByService(service.id),
+  ])
 
   return (
     <ServiceDetailsClient
       service={service}
       doctors={doctors}
       testimonials={testimonials}
+      relatedPosts={relatedPosts}
+      faqs={faqs}
     />
   )
 }

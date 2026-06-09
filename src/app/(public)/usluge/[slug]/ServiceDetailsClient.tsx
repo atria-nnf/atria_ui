@@ -15,16 +15,19 @@ import {
   TestTube,
   Stethoscope,
   Sparkles,
+  ArrowRight,
 } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
 import { getImageUrl } from '@/lib/utils/image'
-import type { Service, Doctor, Testimonial } from '@/types'
+import type { Service, Doctor, Testimonial, Post, FAQ } from '@/types'
 
 interface ServiceDetailsClientProps {
   service: Service
   doctors: Doctor[]
   testimonials: Testimonial[]
+  relatedPosts: Post[]
+  faqs: FAQ[]
 }
 
 // Category icons
@@ -47,6 +50,8 @@ export function ServiceDetailsClient({
   service,
   doctors,
   testimonials,
+  relatedPosts,
+  faqs,
 }: ServiceDetailsClientProps) {
   const { locale } = useLocale()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
@@ -54,7 +59,26 @@ export function ServiceDetailsClient({
   const ServiceIcon = CATEGORY_ICONS[service.category || ''] || Heart
   const categoryColor = CATEGORY_COLORS[service.category || ''] || 'from-gray-500 to-gray-600'
 
-  // Parse pricing for packages
+  // Parse pricing list items
+  type PricingItem = {
+    title: Record<string, string>
+    description: Record<string, string>
+    price: number
+  }
+
+  const getPricingList = (pricing: unknown): PricingItem[] => {
+    if (!pricing) return []
+    try {
+      const p = pricing as { items?: PricingItem[] }
+      return Array.isArray(p.items) ? p.items : []
+    } catch {
+      return []
+    }
+  }
+
+  const pricingList = getPricingList(service.pricing)
+
+  // Parse pricing for packages (legacy)
   const getPricing = (pricing: unknown) => {
     if (!pricing) return null
     try {
@@ -71,153 +95,68 @@ export function ServiceDetailsClient({
 
   const pricing = getPricing(service.pricing)
 
-  // Static content - packages
-  const packages = [
+  // Parse partner logos
+  const partnerLogos: { url: string; name?: string }[] = (() => {
+    if (!service.partner_logos) return []
+    try {
+      const logos = service.partner_logos as { url: string; name?: string }[]
+      return Array.isArray(logos) ? logos : []
+    } catch {
+      return []
+    }
+  })()
+
+  // Parse steps from service data or use defaults
+  const defaultSteps = [
     {
-      id: 'basic',
-      name: locale === 'hr-HR' ? 'Osnovni pregled' : locale === 'en-US' ? 'Basic Examination' : 'Grunduntersuchung',
-      price: pricing?.basic?.price ? `${pricing.basic.price}${pricing.basic.currency || '€'}` : '250€',
-      duration: '30 min',
-      description: locale === 'hr-HR' ? 'Rutinski pregled' : locale === 'en-US' ? 'Routine examination' : 'Routineuntersuchung',
-      features:
-        locale === 'hr-HR'
-          ? ['Pregled', 'Konzultacija', 'Preporuke za daljnje postupanje', 'Osnovni savjeti']
-          : locale === 'en-US'
-          ? ['Examination', 'Consultation', 'Recommendations for further treatment', 'Basic advice']
-          : ['Untersuchung', 'Beratung', 'Empfehlungen für weitere Behandlung', 'Grundlegende Ratschläge'],
+      title: { 'hr-HR': 'Priprema', 'en-US': 'Preparation', 'de-DE': 'Vorbereitung' },
+      description: {
+        'hr-HR': 'Nema posebne pripreme. Preporučujemo doći 10 minuta ranije kako biste ispunili potrebnu dokumentaciju.',
+        'en-US': 'No special preparation needed. We recommend arriving 10 minutes early to complete the necessary documentation.',
+        'de-DE': 'Keine besondere Vorbereitung erforderlich. Wir empfehlen, 10 Minuten früher zu kommen.',
+      },
     },
     {
-      id: 'complete',
-      name: locale === 'hr-HR' ? 'Kompletan pregled' : locale === 'en-US' ? 'Complete Examination' : 'Vollständige Untersuchung',
-      price: pricing?.standard?.price ? `${pricing.standard.price}${pricing.standard.currency || '€'}` : '450€',
-      duration: '45 min',
-      description: locale === 'hr-HR' ? 'Sveobuhvatan pregled' : locale === 'en-US' ? 'Comprehensive examination' : 'Umfassende Untersuchung',
-      features:
-        locale === 'hr-HR'
-          ? ['Sve iz osnovnog', 'Ultrazvuk', 'Laboratorijske pretrage', 'Detaljan pisani nalaz', 'Praćenje rezultata']
-          : locale === 'en-US'
-          ? ['Everything from basic', 'Ultrasound', 'Laboratory tests', 'Detailed written findings', 'Results monitoring']
-          : ['Alles vom Basis', 'Ultraschall', 'Labortests', 'Detaillierte schriftliche Befunde', 'Ergebnisüberwachung'],
-      popular: true,
+      title: { 'hr-HR': 'Razgovor', 'en-US': 'Consultation', 'de-DE': 'Gespräch' },
+      description: {
+        'hr-HR': 'Liječnik će s vama razgovarati o vašem zdravlju, medicinskoj povijesti i eventualnim simptomima.',
+        'en-US': 'The doctor will discuss your health, medical history and any symptoms with you.',
+        'de-DE': 'Der Arzt wird mit Ihnen über Ihre Gesundheit, Krankengeschichte und eventuelle Symptome sprechen.',
+      },
     },
     {
-      id: 'premium',
-      name: locale === 'hr-HR' ? 'Premium paket' : locale === 'en-US' ? 'Premium Package' : 'Premium-Paket',
-      price: pricing?.premium?.price ? `${pricing.premium.price}${pricing.premium.currency || '€'}` : '850€',
-      duration: locale === 'hr-HR' ? 'Kompletno praćenje' : locale === 'en-US' ? 'Complete follow-up' : 'Komplette Nachsorge',
-      description: locale === 'hr-HR' ? 'Kompletna skrb' : locale === 'en-US' ? 'Complete care' : 'Vollständige Betreuung',
-      features:
-        locale === 'hr-HR'
-          ? ['Svi pregledi', 'Sve laboratorijske pretrage', 'Savjetovanje', 'Priprema', '24/7 dostupnost liječnika']
-          : locale === 'en-US'
-          ? ['All examinations', 'All laboratory tests', 'Counseling', 'Preparation', '24/7 doctor availability']
-          : ['Alle Untersuchungen', 'Alle Labortests', 'Beratung', 'Vorbereitung', '24/7 Arztverfügbarkeit'],
+      title: { 'hr-HR': 'Pregled', 'en-US': 'Examination', 'de-DE': 'Untersuchung' },
+      description: {
+        'hr-HR': 'Profesionalan i brižan pregled u udobnom okruženju s najsuvremenijom opremom.',
+        'en-US': 'Professional and caring examination in a comfortable environment with state-of-the-art equipment.',
+        'de-DE': 'Professionelle und fürsorgliche Untersuchung in angenehmer Umgebung mit modernster Ausstattung.',
+      },
+    },
+    {
+      title: { 'hr-HR': 'Rezultati i plan', 'en-US': 'Results & Plan', 'de-DE': 'Ergebnisse & Plan' },
+      description: {
+        'hr-HR': 'Detaljan razgovor o nalazu, odgovori na sva pitanja i plan daljnjeg postupanja.',
+        'en-US': 'Detailed discussion of findings, answers to all questions and a plan for further action.',
+        'de-DE': 'Ausführliche Besprechung der Befunde, Antworten auf alle Fragen und ein Plan für das weitere Vorgehen.',
+      },
     },
   ]
 
-  // Static content - What to expect
-  const whatToExpect = [
-    {
-      step: '1',
-      title: locale === 'hr-HR' ? 'Priprema' : locale === 'en-US' ? 'Preparation' : 'Vorbereitung',
-      description:
-        locale === 'hr-HR'
-          ? 'Nema posebne pripreme. Preporučujemo doći 10 minuta ranije kako biste ispunili potrebnu dokumentaciju.'
-          : locale === 'en-US'
-          ? 'No special preparation needed. We recommend arriving 10 minutes early to complete the necessary documentation.'
-          : 'Keine besondere Vorbereitung erforderlich. Wir empfehlen, 10 Minuten früher zu kommen.',
-    },
-    {
-      step: '2',
-      title: locale === 'hr-HR' ? 'Razgovor' : locale === 'en-US' ? 'Consultation' : 'Gespräch',
-      description:
-        locale === 'hr-HR'
-          ? 'Liječnik će s vama razgovarati o vašem zdravlju, medicinskoj povijesti i eventualnim simptomima.'
-          : locale === 'en-US'
-          ? 'The doctor will discuss your health, medical history and any symptoms with you.'
-          : 'Der Arzt wird mit Ihnen über Ihre Gesundheit, Krankengeschichte und eventuelle Symptome sprechen.',
-    },
-    {
-      step: '3',
-      title: locale === 'hr-HR' ? 'Pregled' : locale === 'en-US' ? 'Examination' : 'Untersuchung',
-      description:
-        locale === 'hr-HR'
-          ? 'Profesionalan i brižan pregled u udobnom okruženju s najsuvremenijom opremom.'
-          : locale === 'en-US'
-          ? 'Professional and caring examination in a comfortable environment with state-of-the-art equipment.'
-          : 'Professionelle und fürsorgliche Untersuchung in angenehmer Umgebung mit modernster Ausstattung.',
-    },
-    {
-      step: '4',
-      title: locale === 'hr-HR' ? 'Rezultati i plan' : locale === 'en-US' ? 'Results & Plan' : 'Ergebnisse & Plan',
-      description:
-        locale === 'hr-HR'
-          ? 'Detaljan razgovor o nalazu, odgovori na sva pitanja i plan daljnjeg postupanja.'
-          : locale === 'en-US'
-          ? 'Detailed discussion of findings, answers to all questions and a plan for further action.'
-          : 'Ausführliche Besprechung der Befunde, Antworten auf alle Fragen und ein Plan für das weitere Vorgehen.',
-    },
-  ]
+  const serviceSteps = (() => {
+    if (!service.steps) return null
+    try {
+      const steps = service.steps as { title: Record<string, string>; description: Record<string, string> }[]
+      return Array.isArray(steps) && steps.length > 0 ? steps : null
+    } catch {
+      return null
+    }
+  })()
 
-  // Static content - FAQs
-  const faqs = [
-    {
-      question:
-        locale === 'hr-HR'
-          ? 'Koliko često trebam dolaziti na pregled?'
-          : locale === 'en-US'
-          ? 'How often should I come for an examination?'
-          : 'Wie oft sollte ich zur Untersuchung kommen?',
-      answer:
-        locale === 'hr-HR'
-          ? 'Preporučujemo godišnje kontrolne preglede. Ako imate specifične zdravstvene probleme, pregledi mogu biti češći prema preporuci vašeg liječnika.'
-          : locale === 'en-US'
-          ? 'We recommend annual check-ups. If you have specific health issues, examinations may be more frequent as recommended by your doctor.'
-          : 'Wir empfehlen jährliche Vorsorgeuntersuchungen. Bei spezifischen Gesundheitsproblemen können häufigere Untersuchungen erforderlich sein.',
-    },
-    {
-      question:
-        locale === 'hr-HR'
-          ? 'Trebam li uputnicu?'
-          : locale === 'en-US'
-          ? 'Do I need a referral?'
-          : 'Brauche ich eine Überweisung?',
-      answer:
-        locale === 'hr-HR'
-          ? 'Uputnica nije potrebna. Možete se naručiti direktno kod nas telefonom ili online.'
-          : locale === 'en-US'
-          ? 'No referral is needed. You can book directly with us by phone or online.'
-          : 'Keine Überweisung erforderlich. Sie können direkt bei uns telefonisch oder online buchen.',
-    },
-    {
-      question:
-        locale === 'hr-HR'
-          ? 'Što trebam ponijeti na prvi pregled?'
-          : locale === 'en-US'
-          ? 'What should I bring to my first appointment?'
-          : 'Was sollte ich zum ersten Termin mitbringen?',
-      answer:
-        locale === 'hr-HR'
-          ? 'Donesite vašu zdravstvenu iskaznicu, prethodne medicinske nalaze (ako ih imate), i popis lijekova koje uzimate.'
-          : locale === 'en-US'
-          ? 'Bring your health card, previous medical records (if any), and a list of medications you are taking.'
-          : 'Bringen Sie Ihre Gesundheitskarte, frühere medizinische Befunde (falls vorhanden) und eine Liste der Medikamente, die Sie einnehmen, mit.',
-    },
-    {
-      question:
-        locale === 'hr-HR'
-          ? 'Kada dobijem rezultate?'
-          : locale === 'en-US'
-          ? 'When will I get my results?'
-          : 'Wann erhalte ich meine Ergebnisse?',
-      answer:
-        locale === 'hr-HR'
-          ? 'Osnovni nalazi dostupni su odmah nakon pregleda. Laboratorijske pretrage obično su gotove u roku od 7-10 dana.'
-          : locale === 'en-US'
-          ? 'Basic findings are available immediately after the examination. Laboratory tests are usually ready within 7-10 days.'
-          : 'Grundlegende Befunde sind sofort nach der Untersuchung verfügbar. Labortests sind in der Regel innerhalb von 7-10 Tagen fertig.',
-    },
-  ]
+  const whatToExpect = (serviceSteps || defaultSteps).map((step, index) => ({
+    step: String(index + 1),
+    title: getLocalizedContent(step.title, locale),
+    description: getLocalizedContent(step.description, locale),
+  }))
 
   return (
     <div className="bg-white text-black font-sans">
@@ -239,7 +178,7 @@ export function ServiceDetailsClient({
             <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
               {/* Icon */}
               <div
-                className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${categoryColor} flex items-center justify-center mb-6 shadow-2xl`}
+                className="w-20 h-20 rounded-2xl bg-orangeCTA flex items-center justify-center mb-6 shadow-2xl"
               >
                 <ServiceIcon className="w-10 h-10 text-white" />
               </div>
@@ -256,22 +195,14 @@ export function ServiceDetailsClient({
                 <p className="text-lg text-gray-400 mb-8 leading-relaxed">{getLocalizedContent(service.description, locale)}</p>
               )}
 
-              {/* CTA Buttons */}
+              {/* CTA Button */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     href="#booking"
-                    className={`block px-8 py-4 bg-gradient-to-r ${categoryColor} text-white rounded-full font-semibold text-center shadow-xl hover:shadow-2xl transition-all`}
+                    className="block px-8 py-4 bg-orangeCTA text-white rounded-full font-semibold text-center shadow-xl hover:shadow-2xl transition-all"
                   >
                     {locale === 'hr-HR' ? 'Zakaži termin' : locale === 'en-US' ? 'Schedule Appointment' : 'Termin vereinbaren'}
-                  </Link>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    href="#packages"
-                    className="block px-8 py-4 bg-white/10 backdrop-blur-sm border-2 border-white text-white rounded-full font-semibold text-center hover:bg-white/20 transition-all"
-                  >
-                    {locale === 'hr-HR' ? 'Pogledaj cijene' : locale === 'en-US' ? 'View Prices' : 'Preise ansehen'}
                   </Link>
                 </motion.div>
               </div>
@@ -318,83 +249,6 @@ export function ServiceDetailsClient({
                 {locale === 'hr-HR' ? 'Online rezervacija' : locale === 'en-US' ? 'Online Booking' : 'Online-Buchung'}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Packages */}
-      <section id="packages" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 font-serif">
-              {locale === 'hr-HR' ? 'Odaberite svoj paket' : locale === 'en-US' ? 'Choose Your Package' : 'Wählen Sie Ihr Paket'}
-            </h2>
-            <p className="text-gray-600 text-lg">
-              {locale === 'hr-HR'
-                ? 'Prilagođeni paketi za različite potrebe'
-                : locale === 'en-US'
-                ? 'Tailored packages for different needs'
-                : 'Maßgeschneiderte Pakete für verschiedene Bedürfnisse'}
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {packages.map((pkg, index) => (
-              <motion.div
-                key={pkg.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`relative bg-white rounded-3xl p-8 transition-all ${
-                  pkg.popular ? 'shadow-2xl border-2 border-orange-500 scale-105' : 'shadow-lg hover:shadow-xl'
-                }`}
-              >
-                {pkg.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="px-4 py-2 bg-orangeCTA text-white rounded-full text-sm font-bold shadow-lg">
-                      {locale === 'hr-HR' ? 'NAJPOPULARNIJE' : locale === 'en-US' ? 'MOST POPULAR' : 'AM BELIEBTESTEN'}
-                    </span>
-                  </div>
-                )}
-
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold mb-2 font-serif">{pkg.name}</h3>
-                  <p className="text-gray-600 text-sm mb-6">{pkg.description}</p>
-                  <div className="flex items-baseline justify-center gap-2">
-                    <span className="text-5xl font-bold font-serif">{pkg.price}</span>
-                  </div>
-                  <div className="text-gray-600 mt-2">{pkg.duration}</div>
-                </div>
-
-                <ul className="space-y-4 mb-8">
-                  {pkg.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`w-full py-4 rounded-full font-semibold transition-all ${
-                    pkg.popular
-                      ? 'bg-orangeCTA text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                  }`}
-                >
-                  {locale === 'hr-HR' ? 'Odaberi paket' : locale === 'en-US' ? 'Select Package' : 'Paket auswählen'}
-                </motion.button>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>
@@ -449,9 +303,74 @@ export function ServiceDetailsClient({
         </div>
       </section>
 
+      {/* Pricing List */}
+      {pricingList.length > 0 && (
+        <section className="py-20 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 font-serif">
+                {locale === 'hr-HR' ? 'Cjenik' : locale === 'en-US' ? 'Pricing' : 'Preisliste'}
+              </h2>
+              <p className="text-gray-600 text-lg">
+                {locale === 'hr-HR'
+                  ? 'Transparentne cijene bez skrivenih troškova'
+                  : locale === 'en-US'
+                  ? 'Transparent prices with no hidden costs'
+                  : 'Transparente Preise ohne versteckte Kosten'}
+              </p>
+            </motion.div>
+
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                {pricingList.map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className={`flex items-center justify-between p-6 ${
+                      index !== pricingList.length - 1 ? 'border-b border-gray-100' : ''
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {getLocalizedContent(item.title, locale)}
+                      </h3>
+                      {getLocalizedContent(item.description, locale) && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          {getLocalizedContent(item.description, locale)}
+                        </p>
+                      )}
+                    </div>
+                    <div className="ml-4 text-right">
+                      <span className="text-2xl font-bold text-orangeCTA">{item.price}€</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <p className="text-center text-sm text-gray-500 mt-6">
+                {locale === 'hr-HR'
+                  ? '* Cijene su izražene u eurima (EUR). Za više informacija kontaktirajte nas.'
+                  : locale === 'en-US'
+                  ? '* Prices are in euros (EUR). Contact us for more information.'
+                  : '* Preise sind in Euro (EUR) angegeben. Kontaktieren Sie uns für weitere Informationen.'}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Our Doctors */}
       {doctors.length > 0 && (
-        <section className="py-20 bg-gray-50">
+        <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-8">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -472,7 +391,7 @@ export function ServiceDetailsClient({
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="space-y-20 max-w-5xl mx-auto">
               {doctors.slice(0, 3).map((doctor, index) => (
                 <motion.div
                   key={doctor.id}
@@ -480,28 +399,90 @@ export function ServiceDetailsClient({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+                  className="flex flex-col md:flex-row gap-10 items-center group"
                 >
-                  <div className="aspect-square overflow-hidden">
-                    <img
-                      src={
-                        getImageUrl(doctor.profile_image) ||
-                        'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop'
-                      }
-                      alt={doctor.name}
-                      className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
-                    />
+                  {/* Image with accent */}
+                  <div className="relative flex-shrink-0">
+                    <div className="absolute -inset-4 bg-gradient-to-br from-slate-900 to-blue-950 rounded-3xl opacity-10 group-hover:opacity-20 transition-opacity" />
+                    <div className="relative w-72 aspect-[3/4] rounded-2xl overflow-hidden">
+                      <img
+                        src={
+                          getImageUrl(doctor.profile_image) ||
+                          'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop'
+                        }
+                        alt={doctor.name}
+                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                      />
+                    </div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-2xl font-bold mb-2 font-serif">{doctor.name}</h3>
-                    {doctor.title && <p className="text-gray-600 mb-4">{getLocalizedContent(doctor.title, locale)}</p>}
+
+                  {/* Content */}
+                  <div className="flex-1 text-center md:text-left">
                     {doctor.specialty && (
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <User className="w-4 h-4" />
+                      <div className="inline-flex items-center gap-2 text-sm text-orangeCTA font-medium mb-3">
+                        <span className="w-8 h-px bg-orangeCTA" />
                         <span>{getLocalizedContent(doctor.specialty, locale)}</span>
                       </div>
                     )}
+                    <h3 className="text-4xl font-bold mb-3 font-serif">{doctor.name}</h3>
+                    {doctor.title && (
+                      <p className="text-gray-500 text-lg mb-4 italic">{getLocalizedContent(doctor.title, locale)}</p>
+                    )}
+                    {doctor.bio && (
+                      <p className="text-gray-600 leading-relaxed text-lg">
+                        {getLocalizedContent(doctor.bio, locale)}
+                      </p>
+                    )}
                   </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Partner Logos */}
+      {partnerLogos.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-2 font-serif">
+                {locale === 'hr-HR'
+                  ? 'Naši partneri'
+                  : locale === 'en-US'
+                  ? 'Our Partners'
+                  : 'Unsere Partner'}
+              </h2>
+              <p className="text-gray-600">
+                {locale === 'hr-HR'
+                  ? 'Surađujemo s vodećim organizacijama'
+                  : locale === 'en-US'
+                  ? 'We collaborate with leading organizations'
+                  : 'Wir arbeiten mit führenden Organisationen zusammen'}
+              </p>
+            </motion.div>
+
+            <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+              {partnerLogos.map((logo, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className="grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300"
+                >
+                  <img
+                    src={getImageUrl(logo.url) || logo.url}
+                    alt={logo.name || 'Partner'}
+                    className="h-12 md:h-16 w-auto object-contain"
+                  />
                 </motion.div>
               ))}
             </div>
@@ -564,6 +545,82 @@ export function ServiceDetailsClient({
         </section>
       )}
 
+      {/* Related Blog Posts */}
+      {relatedPosts.length > 0 && (
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 font-serif">
+                {locale === 'hr-HR'
+                  ? 'Povezani članci'
+                  : locale === 'en-US'
+                  ? 'Related Articles'
+                  : 'Verwandte Artikel'}
+              </h2>
+              <p className="text-gray-600 text-lg">
+                {locale === 'hr-HR'
+                  ? 'Saznajte više o ovoj usluzi'
+                  : locale === 'en-US'
+                  ? 'Learn more about this service'
+                  : 'Erfahren Sie mehr über diesen Service'}
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {relatedPosts.slice(0, 3).map((post, index) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="group block bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+                  >
+                    {post.featured_image && (
+                      <div className="aspect-[16/10] overflow-hidden">
+                        <img
+                          src={getImageUrl(post.featured_image) || ''}
+                          alt={getLocalizedContent(post.title, locale)}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                    )}
+                    <div className="p-6">
+                      {post.category && (
+                        <div className="text-sm text-orangeCTA font-medium mb-2">
+                          {post.category}
+                        </div>
+                      )}
+                      <h3 className="text-xl font-bold mb-3 font-serif group-hover:text-orangeCTA transition-colors">
+                        {getLocalizedContent(post.title, locale)}
+                      </h3>
+                      {post.excerpt && (
+                        <p className="text-gray-600 text-sm line-clamp-2 mb-4">
+                          {getLocalizedContent(post.excerpt, locale)}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-900 group-hover:text-orangeCTA transition-colors">
+                        {locale === 'hr-HR' ? 'Pročitaj više' : locale === 'en-US' ? 'Read more' : 'Mehr lesen'}
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* FAQ */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-8">
@@ -584,34 +641,44 @@ export function ServiceDetailsClient({
           </motion.div>
 
           <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-                className="bg-white rounded-xl overflow-hidden shadow-lg"
-              >
-                <button
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full px-8 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            {faqs.length > 0 ? (
+              faqs.map((faq, index) => (
+                <motion.div
+                  key={faq.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                  className="bg-white rounded-xl overflow-hidden shadow-lg"
                 >
-                  <span className="font-bold text-left text-lg">{faq.question}</span>
-                  <ChevronDown className={`w-5 h-5 transition-transform ${openFaq === index ? 'rotate-180' : ''}`} />
-                </button>
-                {openFaq === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="px-8 pb-6"
+                  <button
+                    onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                    className="w-full px-8 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
                   >
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
-                  </motion.div>
-                )}
-              </motion.div>
-            ))}
+                    <span className="font-bold text-left text-lg">{getLocalizedContent(faq.question, locale)}</span>
+                    <ChevronDown className={`w-5 h-5 transition-transform ${openFaq === index ? 'rotate-180' : ''}`} />
+                  </button>
+                  {openFaq === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="px-8 pb-6"
+                    >
+                      <p className="text-gray-600 leading-relaxed">{getLocalizedContent(faq.answer, locale)}</p>
+                    </motion.div>
+                  )}
+                </motion.div>
+              ))
+            ) : (
+              <p className="text-center text-gray-500 py-8">
+                {locale === 'hr-HR'
+                  ? 'Nema dostupnih pitanja za ovu uslugu.'
+                  : locale === 'en-US'
+                  ? 'No questions available for this service.'
+                  : 'Keine Fragen für diesen Service verfügbar.'}
+              </p>
+            )}
           </div>
         </div>
       </section>

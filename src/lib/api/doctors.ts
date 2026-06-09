@@ -104,6 +104,28 @@ export async function getAllDoctorSlugs(): Promise<string[]> {
 }
 
 /**
+ * Get doctors by service ID
+ */
+export async function getDoctorsByService(serviceId: string): Promise<Doctor[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('service_doctors')
+    .select(`
+      doctors (*)
+    `)
+    .eq('service_id', serviceId)
+
+  if (error) {
+    console.error('Error fetching doctors by service:', error)
+    return []
+  }
+
+  // Extract doctors from the join result
+  return (data as any[])?.map((sd) => sd.doctors).filter(Boolean) || []
+}
+
+/**
  * Get doctors with their services
  */
 export async function getDoctorsWithServices(locale?: Locale): Promise<

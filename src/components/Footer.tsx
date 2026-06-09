@@ -5,10 +5,11 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, ArrowRight } from 'lucide-react'
 import { FaInstagram, FaFacebookF, FaLinkedinIn } from 'react-icons/fa'
-import type { Service } from '@/types'
+import type { Service, ContactInfo } from '@/types'
 
 interface FooterProps {
   services?: Service[]
+  contactInfo?: ContactInfo
 }
 
 const quickLinks = [
@@ -25,7 +26,7 @@ const legal = [
   { name: 'Kolačići', href: '/politika-kolacica' },
 ]
 
-export function Footer({ services: servicesProp = [] }: FooterProps) {
+export function Footer({ services: servicesProp = [], contactInfo }: FooterProps) {
   // Build services list from props
   const services = useMemo(() => {
     return servicesProp.map((service) => ({
@@ -37,6 +38,24 @@ export function Footer({ services: servicesProp = [] }: FooterProps) {
   }, [servicesProp])
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('')
+
+  // Contact info with defaults
+  const contactEmail = contactInfo?.email || 'info@atria.hr'
+  const contactPhone = contactInfo?.phone || '+385 1 123 4567'
+  const contactCity = contactInfo?.city || 'Dugo Selo'
+  const clinicName = contactInfo?.clinicName || 'Poliklinika Atria'
+
+  // Format phone for display
+  const formatPhoneDisplay = (phone: string) => {
+    const digits = phone.replace(/\D/g, '')
+    if (digits.startsWith('385')) {
+      const local = digits.slice(3)
+      return `0${local.slice(0, 1)} ${local.slice(1, 4)} ${local.slice(4)}`
+    }
+    return phone
+  }
+  const phoneDisplay = formatPhoneDisplay(contactPhone)
+  const phoneHref = `tel:${contactPhone.replace(/\s/g, '')}`
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,30 +93,30 @@ export function Footer({ services: servicesProp = [] }: FooterProps) {
               {/* Contact Info */}
               <div className="space-y-4">
                 <a
-                  href="mailto:info@atria.hr"
+                  href={`mailto:${contactEmail}`}
                   className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group"
                 >
                   <div className="w-10 h-10 rounded-full bg-white/5 group-hover:bg-white/10 flex items-center justify-center transition-colors">
                     <Mail className="w-5 h-5" />
                   </div>
-                  <span>info@atria.hr</span>
+                  <span>{contactEmail}</span>
                 </a>
 
                 <a
-                  href="tel:011234567"
+                  href={phoneHref}
                   className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group"
                 >
                   <div className="w-10 h-10 rounded-full bg-white/5 group-hover:bg-white/10 flex items-center justify-center transition-colors">
                     <Phone className="w-5 h-5" />
                   </div>
-                  <span>01 123 4567</span>
+                  <span>{phoneDisplay}</span>
                 </a>
 
                 <div className="flex items-center gap-3 text-gray-400 group">
                   <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
                     <MapPin className="w-5 h-5" />
                   </div>
-                  <span>Dugo Selo, Hrvatska</span>
+                  <span>{contactCity}, Hrvatska</span>
                 </div>
               </div>
             </motion.div>
@@ -285,8 +304,8 @@ export function Footer({ services: servicesProp = [] }: FooterProps) {
             className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4"
           >
             <p className="text-sm text-gray-500">
-              &copy; {new Date().getFullYear()} Poliklinika Atria. Sva prava
-              pridržana.
+              &copy; {new Date().getFullYear()} {clinicName}. Sva prava
+              pridrzana.
             </p>
 
             <div className="flex items-center gap-2 text-sm text-gray-500">

@@ -18,6 +18,7 @@ export type ContactStatus = 'new' | 'read' | 'responded'
 // Settings keys
 export type SettingKey =
   | 'homepage'
+  | 'services_page'
   | 'about_us'
   | 'contact_info'
   | 'privacy_policy'
@@ -25,17 +26,56 @@ export type SettingKey =
   | 'cookie_policy'
 
 // Homepage settings structure
+export interface HomepageStat {
+  number: string
+  label: Record<Locale, string>
+}
+
+export interface HomepageProcessStep {
+  step: string
+  title: Record<Locale, string>
+  description: Record<Locale, string>
+}
+
+export interface HomepageGalleryImage {
+  image: string
+  span: 'col-span-1' | 'col-span-2' | 'col-span-2 row-span-2'
+}
+
 export interface HomepageSettings {
   heroTitle?: Record<Locale, string>
   heroSubtitle?: Record<Locale, string>
   heroBackgroundImage?: string
-  ctaTitle?: Record<Locale, string>
   ctaButtonText?: Record<Locale, string>
+  stats?: HomepageStat[]
+  processSteps?: HomepageProcessStep[]
+  galleryImages?: HomepageGalleryImage[]
   seo?: {
     title?: Record<Locale, string>
     description?: Record<Locale, string>
     ogImage?: string
   }
+}
+
+// Services page settings structure
+export interface ServicesPageStat {
+  number: string
+  label: Record<Locale, string>
+}
+
+export interface ServicesPageWhyItem {
+  title: Record<Locale, string>
+  description: Record<Locale, string>
+  icon: string
+}
+
+export interface ServicesPageSettings {
+  heroTitle?: Record<Locale, string>
+  heroSubtitle?: Record<Locale, string>
+  stats?: ServicesPageStat[]
+  whyChooseUs?: ServicesPageWhyItem[]
+  ctaTitle?: Record<Locale, string>
+  ctaSubtitle?: Record<Locale, string>
 }
 
 // Contact info structure
@@ -57,18 +97,41 @@ export interface ContactInfo {
 }
 
 // About us page structure
+export interface AboutUsStat {
+  number: string
+  label: Record<Locale, string>
+}
+
+export interface AboutUsValue {
+  title: Record<Locale, string>
+  description: Record<Locale, string>
+  icon: string
+  color: string
+}
+
+export interface AboutUsMilestone {
+  year: string
+  event: Record<Locale, string>
+}
+
 export interface AboutUsSettings {
-  title?: Record<Locale, string>
-  content?: Record<Locale, string>
-  mission?: Record<Locale, string>
-  vision?: Record<Locale, string>
-  values?: Array<{
-    title: Record<Locale, string>
-    description: Record<Locale, string>
-    icon?: string
-  }>
-  heroImage?: string
-  teamImage?: string
+  // Hero section
+  heroTitle?: Record<Locale, string>
+  heroSubtitle?: Record<Locale, string>
+  // Stats section
+  stats?: AboutUsStat[]
+  // Our Story section
+  storyTitle?: Record<Locale, string>
+  storyParagraph1?: Record<Locale, string>
+  storyParagraph2?: Record<Locale, string>
+  storyImage?: string
+  // Timeline/Milestones
+  milestones?: AboutUsMilestone[]
+  // Values section
+  values?: AboutUsValue[]
+  // CTA section
+  ctaTitle?: Record<Locale, string>
+  ctaSubtitle?: Record<Locale, string>
 }
 
 // Legal page structure

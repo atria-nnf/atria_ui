@@ -149,3 +149,61 @@ export async function toggleDoctorFeatured(
 
   return { error: null }
 }
+
+/**
+ * Get services for a doctor
+ */
+export async function getDoctorServices(doctorId: string): Promise<string[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('service_doctors')
+    .select('service_id')
+    .eq('doctor_id', doctorId)
+
+  if (error) {
+    console.error('Error fetching doctor services:', error)
+    return []
+  }
+
+  return data?.map((sd) => sd.service_id) || []
+}
+
+/**
+ * Update doctor services (replaces all existing relationships)
+ */
+export async function updateDoctorServices(
+  doctorId: string,
+  serviceIds: string[]
+): Promise<{ error: string | null }> {
+  const supabase = await createClient()
+
+  // Delete existing relationships
+  const { error: deleteError } = await supabase
+    .from('service_doctors')
+    .delete()
+    .eq('doctor_id', doctorId)
+
+  if (deleteError) {
+    console.error('Error deleting doctor services:', deleteError)
+    return { error: deleteError.message }
+  }
+
+  // Insert new relationships
+  if (serviceIds.length > 0) {
+    const { error: insertError } = await supabase
+      .from('service_doctors')
+      .insert(serviceIds.map((serviceId) => ({ doctor_id: doctorId, service_id: serviceId })))
+
+    if (insertError) {
+      console.error('Error inserting doctor services:', insertError)
+      return { error: insertError.message }
+    }
+  }
+
+  revalidatePath('/admin/doctors')
+  revalidatePath('/lijecnici')
+  revalidatePath('/usluge')
+
+  return { error: null }
+}

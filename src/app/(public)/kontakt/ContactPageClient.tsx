@@ -16,11 +16,12 @@ import {
 } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
-import type { Service, ContactInfo } from '@/types'
+import type { Service, ContactInfo, FAQ } from '@/types'
 
 interface ContactPageClientProps {
   contactInfo: ContactInfo
   services: Service[]
+  faqs: FAQ[]
 }
 
 interface FormData {
@@ -31,7 +32,7 @@ interface FormData {
   message: string
 }
 
-export function ContactPageClient({ contactInfo, services }: ContactPageClientProps) {
+export function ContactPageClient({ contactInfo, services, faqs }: ContactPageClientProps) {
   const { locale } = useLocale()
 
   const [formData, setFormData] = useState<FormData>({
@@ -145,34 +146,6 @@ export function ContactPageClient({ contactInfo, services }: ContactPageClientPr
     {
       day: locale === 'hr-HR' ? 'Nedjelja' : locale === 'en-US' ? 'Sunday' : 'Sonntag',
       hours: locale === 'hr-HR' ? 'Zatvoreno' : locale === 'en-US' ? 'Closed' : 'Geschlossen',
-    },
-  ]
-
-  // FAQs
-  const faqs = [
-    {
-      q: locale === 'hr-HR' ? 'Kako mogu zakazati pregled?' : locale === 'en-US' ? 'How can I schedule an appointment?' : 'Wie kann ich einen Termin vereinbaren?',
-      a: locale === 'hr-HR'
-        ? 'Pregled možete zakazati online kroz našu platformu, telefonom ili putem email-a. Online rezervacija dostupna je 24/7.'
-        : locale === 'en-US'
-        ? 'You can schedule an appointment online through our platform, by phone, or via email. Online booking is available 24/7.'
-        : 'Sie können einen Termin online über unsere Plattform, telefonisch oder per E-Mail vereinbaren. Die Online-Buchung ist rund um die Uhr verfügbar.',
-    },
-    {
-      q: locale === 'hr-HR' ? 'Trebam li uputnicu?' : locale === 'en-US' ? 'Do I need a referral?' : 'Brauche ich eine Überweisung?',
-      a: locale === 'hr-HR'
-        ? 'Za većinu pregleda nije potrebna uputnica. Kontaktirajte nas za specifične informacije o usluzi koja vas zanima.'
-        : locale === 'en-US'
-        ? 'A referral is not required for most examinations. Contact us for specific information about the service you are interested in.'
-        : 'Für die meisten Untersuchungen ist keine Überweisung erforderlich. Kontaktieren Sie uns für spezifische Informationen.',
-    },
-    {
-      q: locale === 'hr-HR' ? 'Koliko traje prvi pregled?' : locale === 'en-US' ? 'How long does the first appointment take?' : 'Wie lange dauert der erste Termin?',
-      a: locale === 'hr-HR'
-        ? 'Prvi pregled obično traje 30-45 minuta, ovisno o vrsti usluge. Preporučujemo doći 10 minuta ranije.'
-        : locale === 'en-US'
-        ? 'The first appointment usually takes 30-45 minutes, depending on the type of service. We recommend arriving 10 minutes early.'
-        : 'Der erste Termin dauert in der Regel 30-45 Minuten, je nach Art der Dienstleistung. Wir empfehlen, 10 Minuten früher zu kommen.',
     },
   ]
 
@@ -468,15 +441,6 @@ export function ContactPageClient({ contactInfo, services }: ContactPageClientPr
                   ))}
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-white/10">
-                  <p className="text-sm text-gray-400">
-                    {locale === 'hr-HR'
-                      ? 'Za hitne slučajeve kontaktirajte nas na telefon 24/7'
-                      : locale === 'en-US'
-                      ? 'For emergencies, contact us by phone 24/7'
-                      : 'Für Notfälle erreichen Sie uns telefonisch rund um die Uhr'}
-                  </p>
-                </div>
               </div>
 
               {/* Quick Info Cards */}
@@ -577,7 +541,7 @@ export function ContactPageClient({ contactInfo, services }: ContactPageClientPr
             className="rounded-2xl overflow-hidden shadow-2xl"
           >
             <iframe
-              src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2778.8!2d${contactInfo.longitude}!3d${contactInfo.latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${contactInfo.latitude}!5e0!3m2!1sen!2shr!4v1234567890`}
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d44493.5711845768!2d16.119063106998336!3d45.814298470552195!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47667aba94930067%3A0x11e28535ece6bde!2sPoliklinika%20Atria!5e0!3m2!1shr!2shr!4v1780995760985!5m2!1shr!2shr"
               width="100%"
               height="500"
               style={{ border: 0 }}
@@ -658,19 +622,29 @@ export function ContactPageClient({ contactInfo, services }: ContactPageClientPr
           </motion.div>
 
           <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow"
-              >
-                <h4 className="font-bold text-lg mb-2">{faq.q}</h4>
-                <p className="text-gray-600">{faq.a}</p>
-              </motion.div>
-            ))}
+            {faqs.length > 0 ? (
+              faqs.map((faq, index) => (
+                <motion.div
+                  key={faq.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow"
+                >
+                  <h4 className="font-bold text-lg mb-2">{getLocalizedContent(faq.question, locale)}</h4>
+                  <p className="text-gray-600">{getLocalizedContent(faq.answer, locale)}</p>
+                </motion.div>
+              ))
+            ) : (
+              <p className="text-center text-gray-500">
+                {locale === 'hr-HR'
+                  ? 'Nema dostupnih pitanja.'
+                  : locale === 'en-US'
+                  ? 'No questions available.'
+                  : 'Keine Fragen verfügbar.'}
+              </p>
+            )}
           </div>
         </div>
       </section>
