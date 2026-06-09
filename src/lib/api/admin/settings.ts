@@ -19,9 +19,9 @@ export async function getAllSettings() {
   return data || []
 }
 
-export async function updateSetting(key: string, value: Json) {
+export async function updateSetting(key: string, value: unknown) {
   const supabase = await createClient()
-  const { error } = await supabase.from('settings').upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+  const { error } = await supabase.from('settings').upsert({ key, value: value as Json, updated_at: new Date().toISOString() }, { onConflict: 'key' })
   if (error) return { error: error.message }
   revalidatePath('/admin/settings')
   revalidatePath('/')
