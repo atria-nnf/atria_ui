@@ -3,9 +3,10 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Mail, Phone, MapPin, ArrowRight } from 'lucide-react'
+import { Mail, Phone, MapPin, ArrowRight, Cookie } from 'lucide-react'
 import { FaInstagram, FaFacebookF, FaLinkedinIn } from 'react-icons/fa'
 import type { Service, ContactInfo } from '@/types'
+import { useCookieConsent } from '@/config/cookie-consent-context'
 
 interface FooterProps {
   services?: Service[]
@@ -21,12 +22,13 @@ const quickLinks = [
 ]
 
 const legal = [
-  { name: 'Privatnost', href: '/politika-privatnosti' },
+  { name: 'Privatnost', href: '/pravila-privatnosti' },
   { name: 'Uvjeti korištenja', href: '/uvjeti-koristenja' },
-  { name: 'Kolačići', href: '/politika-kolacica' },
+  { name: 'Kolačići', href: '/kolacici' },
 ]
 
 export function Footer({ services: servicesProp = [], contactInfo }: FooterProps) {
+  const { openPreferenceCenter } = useCookieConsent()
   // Build services list from props
   const services = useMemo(() => {
     return servicesProp.map((service) => ({
@@ -237,6 +239,15 @@ export function Footer({ services: servicesProp = [], contactInfo }: FooterProps
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <button
+                    onClick={openPreferenceCenter}
+                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+                  >
+                    <Cookie className="w-4 h-4" />
+                    Postavke kolačića
+                  </button>
+                </li>
               </ul>
             </motion.div>
 

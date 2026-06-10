@@ -15,7 +15,9 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
+import { useCookieConsent } from '@/config/cookie-consent-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
+import { ConsentPlaceholder } from '@/components/cookies'
 import type { Service, ContactInfo, FAQ } from '@/types'
 
 interface ContactPageClientProps {
@@ -34,6 +36,7 @@ interface FormData {
 
 export function ContactPageClient({ contactInfo, services, faqs }: ContactPageClientProps) {
   const { locale } = useLocale()
+  const { consent } = useCookieConsent()
 
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -540,16 +543,22 @@ export function ContactPageClient({ contactInfo, services, faqs }: ContactPageCl
             transition={{ duration: 0.8 }}
             className="rounded-2xl overflow-hidden shadow-2xl"
           >
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d44493.5711845768!2d16.119063106998336!3d45.814298470552195!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47667aba94930067%3A0x11e28535ece6bde!2sPoliklinika%20Atria!5e0!3m2!1shr!2shr!4v1780995760985!5m2!1shr!2shr"
-              width="100%"
-              height="500"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="grayscale hover:grayscale-0 transition-all duration-500"
-            />
+            {consent.marketing ? (
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d44493.5711845768!2d16.119063106998336!3d45.814298470552195!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47667aba94930067%3A0x11e28535ece6bde!2sPoliklinika%20Atria!5e0!3m2!1shr!2shr!4v1780995760985!5m2!1shr!2shr"
+                width="100%"
+                height="500"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="grayscale hover:grayscale-0 transition-all duration-500"
+              />
+            ) : (
+              <div style={{ height: 500 }}>
+                <ConsentPlaceholder variant="map" className="h-full" />
+              </div>
+            )}
           </motion.div>
 
           {/* Directions */}

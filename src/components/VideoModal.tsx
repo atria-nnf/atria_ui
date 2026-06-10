@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
+import { useCookieConsent } from '@/config/cookie-consent-context'
+import { ConsentPlaceholder } from '@/components/cookies'
 
 interface VideoModalProps {
   isOpen: boolean
@@ -11,6 +13,8 @@ interface VideoModalProps {
 }
 
 export default function VideoModal({ isOpen, onClose, videoUrl }: VideoModalProps) {
+  const { consent } = useCookieConsent()
+
   // Close on ESC key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -102,7 +106,12 @@ export default function VideoModal({ isOpen, onClose, videoUrl }: VideoModalProp
             <div className="relative w-full bg-black rounded-lg sm:rounded-2xl overflow-hidden shadow-2xl">
               {/* 16:9 Aspect Ratio Container */}
               <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                {isYouTube ? (
+                {isYouTube && !consent.marketing ? (
+                  // YouTube blocked - show consent placeholder
+                  <div className="absolute inset-0 w-full h-full bg-gray-900">
+                    <ConsentPlaceholder variant="video" className="h-full rounded-none" />
+                  </div>
+                ) : isYouTube ? (
                   // YouTube Embed
                   <iframe
                     src={embedUrl}

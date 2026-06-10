@@ -4,7 +4,9 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
 import { LocaleProvider } from '@/config/locale-context'
+import { CookieConsentProvider } from '@/config/cookie-consent-context'
 import { LenisProvider } from '@/components/LenisProvider'
+import { CookieConsentBanner, CookiePreferenceCenter } from '@/components/cookies'
 
 const ubuntu = Ubuntu({
   subsets: ['latin', 'latin-ext'],
@@ -65,21 +67,25 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         <LocaleProvider>
-          <LenisProvider>
-            {children}
-            <ToastContainer
-              position="bottom-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-            />
-          </LenisProvider>
+          <CookieConsentProvider>
+            <LenisProvider>
+              {children}
+              <ToastContainer
+                position="bottom-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+              />
+            </LenisProvider>
+            <CookieConsentBanner />
+            <CookiePreferenceCenter />
+          </CookieConsentProvider>
         </LocaleProvider>
       </body>
     </html>
