@@ -318,10 +318,10 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
               </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-4 font-serif">
                 {locale === 'hr-HR'
-                  ? 'Voditelji ordinacija'
+                  ? 'Osnivačica i ravnateljica Poliklinike Atria'
                   : locale === 'en-US'
-                  ? 'Department Heads'
-                  : 'Abteilungsleiter'}
+                  ? 'Founder and Director of Polyclinic Atria'
+                  : 'Gründerin und Direktorin der Poliklinik Atria'}
               </h2>
             </motion.div>
 
@@ -433,25 +433,17 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4 font-serif">
               {locale === 'hr-HR'
-                ? 'Svi naši liječnici'
+                ? 'Upoznaj naš tim'
                 : locale === 'en-US'
-                ? 'All Our Doctors'
-                : 'Alle unsere Ärzte'}
+                ? 'Meet Our Team'
+                : 'Lernen Sie unser Team kennen'}
             </h2>
             <p className="text-gray-600 text-lg">
-              {filteredDoctors.length}{' '}
               {locale === 'hr-HR'
-                ? filteredDoctors.length === 1
-                  ? 'liječnik'
-                  : 'liječnika'
+                ? 'Liječnici i medicinske sestre koji brinu o vama'
                 : locale === 'en-US'
-                ? filteredDoctors.length === 1
-                  ? 'doctor'
-                  : 'doctors'
-                : filteredDoctors.length === 1
-                ? 'Arzt'
-                : 'Ärzte'}{' '}
-              {locale === 'hr-HR' ? 'dostupno' : locale === 'en-US' ? 'available' : 'verfügbar'}
+                ? 'Doctors and nurses who care for you'
+                : 'Ärzte und Krankenschwestern, die sich um Sie kümmern'}
             </p>
           </motion.div>
 

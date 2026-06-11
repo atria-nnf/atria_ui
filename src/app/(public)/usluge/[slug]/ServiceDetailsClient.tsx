@@ -225,34 +225,6 @@ export function ServiceDetailsClient({
         </div>
       </section>
 
-      {/* Quick Info Bar */}
-      <section className="bg-gray-50 border-y border-gray-200 py-8">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl font-bold mb-2 font-serif">{service.duration || '30-60 min'}</div>
-              <div className="text-gray-600">{locale === 'hr-HR' ? 'Trajanje' : locale === 'en-US' ? 'Duration' : 'Dauer'}</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold mb-2 font-serif">
-                {pricing?.basic?.price ? `Od ${pricing.basic.price}€` : 'Od 250€'}
-              </div>
-              <div className="text-gray-600">{locale === 'hr-HR' ? 'Cijena' : locale === 'en-US' ? 'Price' : 'Preis'}</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold mb-2 font-serif">{doctors.length}+</div>
-              <div className="text-gray-600">{locale === 'hr-HR' ? 'Stručnjaka' : locale === 'en-US' ? 'Specialists' : 'Spezialisten'}</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold mb-2 font-serif">24/7</div>
-              <div className="text-gray-600">
-                {locale === 'hr-HR' ? 'Online rezervacija' : locale === 'en-US' ? 'Online Booking' : 'Online-Buchung'}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* What to Expect */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-8">
