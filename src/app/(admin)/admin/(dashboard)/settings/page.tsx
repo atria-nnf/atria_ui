@@ -5,7 +5,7 @@ import { Input } from '@/components/admin/ui/Input'
 import { Button } from '@/components/admin/ui/Button'
 import { LocalizedInput } from '@/components/admin/ui/LocalizedInput'
 import { ImageUpload } from '@/components/admin/ui/ImageUpload'
-import { Save, Building2, Phone, FileText, Plus, X, GripVertical, Image as ImageIcon, Briefcase } from 'lucide-react'
+import { Save, Building2, Phone, FileText, Plus, X, GripVertical, Image as ImageIcon, Briefcase, Link as LinkIcon } from 'lucide-react'
 import type { HomepageStat, HomepageProcessStep, HomepageGalleryImage, ServicesPageStat, ServicesPageWhyItem, AboutUsStat, AboutUsValue, AboutUsMilestone, Locale } from '@/types'
 
 type Tab = 'contact' | 'homepage' | 'services' | 'about'
@@ -46,7 +46,15 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false)
 
   // Contact Info
-  const [contact, setContact] = useState({ clinicName: '', phone: '', email: '', address: '', city: '', postalCode: '' })
+  const [contact, setContact] = useState({
+    clinicName: '',
+    phone: '',
+    email: '',
+    address: '',
+    city: '',
+    postalCode: '',
+    socialMedia: { facebook: '', instagram: '', linkedin: '' }
+  })
 
   // Homepage
   const [heroTitle, setHeroTitle] = useState<Record<string, string>>(emptyLocalized())
@@ -86,7 +94,10 @@ export default function SettingsPage() {
         getSetting('services_page'),
         getSetting('about_us')
       ])
-      if (contactData) setContact(contactData)
+      if (contactData) setContact({
+        ...contactData,
+        socialMedia: contactData.socialMedia || { facebook: '', instagram: '', linkedin: '' }
+      })
       if (homepageData) {
         setHeroTitle(homepageData.heroTitle || emptyLocalized())
         setHeroSubtitle(homepageData.heroSubtitle || emptyLocalized())
@@ -347,6 +358,34 @@ export default function SettingsPage() {
             <div className="grid grid-cols-2 gap-4">
               <Input label="Grad" value={contact.city} onChange={e => setContact({ ...contact, city: e.target.value })} />
               <Input label="Postanski broj" value={contact.postalCode} onChange={e => setContact({ ...contact, postalCode: e.target.value })} />
+            </div>
+
+            {/* Social Media Links */}
+            <div className="border-t border-gray-200 pt-6 mt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <LinkIcon className="w-5 h-5 text-gray-400" />
+                <h3 className="text-lg font-semibold text-gray-900">Društvene mreže</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Input
+                  label="Facebook"
+                  value={contact.socialMedia?.facebook || ''}
+                  onChange={e => setContact({ ...contact, socialMedia: { ...contact.socialMedia, facebook: e.target.value } })}
+                  placeholder="https://facebook.com/..."
+                />
+                <Input
+                  label="Instagram"
+                  value={contact.socialMedia?.instagram || ''}
+                  onChange={e => setContact({ ...contact, socialMedia: { ...contact.socialMedia, instagram: e.target.value } })}
+                  placeholder="https://instagram.com/..."
+                />
+                <Input
+                  label="LinkedIn"
+                  value={contact.socialMedia?.linkedin || ''}
+                  onChange={e => setContact({ ...contact, socialMedia: { ...contact.socialMedia, linkedin: e.target.value } })}
+                  placeholder="https://linkedin.com/..."
+                />
+              </div>
             </div>
           </div>
         )}
