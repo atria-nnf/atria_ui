@@ -2,15 +2,18 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Play } from 'lucide-react'
+import { Play, X } from 'lucide-react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import type { Swiper as SwiperType } from 'swiper'
+import { Pagination, Autoplay } from 'swiper/modules'
 import Link from 'next/link'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import VideoModal from '@/components/VideoModal'
 import { getImageUrl } from '@/lib/utils/image'
+import { useCookieConsent } from '@/config/cookie-consent-context'
+import { ConsentPlaceholder } from '@/components/cookies'
 import type { Service, Doctor, Testimonial, HomepageSettings } from '@/types'
 
 interface HomePageClientProps {
@@ -92,10 +95,47 @@ function getLocalizedContent(content: unknown, locale: string = 'hr-HR'): string
   return ''
 }
 
+// Helper function to detect and convert YouTube URLs to embed format
+function getEmbedUrl(url: string | null): string | null {
+  if (!url) return null
+
+  const youtubePatterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/,
+    /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]+)/,
+  ]
+
+  for (const pattern of youtubePatterns) {
+    const match = url.match(pattern)
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0`
+    }
+  }
+
+  return url
+}
+
+function isYouTubeUrl(url: string | null): boolean {
+  if (!url) return false
+  return url.includes('youtube.com') || url.includes('youtu.be')
+}
+
 export default function HomePageClient({ services, doctors, testimonials, settings }: HomePageClientProps) {
   const [videoModalOpen, setVideoModalOpen] = useState(false)
   const [selectedDoctorVideo, setSelectedDoctorVideo] = useState<string | null>(null)
+  const [playingDoctorId, setPlayingDoctorId] = useState<string | null>(null)
+  const [doctorsSwiperRef, setDoctorsSwiperRef] = useState<SwiperType | null>(null)
 
+  const { consent } = useCookieConsent()
+
+  // Stop/start autoplay when video is playing
+  useEffect(() => {
+    if (!doctorsSwiperRef) return
+    if (playingDoctorId) {
+      doctorsSwiperRef.autoplay?.stop()
+    } else {
+      doctorsSwiperRef.autoplay?.start()
+    }
+  }, [playingDoctorId, doctorsSwiperRef])
   const containerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -146,14 +186,22 @@ export default function HomePageClient({ services, doctors, testimonials, settin
 
   // Transform doctors data for display
   const doctorsData = useMemo(() => {
-    return doctors.map((doctor) => ({
-      id: doctor.id,
-      fullName: doctor.name,
-      title: getLocalizedContent(doctor.title) || getLocalizedContent(doctor.specialty),
-      experience: '10+ godina',
-      image: getImageUrl(doctor.profile_image) || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=800&fit=crop',
-      videoUrl: doctor.video_preview,
-    }))
+    return doctors.map((doctor) => {
+      // Get video URL - use getImageUrl for Supabase paths, keep YouTube URLs as-is
+      const rawVideoUrl = doctor.video_preview
+      const videoUrl = rawVideoUrl && isYouTubeUrl(rawVideoUrl)
+        ? rawVideoUrl
+        : getImageUrl(rawVideoUrl)
+
+      return {
+        id: doctor.id,
+        fullName: doctor.name,
+        title: getLocalizedContent(doctor.title) || getLocalizedContent(doctor.specialty),
+        experience: getLocalizedContent(doctor.specialty) || '',
+        image: getImageUrl(doctor.profile_image) || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=800&fit=crop',
+        videoUrl,
+      }
+    })
   }, [doctors])
 
   // Transform testimonials data for display
@@ -394,10 +442,9 @@ export default function HomePageClient({ services, doctors, testimonials, settin
           </motion.div>
 
           <Swiper
-            modules={[Navigation, Pagination, Autoplay]}
+            modules={[Pagination, Autoplay]}
             spaceBetween={32}
             slidesPerView={1}
-            navigation
             pagination={{ clickable: true }}
             autoplay={{ delay: 5000, disableOnInteraction: false }}
             breakpoints={{
@@ -408,6 +455,7 @@ export default function HomePageClient({ services, doctors, testimonials, settin
             threshold={10}
             resistanceRatio={0}
             className="!pb-16"
+            onSwiper={setDoctorsSwiperRef}
           >
             {doctorsData.map((doctor, index) => (
               <SwiperSlide key={doctor.id}>
@@ -418,31 +466,71 @@ export default function HomePageClient({ services, doctors, testimonials, settin
                   transition={{ duration: 0.8, delay: index * 0.2 }}
                   className="group cursor-pointer"
                 >
-                  <div className="relative aspect-[3/4] rounded-3xl overflow-hidden mb-6">
-                    <img
-                      src={doctor.image}
-                      alt={doctor.fullName}
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
-                    />
-                    {doctor.videoUrl && (
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          setSelectedDoctorVideo(doctor.videoUrl)
-                          setVideoModalOpen(true)
-                        }}
-                        className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-                        aria-label={`Play video for ${doctor.fullName}`}
-                      >
-                        <div className="w-20 h-20 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
-                          <Play className="w-8 h-8 text-orangeCTA ml-1" />
+                  <div className="relative aspect-[3/4] rounded-3xl overflow-hidden mb-6 bg-black">
+                    {playingDoctorId === doctor.id && doctor.videoUrl ? (
+                      <>
+                        {isYouTubeUrl(doctor.videoUrl) ? (
+                          consent.marketing ? (
+                            <iframe
+                              src={getEmbedUrl(doctor.videoUrl) || ''}
+                              className="absolute inset-0 w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              title={`Video - ${doctor.fullName}`}
+                            />
+                          ) : (
+                            <div className="absolute inset-0 w-full h-full bg-gray-900">
+                              <ConsentPlaceholder variant="video" className="h-full rounded-none" />
+                            </div>
+                          )
+                        ) : (
+                          <video
+                            src={doctor.videoUrl}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            controls
+                            autoPlay
+                            controlsList="nodownload"
+                          />
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setPlayingDoctorId(null)
+                          }}
+                          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center z-20 hover:bg-white transition-colors"
+                          aria-label="Close video"
+                        >
+                          <X className="w-5 h-5 text-black" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <img
+                          src={doctor.image}
+                          alt={doctor.fullName}
+                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
+                        />
+                        {doctor.videoUrl && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              setPlayingDoctorId(doctor.id)
+                            }}
+                            className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                            aria-label={`Play video for ${doctor.fullName}`}
+                          >
+                            <div className="w-20 h-20 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
+                              <Play className="w-8 h-8 text-orangeCTA ml-1" />
+                            </div>
+                          </button>
+                        )}
+                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-black text-sm font-medium">
+                          {doctor.experience}
                         </div>
-                      </button>
+                      </>
                     )}
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-black text-sm font-medium">
-                      {doctor.experience}
-                    </div>
                   </div>
                   <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
                     {doctor.fullName}

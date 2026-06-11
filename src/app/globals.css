@@ -559,6 +559,29 @@ button.learn-more-dark:hover .button-text-dark {
   transform: scale(1.1);
 }
 
+/* Doctors slider specific styles */
+.doctors-slider-wrapper {
+  position: relative;
+}
+
+.doctors-slider .swiper-button-prev {
+  left: -60px !important;
+  top: 35% !important;
+}
+
+.doctors-slider .swiper-button-next {
+  right: -60px !important;
+  top: 35% !important;
+}
+
+/* Hide navigation on mobile */
+@media (max-width: 768px) {
+  .doctors-slider .swiper-button-next,
+  .doctors-slider .swiper-button-prev {
+    display: none !important;
+  }
+}
+
 .swiper-pagination-bullet {
   background: #d1d5db !important;
   width: 12px !important;
