@@ -27,6 +27,7 @@ export type Database = {
           description: LocalizedContent | null
           short_description: LocalizedContent | null
           category: string | null
+          categories: string[] | null
           featured_image: string | null
           icon: string | null
           pricing: Json | null
@@ -46,6 +47,7 @@ export type Database = {
           description?: LocalizedContent | null
           short_description?: LocalizedContent | null
           category?: string | null
+          categories?: string[] | null
           featured_image?: string | null
           icon?: string | null
           pricing?: Json | null
@@ -65,6 +67,7 @@ export type Database = {
           description?: LocalizedContent | null
           short_description?: LocalizedContent | null
           category?: string | null
+          categories?: string[] | null
           featured_image?: string | null
           icon?: string | null
           pricing?: Json | null

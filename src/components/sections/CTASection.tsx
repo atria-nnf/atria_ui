@@ -4,16 +4,24 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { BsArrowRight } from 'react-icons/bs'
-import type { ContactInfo } from '@/types'
+import type { ContactInfo, Locale } from '@/types'
 
 interface CTASectionProps {
   contactInfo?: ContactInfo
+  title?: Record<Locale, string>
+  subtitle?: Record<Locale, string>
+  buttonText?: Record<Locale, string>
 }
 
-export function CTASection({ contactInfo }: CTASectionProps) {
+export function CTASection({ contactInfo, title, subtitle, buttonText }: CTASectionProps) {
   const email = contactInfo?.email || 'info@atria.hr'
   const phone = contactInfo?.phone || '+385 1 123 4567'
   const phoneHref = `tel:${phone.replace(/\s/g, '')}`
+
+  // Use settings or default values
+  const ctaTitle = title?.['hr-HR'] || 'Naručite se na pregled'
+  const ctaSubtitle = subtitle?.['hr-HR'] || 'Naš tim stručnjaka je tu za vas. Zakažite pregled i prepustite svoje zdravlje u sigurne ruke.'
+  const ctaButtonText = buttonText?.['hr-HR'] || 'Naručite se'
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       {/* Background Image */}
@@ -37,7 +45,7 @@ export function CTASection({ contactInfo }: CTASectionProps) {
           viewport={{ once: true }}
           className="text-4xl md:text-6xl font-bold mb-6 text-white font-serif"
         >
-          Naručite se na pregled
+          {ctaTitle}
         </motion.h2>
 
         <motion.p
@@ -47,8 +55,7 @@ export function CTASection({ contactInfo }: CTASectionProps) {
           transition={{ delay: 0.1 }}
           className="text-xl text-white/90 mb-12 max-w-2xl mx-auto"
         >
-          Naš tim stručnjaka je tu za vas. Zakažite pregled i prepustite svoje
-          zdravlje u sigurne ruke.
+          {ctaSubtitle}
         </motion.p>
 
         <motion.div
@@ -60,7 +67,7 @@ export function CTASection({ contactInfo }: CTASectionProps) {
         >
           <Link href="/kontakt">
             <button className="group bg-white text-brand-color px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all flex items-center gap-2">
-              Naručite se
+              {ctaButtonText}
               <BsArrowRight className="group-hover:translate-x-1 transition-transform" />
             </button>
           </Link>

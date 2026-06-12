@@ -401,9 +401,10 @@ export function ServiceDetailsClient({
                       <p className="text-gray-500 text-lg mb-4 italic">{getLocalizedContent(doctor.title, locale)}</p>
                     )}
                     {doctor.bio && (
-                      <p className="text-gray-600 leading-relaxed text-lg">
-                        {getLocalizedContent(doctor.bio, locale)}
-                      </p>
+                      <div
+                        className="text-gray-600 leading-relaxed text-lg prose prose-lg max-w-none"
+                        dangerouslySetInnerHTML={{ __html: getLocalizedContent(doctor.bio, locale) }}
+                      />
                     )}
                   </div>
                 </motion.div>

@@ -6,6 +6,7 @@ import type {
   ContactInfo,
   AboutUsSettings,
   LegalPageSettings,
+  FooterSettings,
   SettingKey,
 } from '@/types'
 
@@ -71,6 +72,13 @@ export async function getContactInfo(): Promise<ContactInfo> {
  */
 export async function getAboutUsPage(): Promise<AboutUsSettings | null> {
   return getSetting<AboutUsSettings>('about_us')
+}
+
+/**
+ * Get footer settings
+ */
+export async function getFooterSettings(): Promise<FooterSettings | null> {
+  return getSetting<FooterSettings>('footer')
 }
 
 /**

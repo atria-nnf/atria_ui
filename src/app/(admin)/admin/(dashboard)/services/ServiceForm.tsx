@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Input } from '@/components/admin/ui/Input'
-import { Select } from '@/components/admin/ui/Select'
+import { MultiSelect } from '@/components/admin/ui/MultiSelect'
 import { Button } from '@/components/admin/ui/Button'
 import { Switch } from '@/components/admin/ui/Switch'
 import { LocalizedInput } from '@/components/admin/ui/LocalizedInput'
@@ -18,7 +18,7 @@ import Link from 'next/link'
 
 const serviceSchema = z.object({
   slug: z.string().min(1, 'Slug je obavezan').regex(/^[a-z0-9-]+$/, 'Slug može sadržavati samo mala slova, brojeve i crtice'),
-  category: z.string().optional(),
+  categories: z.array(z.string()).optional(),
   duration: z.string().optional(),
   icon: z.string().optional(),
   featured_image: z.string().optional(),
@@ -69,6 +69,11 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
 
   // Featured image state
   const [featuredImage, setFeaturedImage] = useState(service?.featured_image || '')
+
+  // Categories state (multi-select)
+  const [categories, setCategories] = useState<string[]>(
+    service?.categories || (service?.category ? [service.category] : [])
+  )
 
   // Partner logos state
   const [partnerLogos, setPartnerLogos] = useState<{ url: string; name: string }[]>(
@@ -189,7 +194,7 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
     resolver: zodResolver(serviceSchema),
     defaultValues: {
       slug: service?.slug || '',
-      category: service?.category || '',
+      categories: service?.categories || (service?.category ? [service.category] : []),
       duration: service?.duration || '',
       icon: service?.icon || '',
       featured_image: service?.featured_image || '',
@@ -223,6 +228,7 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
       name,
       short_description: shortDescription,
       description,
+      categories: categories.length > 0 ? categories : null,
       featured_image: featuredImage || null,
       partner_logos: partnerLogos.length > 0 ? partnerLogos : null,
       steps: steps.length > 0 ? steps : null,
@@ -698,12 +704,12 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
               error={errors.slug?.message}
             />
 
-            <Select
-              label="Kategorija"
+            <MultiSelect
+              label="Kategorije"
               options={categoryOptions}
-              placeholder="Odaberi kategoriju"
-              {...register('category')}
-              error={errors.category?.message}
+              placeholder="Odaberi kategorije"
+              value={categories}
+              onChange={setCategories}
             />
 
             <Input

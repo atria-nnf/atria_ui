@@ -652,14 +652,19 @@ export default function HomePageClient({ services, doctors, testimonials, settin
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <div className="text-sm tracking-widest text-gray-500 mb-4">PROSTORI</div>
+            <div className="text-sm tracking-widest text-gray-500 mb-4">
+              {settings?.gallerySectionLabel?.['hr-HR'] || 'PROSTORI'}
+            </div>
             <h2
               className="text-6xl md:text-8xl font-bold mb-6 text-black"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
-              Gdje se
-              <br />
-              događa magija
+              {(settings?.gallerySectionTitle?.['hr-HR'] || 'Gdje se\ndogađa magija').split('\n').map((line, i, arr) => (
+                <span key={i}>
+                  {line}
+                  {i < arr.length - 1 && <br />}
+                </span>
+              ))}
             </h2>
           </motion.div>
 
@@ -831,19 +836,22 @@ export default function HomePageClient({ services, doctors, testimonials, settin
             className="text-6xl md:text-9xl font-bold mb-8 leading-none"
             style={{ fontFamily: 'Playfair Display, serif' }}
           >
-            Započni
-            <br />
-            danas
+            {(settings?.ctaSectionTitle?.['hr-HR'] || 'Započni\ndanas').split('\n').map((line, i, arr) => (
+              <span key={i}>
+                {line}
+                {i < arr.length - 1 && <br />}
+              </span>
+            ))}
           </h2>
           <p className="text-2xl md:text-3xl mb-12 text-white/90 max-w-3xl mx-auto font-light">
-            Tvoje putovanje prema boljem zdravlju počinje jednim klikom
+            {settings?.ctaSectionSubtitle?.['hr-HR'] || 'Tvoje putovanje prema boljem zdravlju počinje jednim klikom'}
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/kontakt"
               className="inline-block px-16 py-6 bg-black text-white rounded-full text-xl font-medium hover:bg-gray-900 transition-all"
             >
-              Rezerviraj termin
+              {settings?.ctaSectionButtonText?.['hr-HR'] || 'Rezerviraj termin'}
             </Link>
           </motion.div>
         </motion.div>

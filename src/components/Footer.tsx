@@ -4,13 +4,14 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, ArrowRight, Cookie } from 'lucide-react'
-import { FaInstagram, FaFacebookF, FaLinkedinIn } from 'react-icons/fa'
-import type { Service, ContactInfo } from '@/types'
+import { FaInstagram, FaFacebookF, FaTiktok } from 'react-icons/fa'
+import type { Service, ContactInfo, FooterSettings } from '@/types'
 import { useCookieConsent } from '@/config/cookie-consent-context'
 
 interface FooterProps {
   services?: Service[]
   contactInfo?: ContactInfo
+  footerSettings?: FooterSettings | null
 }
 
 const quickLinks = [
@@ -27,7 +28,7 @@ const legal = [
   { name: 'Kolačići', href: '/kolacici' },
 ]
 
-export function Footer({ services: servicesProp = [], contactInfo }: FooterProps) {
+export function Footer({ services: servicesProp = [], contactInfo, footerSettings }: FooterProps) {
   const { openPreferenceCenter } = useCookieConsent()
   // Build services list from props
   const services = useMemo(() => {
@@ -46,6 +47,13 @@ export function Footer({ services: servicesProp = [], contactInfo }: FooterProps
   const contactPhone = contactInfo?.phone || '+385 1 123 4567'
   const contactCity = contactInfo?.city || 'Dugo Selo'
   const clinicName = contactInfo?.clinicName || 'Poliklinika Atria'
+
+  // Footer settings with defaults
+  const brandTagline = footerSettings?.brandTagline?.['hr-HR'] || 'Moderna medicina koja vas razumije. Vaše zdravlje je naša misija.'
+  const newsletterTitle = footerSettings?.newsletterTitle?.['hr-HR'] || 'Newsletter'
+  const newsletterDescription = footerSettings?.newsletterDescription?.['hr-HR'] || 'Primajte zdravstvene savjete, vijesti i posebne ponude direktno u svoj inbox.'
+  const workingHoursWeekdays = footerSettings?.workingHoursWeekdays || 'Pon - Pet: 8:00 - 20:00'
+  const workingHoursSaturday = footerSettings?.workingHoursSaturday || 'Sub: 9:00 - 14:00'
 
   // Format phone for display
   const formatPhoneDisplay = (phone: string) => {
@@ -89,7 +97,7 @@ export function Footer({ services: servicesProp = [], contactInfo }: FooterProps
                 ATRIA
               </div>
               <p className="text-xl text-gray-400 mb-10 max-w-md leading-relaxed">
-                Moderna medicina koja vas razumije. Vaše zdravlje je naša misija.
+                {brandTagline}
               </p>
 
               {/* Contact Info */}
@@ -131,10 +139,9 @@ export function Footer({ services: servicesProp = [], contactInfo }: FooterProps
               transition={{ duration: 0.6, delay: 0.2 }}
               className="lg:ml-auto lg:max-w-[500px]"
             >
-              <h3 className="text-3xl font-bold mb-4 font-serif">Newsletter</h3>
+              <h3 className="text-3xl font-bold mb-4 font-serif">{newsletterTitle}</h3>
               <p className="text-gray-400 mb-8 leading-relaxed">
-                Primajte zdravstvene savjete, vijesti i posebne ponude direktno
-                u svoj inbox.
+                {newsletterDescription}
               </p>
 
               <form onSubmit={handleNewsletterSubmit} className="relative mb-4">
@@ -287,15 +294,15 @@ export function Footer({ services: servicesProp = [], contactInfo }: FooterProps
                   </motion.a>
                 )}
 
-                {(contactInfo?.socialMedia?.linkedin || 'https://linkedin.com') && (
+                {(contactInfo?.socialMedia?.tiktok || 'https://tiktok.com') && (
                   <motion.a
-                    href={contactInfo?.socialMedia?.linkedin || 'https://linkedin.com'}
+                    href={contactInfo?.socialMedia?.tiktok || 'https://tiktok.com'}
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.1, y: -2 }}
                     className="w-10 h-10 bg-white/5 hover:bg-orangeCTA rounded-full flex items-center justify-center transition-all"
                   >
-                    <FaLinkedinIn className="w-5 h-5" />
+                    <FaTiktok className="w-5 h-5" />
                   </motion.a>
                 )}
               </div>
@@ -305,9 +312,9 @@ export function Footer({ services: servicesProp = [], contactInfo }: FooterProps
                   Radno vrijeme
                 </p>
                 <p className="text-sm text-gray-400 mb-1">
-                  Pon - Pet: 8:00 - 20:00
+                  {workingHoursWeekdays}
                 </p>
-                <p className="text-sm text-gray-400">Sub: 9:00 - 14:00</p>
+                <p className="text-sm text-gray-400">{workingHoursSaturday}</p>
               </div>
             </motion.div>
           </div>

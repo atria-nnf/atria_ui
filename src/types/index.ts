@@ -21,6 +21,7 @@ export type SettingKey =
   | 'services_page'
   | 'about_us'
   | 'contact_info'
+  | 'footer'
   | 'privacy_policy'
   | 'terms_of_service'
   | 'cookie_policy'
@@ -49,12 +50,29 @@ export interface HomepageSettings {
   ctaButtonText?: Record<Locale, string>
   stats?: HomepageStat[]
   processSteps?: HomepageProcessStep[]
+  // Gallery section
+  gallerySectionLabel?: Record<Locale, string>
+  gallerySectionTitle?: Record<Locale, string>
   galleryImages?: HomepageGalleryImage[]
+  // CTA section at the bottom of homepage
+  ctaSectionTitle?: Record<Locale, string>
+  ctaSectionSubtitle?: Record<Locale, string>
+  ctaSectionButtonText?: Record<Locale, string>
   seo?: {
     title?: Record<Locale, string>
     description?: Record<Locale, string>
     ogImage?: string
   }
+}
+
+// Footer settings structure
+export interface FooterSettings {
+  brandTagline?: Record<Locale, string>
+  newsletterTitle?: Record<Locale, string>
+  newsletterDescription?: Record<Locale, string>
+  workingHoursWeekdays?: string
+  workingHoursSaturday?: string
+  copyrightText?: Record<Locale, string>
 }
 
 // Services page settings structure
@@ -92,7 +110,7 @@ export interface ContactInfo {
   socialMedia?: {
     facebook?: string
     instagram?: string
-    linkedin?: string
+    tiktok?: string
   }
 }
 

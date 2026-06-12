@@ -383,9 +383,10 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                       <h3 className="text-4xl md:text-5xl font-bold mb-4 font-serif">{doctor.name}</h3>
 
                       {doctor.bio && (
-                        <p className="text-gray-600 text-lg leading-relaxed mb-8">
-                          {getLocalizedContent(doctor.bio, locale)}
-                        </p>
+                        <div
+                          className="text-gray-600 text-lg leading-relaxed mb-8 prose prose-lg max-w-none"
+                          dangerouslySetInnerHTML={{ __html: getLocalizedContent(doctor.bio, locale) }}
+                        />
                       )}
 
                       {/* Quick Info */}

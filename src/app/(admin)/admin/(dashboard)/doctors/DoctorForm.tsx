@@ -9,6 +9,7 @@ import { Input } from '@/components/admin/ui/Input'
 import { Button } from '@/components/admin/ui/Button'
 import { Switch } from '@/components/admin/ui/Switch'
 import { LocalizedInput } from '@/components/admin/ui/LocalizedInput'
+import { LocalizedRichText } from '@/components/admin/ui/LocalizedRichText'
 import { ImageUpload } from '@/components/admin/ui/ImageUpload'
 import { createDoctor, updateDoctor, getDoctorServices, updateDoctorServices } from '@/lib/api/admin/doctors'
 import { createClient } from '@/lib/supabase/client'
@@ -262,14 +263,13 @@ export function DoctorForm({ doctor, isEditing }: DoctorFormProps) {
               placeholder="Npr. Interna medicina"
             />
 
-            <LocalizedInput
+            <LocalizedRichText
               label="Biografija"
               name="bio"
               value={bio}
               onChange={setBio}
-              type="textarea"
-              rows={6}
               placeholder="Kratka biografija liječnika"
+              minHeight="200px"
             />
           </div>
 

@@ -6,9 +6,10 @@ import { Button } from '@/components/admin/ui/Button'
 import { LocalizedInput } from '@/components/admin/ui/LocalizedInput'
 import { ImageUpload } from '@/components/admin/ui/ImageUpload'
 import { Save, Building2, Phone, FileText, Plus, X, GripVertical, Image as ImageIcon, Briefcase, Link as LinkIcon } from 'lucide-react'
-import type { HomepageStat, HomepageProcessStep, HomepageGalleryImage, ServicesPageStat, ServicesPageWhyItem, AboutUsStat, AboutUsValue, AboutUsMilestone, Locale } from '@/types'
+import type { HomepageStat, HomepageProcessStep, HomepageGalleryImage, ServicesPageStat, ServicesPageWhyItem, AboutUsStat, AboutUsValue, AboutUsMilestone, Locale, FooterSettings } from '@/types'
+import { PanelBottom } from 'lucide-react'
 
-type Tab = 'contact' | 'homepage' | 'services' | 'about'
+type Tab = 'contact' | 'homepage' | 'services' | 'about' | 'footer'
 
 const emptyLocalized = (): Record<Locale, string> => ({ 'hr-HR': '', 'en-US': '', 'de-DE': '' })
 
@@ -53,7 +54,7 @@ export default function SettingsPage() {
     address: '',
     city: '',
     postalCode: '',
-    socialMedia: { facebook: '', instagram: '', linkedin: '' }
+    socialMedia: { facebook: '', instagram: '', tiktok: '' }
   })
 
   // Homepage
@@ -63,7 +64,14 @@ export default function SettingsPage() {
   const [ctaButtonText, setCtaButtonText] = useState<Record<string, string>>(emptyLocalized())
   const [stats, setStats] = useState<HomepageStat[]>([])
   const [processSteps, setProcessSteps] = useState<HomepageProcessStep[]>([])
+  // Gallery Section
+  const [gallerySectionLabel, setGallerySectionLabel] = useState<Record<string, string>>(emptyLocalized())
+  const [gallerySectionTitle, setGallerySectionTitle] = useState<Record<string, string>>(emptyLocalized())
   const [galleryImages, setGalleryImages] = useState<HomepageGalleryImage[]>([])
+  // Homepage CTA Section
+  const [ctaSectionTitle, setCtaSectionTitle] = useState<Record<string, string>>(emptyLocalized())
+  const [ctaSectionSubtitle, setCtaSectionSubtitle] = useState<Record<string, string>>(emptyLocalized())
+  const [ctaSectionButtonText, setCtaSectionButtonText] = useState<Record<string, string>>(emptyLocalized())
 
   // Services Page
   const [servicesHeroTitle, setServicesHeroTitle] = useState<Record<string, string>>(emptyLocalized())
@@ -86,13 +94,21 @@ export default function SettingsPage() {
   const [aboutCtaTitle, setAboutCtaTitle] = useState<Record<string, string>>(emptyLocalized())
   const [aboutCtaSubtitle, setAboutCtaSubtitle] = useState<Record<string, string>>(emptyLocalized())
 
+  // Footer
+  const [footerBrandTagline, setFooterBrandTagline] = useState<Record<string, string>>(emptyLocalized())
+  const [footerNewsletterTitle, setFooterNewsletterTitle] = useState<Record<string, string>>(emptyLocalized())
+  const [footerNewsletterDescription, setFooterNewsletterDescription] = useState<Record<string, string>>(emptyLocalized())
+  const [footerWorkingHoursWeekdays, setFooterWorkingHoursWeekdays] = useState('')
+  const [footerWorkingHoursSaturday, setFooterWorkingHoursSaturday] = useState('')
+
   useEffect(() => {
     const load = async () => {
-      const [contactData, homepageData, servicesData, aboutData] = await Promise.all([
+      const [contactData, homepageData, servicesData, aboutData, footerData] = await Promise.all([
         getSetting('contact_info'),
         getSetting('homepage'),
         getSetting('services_page'),
-        getSetting('about_us')
+        getSetting('about_us'),
+        getSetting('footer')
       ])
       if (contactData) setContact({
         ...contactData,
@@ -105,7 +121,12 @@ export default function SettingsPage() {
         setCtaButtonText(homepageData.ctaButtonText || emptyLocalized())
         setStats(homepageData.stats || [])
         setProcessSteps(homepageData.processSteps || [])
+        setGallerySectionLabel(homepageData.gallerySectionLabel || emptyLocalized())
+        setGallerySectionTitle(homepageData.gallerySectionTitle || emptyLocalized())
         setGalleryImages(homepageData.galleryImages || [])
+        setCtaSectionTitle(homepageData.ctaSectionTitle || emptyLocalized())
+        setCtaSectionSubtitle(homepageData.ctaSectionSubtitle || emptyLocalized())
+        setCtaSectionButtonText(homepageData.ctaSectionButtonText || emptyLocalized())
       }
       if (servicesData) {
         setServicesHeroTitle(servicesData.heroTitle || emptyLocalized())
@@ -128,6 +149,13 @@ export default function SettingsPage() {
         setAboutCtaTitle(aboutData.ctaTitle || emptyLocalized())
         setAboutCtaSubtitle(aboutData.ctaSubtitle || emptyLocalized())
       }
+      if (footerData) {
+        setFooterBrandTagline(footerData.brandTagline || emptyLocalized())
+        setFooterNewsletterTitle(footerData.newsletterTitle || emptyLocalized())
+        setFooterNewsletterDescription(footerData.newsletterDescription || emptyLocalized())
+        setFooterWorkingHoursWeekdays(footerData.workingHoursWeekdays || '')
+        setFooterWorkingHoursSaturday(footerData.workingHoursSaturday || '')
+      }
     }
     load()
   }, [])
@@ -143,7 +171,12 @@ export default function SettingsPage() {
       ctaButtonText,
       stats,
       processSteps,
+      gallerySectionLabel,
+      gallerySectionTitle,
       galleryImages,
+      ctaSectionTitle,
+      ctaSectionSubtitle,
+      ctaSectionButtonText,
     })
     if (tab === 'services') await updateSetting('services_page', {
       heroTitle: servicesHeroTitle,
@@ -165,6 +198,13 @@ export default function SettingsPage() {
       values: aboutValues,
       ctaTitle: aboutCtaTitle,
       ctaSubtitle: aboutCtaSubtitle,
+    })
+    if (tab === 'footer') await updateSetting('footer', {
+      brandTagline: footerBrandTagline,
+      newsletterTitle: footerNewsletterTitle,
+      newsletterDescription: footerNewsletterDescription,
+      workingHoursWeekdays: footerWorkingHoursWeekdays,
+      workingHoursSaturday: footerWorkingHoursSaturday,
     })
     setLoading(false)
     setSaved(true)
@@ -317,6 +357,7 @@ export default function SettingsPage() {
     { id: 'homepage' as Tab, label: 'Pocetna', icon: Building2 },
     { id: 'services' as Tab, label: 'Usluge', icon: Briefcase },
     { id: 'about' as Tab, label: 'O nama', icon: FileText },
+    { id: 'footer' as Tab, label: 'Footer', icon: PanelBottom },
   ]
 
   return (
@@ -380,10 +421,10 @@ export default function SettingsPage() {
                   placeholder="https://instagram.com/..."
                 />
                 <Input
-                  label="LinkedIn"
-                  value={contact.socialMedia?.linkedin || ''}
-                  onChange={e => setContact({ ...contact, socialMedia: { ...contact.socialMedia, linkedin: e.target.value } })}
-                  placeholder="https://linkedin.com/..."
+                  label="TikTok"
+                  value={contact.socialMedia?.tiktok || ''}
+                  onChange={e => setContact({ ...contact, socialMedia: { ...contact.socialMedia, tiktok: e.target.value } })}
+                  placeholder="https://tiktok.com/@..."
                 />
               </div>
             </div>
@@ -468,8 +509,15 @@ export default function SettingsPage() {
 
             {/* Gallery Section */}
             <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Galerija - Tekst</h2>
+              <LocalizedInput label="Oznaka (mala slova iznad naslova)" name="gallerySectionLabel" value={gallerySectionLabel} onChange={setGallerySectionLabel} placeholder="PROSTORI" />
+              <LocalizedInput label="Naslov" name="gallerySectionTitle" value={gallerySectionTitle} onChange={setGallerySectionTitle} type="textarea" rows={2} placeholder="Gdje se&#10;događa magija" />
+            </div>
+
+            {/* Gallery Images */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
               <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                <h2 className="text-lg font-semibold text-gray-900">Galerija</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Galerija - Slike</h2>
                 <Button type="button" variant="outline" onClick={addGalleryImage}>
                   <Plus className="w-4 h-4" /> Dodaj
                 </Button>
@@ -501,6 +549,14 @@ export default function SettingsPage() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* CTA Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">CTA sekcija (poziv na akciju)</h2>
+              <LocalizedInput label="Naslov" name="ctaSectionTitle" value={ctaSectionTitle} onChange={setCtaSectionTitle} placeholder="Naručite se na pregled" />
+              <LocalizedInput label="Podnaslov" name="ctaSectionSubtitle" value={ctaSectionSubtitle} onChange={setCtaSectionSubtitle} type="textarea" rows={2} placeholder="Naš tim stručnjaka je tu za vas..." />
+              <LocalizedInput label="Tekst gumba" name="ctaSectionButtonText" value={ctaSectionButtonText} onChange={setCtaSectionButtonText} placeholder="Naručite se" />
             </div>
           </>
         )}
@@ -720,6 +776,62 @@ export default function SettingsPage() {
               <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">CTA sekcija</h2>
               <LocalizedInput label="Naslov" name="aboutCtaTitle" value={aboutCtaTitle} onChange={setAboutCtaTitle} placeholder="Postanite dio naše priče" />
               <LocalizedInput label="Podnaslov" name="aboutCtaSubtitle" value={aboutCtaSubtitle} onChange={setAboutCtaSubtitle} type="textarea" rows={2} placeholder="Zakažite svoj prvi pregled..." />
+            </div>
+          </>
+        )}
+
+        {tab === 'footer' && (
+          <>
+            {/* Brand Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Brend</h2>
+              <LocalizedInput
+                label="Tagline / Opis klinike"
+                name="footerBrandTagline"
+                value={footerBrandTagline}
+                onChange={setFooterBrandTagline}
+                type="textarea"
+                rows={2}
+                placeholder="Moderna medicina koja vas razumije. Vaše zdravlje je naša misija."
+              />
+            </div>
+
+            {/* Newsletter Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Newsletter</h2>
+              <LocalizedInput
+                label="Naslov"
+                name="footerNewsletterTitle"
+                value={footerNewsletterTitle}
+                onChange={setFooterNewsletterTitle}
+                placeholder="Newsletter"
+              />
+              <LocalizedInput
+                label="Opis"
+                name="footerNewsletterDescription"
+                value={footerNewsletterDescription}
+                onChange={setFooterNewsletterDescription}
+                type="textarea"
+                rows={2}
+                placeholder="Primajte zdravstvene savjete, vijesti i posebne ponude direktno u svoj inbox."
+              />
+            </div>
+
+            {/* Working Hours Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Radno vrijeme</h2>
+              <Input
+                label="Radni dani"
+                value={footerWorkingHoursWeekdays}
+                onChange={(e) => setFooterWorkingHoursWeekdays(e.target.value)}
+                placeholder="Pon - Pet: 8:00 - 20:00"
+              />
+              <Input
+                label="Subota"
+                value={footerWorkingHoursSaturday}
+                onChange={(e) => setFooterWorkingHoursSaturday(e.target.value)}
+                placeholder="Sub: 9:00 - 14:00"
+              />
             </div>
           </>
         )}
