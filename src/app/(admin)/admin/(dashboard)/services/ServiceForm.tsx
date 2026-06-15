@@ -116,6 +116,12 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
     (service?.pricing as { items?: PricingItem[] })?.items || []
   )
 
+  // Walk-in service state
+  const [isWalkin, setIsWalkin] = useState(service?.is_walkin || false)
+  const [walkinInfo, setWalkinInfo] = useState<Record<string, string>>(
+    service?.walkin_info || { 'hr-HR': '', 'en-US': '', 'de-DE': '' }
+  )
+
   const addStep = () => {
     setSteps([
       ...steps,
@@ -233,6 +239,8 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
       partner_logos: partnerLogos.length > 0 ? partnerLogos : null,
       steps: steps.length > 0 ? steps : null,
       pricing: pricingList.length > 0 ? { items: pricingList } : null,
+      is_walkin: isWalkin,
+      walkin_info: isWalkin && walkinInfo['hr-HR']?.trim() ? walkinInfo : null,
     }
 
     const result = isEditing && service
@@ -687,6 +695,29 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
               onChange={(checked) => setValue('is_featured', checked)}
               label="Istaknuta usluga"
             />
+
+            <div className="border-t border-gray-100 pt-4">
+              <Switch
+                checked={isWalkin}
+                onChange={setIsWalkin}
+                label="Bez naručivanja (walk-in)"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Umjesto "Zakaži termin" prikazat će se radno vrijeme
+              </p>
+            </div>
+
+            {isWalkin && (
+              <LocalizedInput
+                label="Radno vrijeme / Info"
+                name="walkin_info"
+                value={walkinInfo}
+                onChange={setWalkinInfo}
+                type="textarea"
+                rows={2}
+                placeholder="Npr. Vađenje krvi: 7:00 - 9:00"
+              />
+            )}
           </div>
 
           {/* Details Card */}

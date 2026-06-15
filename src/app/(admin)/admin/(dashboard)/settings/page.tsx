@@ -5,11 +5,11 @@ import { Input } from '@/components/admin/ui/Input'
 import { Button } from '@/components/admin/ui/Button'
 import { LocalizedInput } from '@/components/admin/ui/LocalizedInput'
 import { ImageUpload } from '@/components/admin/ui/ImageUpload'
-import { Save, Building2, Phone, FileText, Plus, X, GripVertical, Image as ImageIcon, Briefcase, Link as LinkIcon } from 'lucide-react'
+import { Save, Building2, Phone, FileText, Plus, X, GripVertical, Image as ImageIcon, Briefcase, Link as LinkIcon, MessageSquare, Users } from 'lucide-react'
 import type { HomepageStat, HomepageProcessStep, HomepageGalleryImage, ServicesPageStat, ServicesPageWhyItem, AboutUsStat, AboutUsValue, AboutUsMilestone, Locale, FooterSettings } from '@/types'
 import { PanelBottom } from 'lucide-react'
 
-type Tab = 'contact' | 'homepage' | 'services' | 'about' | 'footer'
+type Tab = 'contact' | 'homepage' | 'services' | 'about' | 'footer' | 'contact_page' | 'doctors_page'
 
 const emptyLocalized = (): Record<Locale, string> => ({ 'hr-HR': '', 'en-US': '', 'de-DE': '' })
 
@@ -101,14 +101,26 @@ export default function SettingsPage() {
   const [footerWorkingHoursWeekdays, setFooterWorkingHoursWeekdays] = useState('')
   const [footerWorkingHoursSaturday, setFooterWorkingHoursSaturday] = useState('')
 
+  // Contact Page
+  const [contactPageHeroLabel, setContactPageHeroLabel] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageHeroTitle, setContactPageHeroTitle] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageHeroSubtitle, setContactPageHeroSubtitle] = useState<Record<string, string>>(emptyLocalized())
+
+  // Doctors Page
+  const [doctorsPageHeroLabel, setDoctorsPageHeroLabel] = useState<Record<string, string>>(emptyLocalized())
+  const [doctorsPageHeroTitle, setDoctorsPageHeroTitle] = useState<Record<string, string>>(emptyLocalized())
+  const [doctorsPageHeroSubtitle, setDoctorsPageHeroSubtitle] = useState<Record<string, string>>(emptyLocalized())
+
   useEffect(() => {
     const load = async () => {
-      const [contactData, homepageData, servicesData, aboutData, footerData] = await Promise.all([
+      const [contactData, homepageData, servicesData, aboutData, footerData, contactPageData, doctorsPageData] = await Promise.all([
         getSetting('contact_info'),
         getSetting('homepage'),
         getSetting('services_page'),
         getSetting('about_us'),
-        getSetting('footer')
+        getSetting('footer'),
+        getSetting('contact_page'),
+        getSetting('doctors_page')
       ])
       if (contactData) setContact({
         ...contactData,
@@ -155,6 +167,16 @@ export default function SettingsPage() {
         setFooterNewsletterDescription(footerData.newsletterDescription || emptyLocalized())
         setFooterWorkingHoursWeekdays(footerData.workingHoursWeekdays || '')
         setFooterWorkingHoursSaturday(footerData.workingHoursSaturday || '')
+      }
+      if (contactPageData) {
+        setContactPageHeroLabel(contactPageData.heroLabel || emptyLocalized())
+        setContactPageHeroTitle(contactPageData.heroTitle || emptyLocalized())
+        setContactPageHeroSubtitle(contactPageData.heroSubtitle || emptyLocalized())
+      }
+      if (doctorsPageData) {
+        setDoctorsPageHeroLabel(doctorsPageData.heroLabel || emptyLocalized())
+        setDoctorsPageHeroTitle(doctorsPageData.heroTitle || emptyLocalized())
+        setDoctorsPageHeroSubtitle(doctorsPageData.heroSubtitle || emptyLocalized())
       }
     }
     load()
@@ -205,6 +227,16 @@ export default function SettingsPage() {
       newsletterDescription: footerNewsletterDescription,
       workingHoursWeekdays: footerWorkingHoursWeekdays,
       workingHoursSaturday: footerWorkingHoursSaturday,
+    })
+    if (tab === 'contact_page') await updateSetting('contact_page', {
+      heroLabel: contactPageHeroLabel,
+      heroTitle: contactPageHeroTitle,
+      heroSubtitle: contactPageHeroSubtitle,
+    })
+    if (tab === 'doctors_page') await updateSetting('doctors_page', {
+      heroLabel: doctorsPageHeroLabel,
+      heroTitle: doctorsPageHeroTitle,
+      heroSubtitle: doctorsPageHeroSubtitle,
     })
     setLoading(false)
     setSaved(true)
@@ -353,10 +385,12 @@ export default function SettingsPage() {
   }
 
   const tabs = [
-    { id: 'contact' as Tab, label: 'Kontakt', icon: Phone },
+    { id: 'contact' as Tab, label: 'Kontakt info', icon: Phone },
     { id: 'homepage' as Tab, label: 'Pocetna', icon: Building2 },
     { id: 'services' as Tab, label: 'Usluge', icon: Briefcase },
     { id: 'about' as Tab, label: 'O nama', icon: FileText },
+    { id: 'doctors_page' as Tab, label: 'Liječnici', icon: Users },
+    { id: 'contact_page' as Tab, label: 'Kontakt stranica', icon: MessageSquare },
     { id: 'footer' as Tab, label: 'Footer', icon: PanelBottom },
   ]
 
@@ -831,6 +865,74 @@ export default function SettingsPage() {
                 value={footerWorkingHoursSaturday}
                 onChange={(e) => setFooterWorkingHoursSaturday(e.target.value)}
                 placeholder="Sub: 9:00 - 14:00"
+              />
+            </div>
+          </>
+        )}
+
+        {tab === 'doctors_page' && (
+          <>
+            {/* Hero Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Hero sekcija</h2>
+              <LocalizedInput
+                label="Oznaka (mala slova iznad naslova)"
+                name="doctorsPageHeroLabel"
+                value={doctorsPageHeroLabel}
+                onChange={setDoctorsPageHeroLabel}
+                placeholder="NAŠ TIM"
+              />
+              <LocalizedInput
+                label="Naslov"
+                name="doctorsPageHeroTitle"
+                value={doctorsPageHeroTitle}
+                onChange={setDoctorsPageHeroTitle}
+                type="textarea"
+                rows={2}
+                placeholder="Upoznajte&#10;naše stručnjake"
+              />
+              <LocalizedInput
+                label="Podnaslov"
+                name="doctorsPageHeroSubtitle"
+                value={doctorsPageHeroSubtitle}
+                onChange={setDoctorsPageHeroSubtitle}
+                type="textarea"
+                rows={3}
+                placeholder="Iskusni liječnici s ljudskim pristupom. Svaki član našeg tima donosi jedinstvenu kombinaciju stručnosti, iskustva i strasti za pomoć ljudima."
+              />
+            </div>
+          </>
+        )}
+
+        {tab === 'contact_page' && (
+          <>
+            {/* Hero Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Hero sekcija</h2>
+              <LocalizedInput
+                label="Oznaka (mala slova iznad naslova)"
+                name="contactPageHeroLabel"
+                value={contactPageHeroLabel}
+                onChange={setContactPageHeroLabel}
+                placeholder="KONTAKTIRAJTE NAS"
+              />
+              <LocalizedInput
+                label="Naslov"
+                name="contactPageHeroTitle"
+                value={contactPageHeroTitle}
+                onChange={setContactPageHeroTitle}
+                type="textarea"
+                rows={2}
+                placeholder="Tu smo&#10;za vas"
+              />
+              <LocalizedInput
+                label="Podnaslov"
+                name="contactPageHeroSubtitle"
+                value={contactPageHeroSubtitle}
+                onChange={setContactPageHeroSubtitle}
+                type="textarea"
+                rows={3}
+                placeholder="Imate pitanja? Trebate savjet? Želite zakazati pregled? Kontaktirajte nas - odgovorit ćemo vam u najkraćem roku."
               />
             </div>
           </>

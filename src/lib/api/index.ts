@@ -73,6 +73,8 @@ export {
   getHomepageSettings,
   getServicesPageSettings,
   getContactInfo,
+  getContactPageSettings,
+  getDoctorsPageSettings,
   getFooterSettings,
   getAboutUsPage,
   getPrivacyPolicy,

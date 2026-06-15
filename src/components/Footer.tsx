@@ -45,8 +45,16 @@ export function Footer({ services: servicesProp = [], contactInfo, footerSetting
   // Contact info with defaults
   const contactEmail = contactInfo?.email || 'info@atria.hr'
   const contactPhone = contactInfo?.phone || '+385 1 123 4567'
+  const contactAddress = contactInfo?.address || ''
   const contactCity = contactInfo?.city || 'Dugo Selo'
+  const contactPostalCode = contactInfo?.postalCode || ''
   const clinicName = contactInfo?.clinicName || 'Poliklinika Atria'
+
+  // Format full address
+  const fullAddress = [
+    contactAddress,
+    [contactPostalCode, contactCity].filter(Boolean).join(' ')
+  ].filter(Boolean).join(', ')
 
   // Footer settings with defaults
   const brandTagline = footerSettings?.brandTagline?.['hr-HR'] || 'Moderna medicina koja vas razumije. Vaše zdravlje je naša misija.'
@@ -122,11 +130,11 @@ export function Footer({ services: servicesProp = [], contactInfo, footerSetting
                   <span>{phoneDisplay}</span>
                 </a>
 
-                <div className="flex items-center gap-3 text-gray-400 group">
-                  <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+                <div className="flex items-start gap-3 text-gray-400 group">
+                  <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-5 h-5" />
                   </div>
-                  <span>{contactCity}, Hrvatska</span>
+                  <span>{fullAddress || `${contactCity}, Hrvatska`}</span>
                 </div>
               </div>
             </motion.div>

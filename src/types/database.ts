@@ -35,6 +35,8 @@ export type Database = {
           partner_logos: Json | null
           steps: Json | null
           is_featured: boolean
+          is_walkin: boolean
+          walkin_info: LocalizedContent | null
           order_index: number
           seo: Json | null
           created_at: string
@@ -55,6 +57,8 @@ export type Database = {
           partner_logos?: Json | null
           steps?: Json | null
           is_featured?: boolean
+          is_walkin?: boolean
+          walkin_info?: LocalizedContent | null
           order_index?: number
           seo?: Json | null
           created_at?: string
@@ -75,6 +79,8 @@ export type Database = {
           partner_logos?: Json | null
           steps?: Json | null
           is_featured?: boolean
+          is_walkin?: boolean
+          walkin_info?: LocalizedContent | null
           order_index?: number
           seo?: Json | null
           created_at?: string

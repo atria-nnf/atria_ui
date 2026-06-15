@@ -21,6 +21,8 @@ export type SettingKey =
   | 'services_page'
   | 'about_us'
   | 'contact_info'
+  | 'contact_page'
+  | 'doctors_page'
   | 'footer'
   | 'privacy_policy'
   | 'terms_of_service'
@@ -112,6 +114,20 @@ export interface ContactInfo {
     instagram?: string
     tiktok?: string
   }
+}
+
+// Contact page settings structure
+export interface ContactPageSettings {
+  heroLabel?: Record<Locale, string>
+  heroTitle?: Record<Locale, string>
+  heroSubtitle?: Record<Locale, string>
+}
+
+// Doctors page settings structure
+export interface DoctorsPageSettings {
+  heroLabel?: Record<Locale, string>
+  heroTitle?: Record<Locale, string>
+  heroSubtitle?: Record<Locale, string>
 }
 
 // About us page structure

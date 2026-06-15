@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { getContactInfo, getServices, getFAQs } from '@/lib/api'
+import { getContactInfo, getServices, getFAQs, getContactPageSettings } from '@/lib/api'
 import { ContactPageClient } from './ContactPageClient'
 
 export const metadata: Metadata = {
@@ -9,11 +9,12 @@ export const metadata: Metadata = {
 }
 
 export default async function ContactPage() {
-  const [contactInfo, services, faqs] = await Promise.all([
+  const [contactInfo, services, faqs, pageSettings] = await Promise.all([
     getContactInfo(),
     getServices(),
     getFAQs(),
+    getContactPageSettings(),
   ])
 
-  return <ContactPageClient contactInfo={contactInfo} services={services} faqs={faqs} />
+  return <ContactPageClient contactInfo={contactInfo} services={services} faqs={faqs} pageSettings={pageSettings} />
 }

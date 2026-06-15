@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { getDoctors } from '@/lib/api'
+import { getDoctors, getDoctorsPageSettings } from '@/lib/api'
 import { DoctorsPageClient } from './DoctorsPageClient'
 
 export const metadata: Metadata = {
@@ -9,7 +9,10 @@ export const metadata: Metadata = {
 }
 
 export default async function DoctorsPage() {
-  const doctors = await getDoctors()
+  const [doctors, pageSettings] = await Promise.all([
+    getDoctors(),
+    getDoctorsPageSettings(),
+  ])
 
-  return <DoctorsPageClient initialDoctors={doctors} />
+  return <DoctorsPageClient initialDoctors={doctors} pageSettings={pageSettings} />
 }

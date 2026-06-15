@@ -16,6 +16,7 @@ import {
   Stethoscope,
   Sparkles,
   ArrowRight,
+  Clock,
 } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
@@ -195,16 +196,30 @@ export function ServiceDetailsClient({
                 <p className="text-lg text-gray-400 mb-8 leading-relaxed">{getLocalizedContent(service.description, locale)}</p>
               )}
 
-              {/* CTA Button */}
+              {/* CTA Button or Walk-in Info */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    href="#booking"
-                    className="block px-8 py-4 bg-orangeCTA text-white rounded-full font-semibold text-center shadow-xl hover:shadow-2xl transition-all"
-                  >
-                    {locale === 'hr-HR' ? 'Zakaži termin' : locale === 'en-US' ? 'Schedule Appointment' : 'Termin vereinbaren'}
-                  </Link>
-                </motion.div>
+                {service.is_walkin ? (
+                  <div className="flex items-center gap-3 px-6 py-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+                    <Clock className="w-6 h-6 text-orangeCTA" />
+                    <div>
+                      <p className="text-sm text-gray-400">
+                        {locale === 'hr-HR' ? 'Bez naručivanja' : locale === 'en-US' ? 'No appointment needed' : 'Ohne Termin'}
+                      </p>
+                      <p className="text-white font-semibold whitespace-pre-line">
+                        {getLocalizedContent(service.walkin_info, locale) || (locale === 'hr-HR' ? 'Dođite tijekom radnog vremena' : locale === 'en-US' ? 'Come during working hours' : 'Kommen Sie während der Öffnungszeiten')}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Link
+                      href="#booking"
+                      className="block px-8 py-4 bg-orangeCTA text-white rounded-full font-semibold text-center shadow-xl hover:shadow-2xl transition-all"
+                    >
+                      {locale === 'hr-HR' ? 'Zakaži termin' : locale === 'en-US' ? 'Schedule Appointment' : 'Termin vereinbaren'}
+                    </Link>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
 
@@ -679,29 +694,49 @@ export function ServiceDetailsClient({
           className="max-w-4xl mx-auto px-8 text-center relative z-10"
         >
           <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight font-serif">
-            {locale === 'hr-HR'
-              ? 'Spremni za prvi korak?'
-              : locale === 'en-US'
-              ? 'Ready for the first step?'
-              : 'Bereit für den ersten Schritt?'}
+            {service.is_walkin
+              ? (locale === 'hr-HR'
+                ? 'Dođite bez naručivanja'
+                : locale === 'en-US'
+                ? 'Come without an appointment'
+                : 'Kommen Sie ohne Termin')
+              : (locale === 'hr-HR'
+                ? 'Spremni za prvi korak?'
+                : locale === 'en-US'
+                ? 'Ready for the first step?'
+                : 'Bereit für den ersten Schritt?')}
           </h2>
           <p className="text-2xl mb-10 text-white/90">
-            {locale === 'hr-HR'
-              ? `Zakažite svoj ${getLocalizedContent(service.name, locale).toLowerCase()} danas`
-              : locale === 'en-US'
-              ? `Schedule your ${getLocalizedContent(service.name, locale).toLowerCase()} today`
-              : `Vereinbaren Sie noch heute Ihren ${getLocalizedContent(service.name, locale)}`}
+            {service.is_walkin
+              ? (getLocalizedContent(service.walkin_info, locale) || (locale === 'hr-HR' ? 'Posjetite nas tijekom radnog vremena' : locale === 'en-US' ? 'Visit us during working hours' : 'Besuchen Sie uns während der Öffnungszeiten'))
+              : (locale === 'hr-HR'
+                ? `Zakažite svoj ${getLocalizedContent(service.name, locale).toLowerCase()} danas`
+                : locale === 'en-US'
+                ? `Schedule your ${getLocalizedContent(service.name, locale).toLowerCase()} today`
+                : `Vereinbaren Sie noch heute Ihren ${getLocalizedContent(service.name, locale)}`)}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/kontakt"
-                className="px-10 py-4 bg-black text-white rounded-full text-lg font-semibold hover:bg-gray-900 transition-all inline-flex items-center justify-center gap-2"
-              >
-                <Calendar className="w-5 h-5" />
-                {locale === 'hr-HR' ? 'Zakaži termin' : locale === 'en-US' ? 'Schedule Appointment' : 'Termin vereinbaren'}
-              </Link>
-            </motion.div>
+            {service.is_walkin ? (
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  href="/kontakt"
+                  className="px-10 py-4 bg-black text-white rounded-full text-lg font-semibold hover:bg-gray-900 transition-all inline-flex items-center justify-center gap-2"
+                >
+                  <Clock className="w-5 h-5" />
+                  {locale === 'hr-HR' ? 'Pogledaj radno vrijeme' : locale === 'en-US' ? 'View Working Hours' : 'Öffnungszeiten ansehen'}
+                </Link>
+              </motion.div>
+            ) : (
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  href="/kontakt"
+                  className="px-10 py-4 bg-black text-white rounded-full text-lg font-semibold hover:bg-gray-900 transition-all inline-flex items-center justify-center gap-2"
+                >
+                  <Calendar className="w-5 h-5" />
+                  {locale === 'hr-HR' ? 'Zakaži termin' : locale === 'en-US' ? 'Schedule Appointment' : 'Termin vereinbaren'}
+                </Link>
+              </motion.div>
+            )}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/kontakt"

@@ -174,7 +174,7 @@ export default function HomePageClient({ services, doctors, testimonials, settin
 
   // Transform services data for display
   const servicesData = useMemo(() => {
-    return services.slice(0, 3).map((service) => ({
+    return services.map((service) => ({
       id: service.id,
       name: getLocalizedContent(service.name),
       slug: service.slug,

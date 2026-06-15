@@ -18,12 +18,13 @@ import { useLocale } from '@/config/locale-context'
 import { useCookieConsent } from '@/config/cookie-consent-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
 import { ConsentPlaceholder } from '@/components/cookies'
-import type { Service, ContactInfo, FAQ } from '@/types'
+import type { Service, ContactInfo, FAQ, ContactPageSettings } from '@/types'
 
 interface ContactPageClientProps {
   contactInfo: ContactInfo
   services: Service[]
   faqs: FAQ[]
+  pageSettings: ContactPageSettings | null
 }
 
 interface FormData {
@@ -34,7 +35,7 @@ interface FormData {
   message: string
 }
 
-export function ContactPageClient({ contactInfo, services, faqs }: ContactPageClientProps) {
+export function ContactPageClient({ contactInfo, services, faqs, pageSettings }: ContactPageClientProps) {
   const { locale } = useLocale()
   const { consent } = useCookieConsent()
 
@@ -177,23 +178,17 @@ export function ContactPageClient({ contactInfo, services, faqs }: ContactPageCl
             className="text-center max-w-3xl mx-auto"
           >
             <div className="text-sm tracking-widest text-blue-300 mb-6">
-              {locale === 'hr-HR' ? 'KONTAKTIRAJTE NAS' : locale === 'en-US' ? 'CONTACT US' : 'KONTAKTIEREN SIE UNS'}
+              {getLocalizedContent(pageSettings?.heroLabel, locale) || (locale === 'hr-HR' ? 'KONTAKTIRAJTE NAS' : locale === 'en-US' ? 'CONTACT US' : 'KONTAKTIEREN SIE UNS')}
             </div>
-            <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight font-serif">
-              {locale === 'hr-HR' ? (
-                <>Tu smo<br />za vas</>
-              ) : locale === 'en-US' ? (
-                <>We're here<br />for you</>
-              ) : (
-                <>Wir sind<br />für Sie da</>
-              )}
+            <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight font-serif whitespace-pre-line">
+              {getLocalizedContent(pageSettings?.heroTitle, locale) || (locale === 'hr-HR' ? 'Tu smo\nza vas' : locale === 'en-US' ? "We're here\nfor you" : 'Wir sind\nfür Sie da')}
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">
-              {locale === 'hr-HR'
+              {getLocalizedContent(pageSettings?.heroSubtitle, locale) || (locale === 'hr-HR'
                 ? 'Imate pitanja? Trebate savjet? Želite zakazati pregled? Kontaktirajte nas - odgovorit ćemo vam u najkraćem roku.'
                 : locale === 'en-US'
                 ? 'Have questions? Need advice? Want to schedule an appointment? Contact us - we will respond as soon as possible.'
-                : 'Haben Sie Fragen? Brauchen Sie Beratung? Möchten Sie einen Termin vereinbaren? Kontaktieren Sie uns - wir werden Ihnen schnellstmöglich antworten.'}
+                : 'Haben Sie Fragen? Brauchen Sie Beratung? Möchten Sie einen Termin vereinbaren? Kontaktieren Sie uns - wir werden Ihnen schnellstmöglich antworten.')}
             </p>
           </motion.div>
         </div>

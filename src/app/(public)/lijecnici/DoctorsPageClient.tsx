@@ -16,10 +16,11 @@ import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
 import { getImageUrl } from '@/lib/utils/image'
 import VideoModal from '@/components/VideoModal'
-import type { Doctor } from '@/types'
+import type { Doctor, DoctorsPageSettings } from '@/types'
 
 interface DoctorsPageClientProps {
   initialDoctors: Doctor[]
+  pageSettings: DoctorsPageSettings | null
 }
 
 // Specialty display names
@@ -56,7 +57,7 @@ const SPECIALTY_DISPLAY_NAMES: Record<string, Record<string, string>> = {
   },
 }
 
-export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
+export function DoctorsPageClient({ initialDoctors, pageSettings }: DoctorsPageClientProps) {
   const { locale } = useLocale()
   const [selectedSpecialty, setSelectedSpecialty] = useState('all')
   const [hoveredDoctor, setHoveredDoctor] = useState<string | null>(null)
@@ -224,29 +225,17 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
             className="text-center max-w-4xl mx-auto"
           >
             <div className="text-sm tracking-widest text-blue-300 mb-6">
-              {locale === 'hr-HR' ? 'NAŠ TIM' : locale === 'en-US' ? 'OUR TEAM' : 'UNSER TEAM'}
+              {getLocalizedContent(pageSettings?.heroLabel, locale) || (locale === 'hr-HR' ? 'NAŠ TIM' : locale === 'en-US' ? 'OUR TEAM' : 'UNSER TEAM')}
             </div>
-            <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight font-serif">
-              {locale === 'hr-HR' ? (
-                <>
-                  Upoznajte<br />naše stručnjake
-                </>
-              ) : locale === 'en-US' ? (
-                <>
-                  Meet<br />Our Experts
-                </>
-              ) : (
-                <>
-                  Lernen Sie<br />unsere Experten kennen
-                </>
-              )}
+            <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight font-serif whitespace-pre-line">
+              {getLocalizedContent(pageSettings?.heroTitle, locale) || (locale === 'hr-HR' ? 'Upoznajte\nnaše stručnjake' : locale === 'en-US' ? 'Meet\nOur Experts' : 'Lernen Sie\nunsere Experten kennen')}
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">
-              {locale === 'hr-HR'
+              {getLocalizedContent(pageSettings?.heroSubtitle, locale) || (locale === 'hr-HR'
                 ? 'Iskusni liječnici s ljudskim pristupom. Svaki član našeg tima donosi jedinstvenu kombinaciju stručnosti, iskustva i strasti za pomoć ljudima.'
                 : locale === 'en-US'
                 ? 'Experienced doctors with a human approach. Each member of our team brings a unique combination of expertise, experience, and passion for helping people.'
-                : 'Erfahrene Ärzte mit menschlichem Ansatz. Jedes Mitglied unseres Teams bringt eine einzigartige Kombination aus Fachwissen, Erfahrung und Leidenschaft für die Hilfe von Menschen mit.'}
+                : 'Erfahrene Ärzte mit menschlichem Ansatz. Jedes Mitglied unseres Teams bringt eine einzigartige Kombination aus Fachwissen, Erfahrung und Leidenschaft für die Hilfe von Menschen mit.')}
             </p>
           </motion.div>
         </div>
@@ -520,21 +509,23 @@ export function DoctorsPageClient({ initialDoctors }: DoctorsPageClientProps) {
                       </div>
                     )}
 
-                    {/* CTAs */}
-                    <div className="flex gap-3">
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="flex-1"
-                      >
-                        <Link
-                          href={`/kontakt?doctor=${doctor.slug}`}
-                          className="block py-3 bg-orangeCTA text-white rounded-xl font-semibold text-center text-sm shadow-lg hover:shadow-xl transition-all"
+                    {/* CTAs - Hide for nurses (medicinska sestra) */}
+                    {!getLocalizedContent(doctor.specialty, 'hr-HR')?.toLowerCase().includes('medicinska sestra') && (
+                      <div className="flex gap-3">
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="flex-1"
                         >
-                          {locale === 'hr-HR' ? 'Rezerviraj' : locale === 'en-US' ? 'Book' : 'Buchen'}
-                        </Link>
-                      </motion.div>
-                    </div>
+                          <Link
+                            href={`/kontakt?doctor=${doctor.slug}`}
+                            className="block py-3 bg-orangeCTA text-white rounded-xl font-semibold text-center text-sm shadow-lg hover:shadow-xl transition-all"
+                          >
+                            {locale === 'hr-HR' ? 'Rezerviraj' : locale === 'en-US' ? 'Book' : 'Buchen'}
+                          </Link>
+                        </motion.div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )
