@@ -23,6 +23,8 @@ export type SettingKey =
   | 'contact_info'
   | 'contact_page'
   | 'doctors_page'
+  | 'careers_page'
+  | 'blog_page'
   | 'footer'
   | 'privacy_policy'
   | 'terms_of_service'
@@ -102,6 +104,7 @@ export interface ServicesPageSettings {
 export interface ContactInfo {
   clinicName: string
   phone: string
+  mobilePhone?: string
   email: string
   address: string
   city: string
@@ -121,6 +124,29 @@ export interface ContactPageSettings {
   heroLabel?: Record<Locale, string>
   heroTitle?: Record<Locale, string>
   heroSubtitle?: Record<Locale, string>
+  // Form section
+  formSectionTitle?: Record<Locale, string>
+  formSectionSubtitle?: Record<Locale, string>
+  // Working hours
+  workingHoursWeekdays?: string
+  workingHoursSaturday?: string
+  workingHoursSunday?: Record<Locale, string>
+  // Booking card
+  bookingCardLine1?: Record<Locale, string>
+  bookingCardLine2?: Record<Locale, string>
+  // Directions section
+  directionsByCarTitle?: Record<Locale, string>
+  directionsByCarText?: Record<Locale, string>
+  directionsByTransportTitle?: Record<Locale, string>
+  directionsByTransportText?: Record<Locale, string>
+  directionsAccessibilityTitle?: Record<Locale, string>
+  directionsAccessibilityText?: Record<Locale, string>
+}
+
+// Doctors page stat structure
+export interface DoctorsPageStat {
+  number: string
+  label: Record<Locale, string>
 }
 
 // Doctors page settings structure
@@ -128,6 +154,24 @@ export interface DoctorsPageSettings {
   heroLabel?: Record<Locale, string>
   heroTitle?: Record<Locale, string>
   heroSubtitle?: Record<Locale, string>
+  stats?: DoctorsPageStat[]
+}
+
+// Careers page settings structure
+export interface CareersPageSettings {
+  heroLabel?: Record<Locale, string>
+  heroTitleLine1?: Record<Locale, string>
+  heroTitleLine2?: Record<Locale, string>
+  heroSubtitle?: Record<Locale, string>
+}
+
+// Blog/News page settings structure
+export interface BlogPageSettings {
+  newsletterTitle?: Record<Locale, string>
+  newsletterSubtitle?: Record<Locale, string>
+  newsletterPlaceholder?: Record<Locale, string>
+  newsletterButtonText?: Record<Locale, string>
+  newsletterDisclaimer?: Record<Locale, string>
 }
 
 // About us page structure

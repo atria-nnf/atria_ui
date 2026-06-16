@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { getPosts, getFeaturedPosts } from '@/lib/api'
+import { getPosts, getFeaturedPosts, getBlogPageSettings } from '@/lib/api'
 import { BlogPageClient } from './BlogPageClient'
 
 export const metadata: Metadata = {
@@ -9,10 +9,11 @@ export const metadata: Metadata = {
 }
 
 export default async function BlogPage() {
-  const [posts, featuredPosts] = await Promise.all([
+  const [posts, featuredPosts, pageSettings] = await Promise.all([
     getPosts(),
     getFeaturedPosts(),
+    getBlogPageSettings(),
   ])
 
-  return <BlogPageClient initialPosts={posts} featuredPosts={featuredPosts} />
+  return <BlogPageClient initialPosts={posts} featuredPosts={featuredPosts} pageSettings={pageSettings} />
 }

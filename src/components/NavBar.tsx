@@ -48,6 +48,9 @@ export function NavBar({ services = [], contactInfo }: NavBarProps) {
   const phoneNumber = contactInfo?.phone || '+385 1 234 5678'
   const phoneHref = `tel:${phoneNumber.replace(/\s/g, '')}`
   const phoneDisplay = formatPhoneDisplay(phoneNumber)
+  const mobilePhoneNumber = contactInfo?.mobilePhone
+  const mobilePhoneHref = mobilePhoneNumber ? `tel:${mobilePhoneNumber.replace(/\s/g, '')}` : null
+  const mobilePhoneDisplay = mobilePhoneNumber ? formatPhoneDisplay(mobilePhoneNumber) : null
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
@@ -228,14 +231,24 @@ export function NavBar({ services = [], contactInfo }: NavBarProps) {
                   </AnimatePresence>
                 </div>
 
-                {/* Phone Number */}
-                <a
-                  href={phoneHref}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 text-gray-600 hover:text-orangeCTA hover:bg-orange-50"
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>{phoneDisplay}</span>
-                </a>
+                {/* Phone Numbers */}
+                <div className="flex items-center gap-1">
+                  <a
+                    href={phoneHref}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 text-gray-600 hover:text-orangeCTA hover:bg-orange-50"
+                  >
+                    <Phone className="w-4 h-4" />
+                    <span>{phoneDisplay}</span>
+                  </a>
+                  {mobilePhoneHref && mobilePhoneDisplay && (
+                    <a
+                      href={mobilePhoneHref}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 text-gray-600 hover:text-orangeCTA hover:bg-orange-50"
+                    >
+                      <span>{mobilePhoneDisplay}</span>
+                    </a>
+                  )}
+                </div>
 
                 {/* Divider */}
                 <div className="w-px h-6 bg-gray-200" />
@@ -379,20 +392,33 @@ export function NavBar({ services = [], contactInfo }: NavBarProps) {
                 <div className="mx-3 border-t border-gray-100" />
 
                 {/* Phone & CTA Row */}
-                <div className="p-2 flex gap-2">
-                  <a
-                    href={phoneHref}
-                    className="flex items-center gap-2 flex-1 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-all"
-                  >
-                    <div className="p-1.5 bg-orangeCTA rounded-lg">
-                      <Phone className="w-3.5 h-3.5 text-white" />
-                    </div>
-                    <span className="font-semibold text-gray-900 text-sm">{phoneDisplay}</span>
-                  </a>
+                <div className="p-2 space-y-2">
+                  <div className="flex gap-2">
+                    <a
+                      href={phoneHref}
+                      className="flex items-center gap-2 flex-1 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-all"
+                    >
+                      <div className="p-1.5 bg-orangeCTA rounded-lg">
+                        <Phone className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <span className="font-semibold text-gray-900 text-sm">{phoneDisplay}</span>
+                    </a>
+                    {mobilePhoneHref && mobilePhoneDisplay && (
+                      <a
+                        href={mobilePhoneHref}
+                        className="flex items-center gap-2 flex-1 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-all"
+                      >
+                        <div className="p-1.5 bg-orangeCTA rounded-lg">
+                          <Phone className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span className="font-semibold text-gray-900 text-sm">{mobilePhoneDisplay}</span>
+                      </a>
+                    )}
+                  </div>
 
                   <Link
                     href="/kontakt"
-                    className="flex items-center justify-center gap-2 flex-1 p-3 bg-orangeCTA text-white rounded-xl font-semibold hover:bg-orange-600 transition-all text-sm"
+                    className="flex items-center justify-center gap-2 w-full p-3 bg-orangeCTA text-white rounded-xl font-semibold hover:bg-orange-600 transition-all text-sm"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Rezerviraj

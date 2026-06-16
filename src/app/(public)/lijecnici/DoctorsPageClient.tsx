@@ -98,45 +98,50 @@ export function DoctorsPageClient({ initialDoctors, pageSettings }: DoctorsPageC
   // Featured doctors
   const featuredDoctors = filteredDoctors.filter((d) => d.is_featured)
 
-  // Stats
-  const stats = [
-    {
-      number: `${initialDoctors.length}`,
-      label:
-        locale === 'hr-HR'
-          ? 'Specijaliziranih liječnika'
-          : locale === 'en-US'
-          ? 'Specialized Doctors'
-          : 'Spezialisierte Ärzte',
-    },
-    {
-      number: '15+',
-      label:
-        locale === 'hr-HR'
-          ? 'Prosječno godina iskustva'
-          : locale === 'en-US'
-          ? 'Average Years of Experience'
-          : 'Durchschnittliche Jahre Erfahrung',
-    },
-    {
-      number: '15,000+',
-      label:
-        locale === 'hr-HR'
-          ? 'Zadovoljnih pacijenata'
-          : locale === 'en-US'
-          ? 'Satisfied Patients'
-          : 'Zufriedene Patienten',
-    },
-    {
-      number: '4.8',
-      label:
-        locale === 'hr-HR'
-          ? 'Prosječna ocjena'
-          : locale === 'en-US'
-          ? 'Average Rating'
-          : 'Durchschnittliche Bewertung',
-    },
-  ]
+  // Stats - use from settings if available, otherwise use defaults
+  const stats = pageSettings?.stats && pageSettings.stats.length > 0
+    ? pageSettings.stats.map(stat => ({
+        number: stat.number,
+        label: getLocalizedContent(stat.label, locale) || stat.number,
+      }))
+    : [
+        {
+          number: `${initialDoctors.length}`,
+          label:
+            locale === 'hr-HR'
+              ? 'Specijaliziranih liječnika'
+              : locale === 'en-US'
+              ? 'Specialized Doctors'
+              : 'Spezialisierte Ärzte',
+        },
+        {
+          number: '15+',
+          label:
+            locale === 'hr-HR'
+              ? 'Prosječno godina iskustva'
+              : locale === 'en-US'
+              ? 'Average Years of Experience'
+              : 'Durchschnittliche Jahre Erfahrung',
+        },
+        {
+          number: '15,000+',
+          label:
+            locale === 'hr-HR'
+              ? 'Zadovoljnih pacijenata'
+              : locale === 'en-US'
+              ? 'Satisfied Patients'
+              : 'Zufriedene Patienten',
+        },
+        {
+          number: '4.8',
+          label:
+            locale === 'hr-HR'
+              ? 'Prosječna ocjena'
+              : locale === 'en-US'
+              ? 'Average Rating'
+              : 'Durchschnittliche Bewertung',
+        },
+      ]
 
   // Why our doctors items
   const whyOurDoctors = [

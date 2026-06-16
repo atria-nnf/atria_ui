@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { getActiveJobs } from '@/lib/api'
+import { getActiveJobs, getCareersPageSettings } from '@/lib/api'
 import { CareersPageClient } from './CareersPageClient'
 
 export const metadata: Metadata = {
@@ -8,6 +8,9 @@ export const metadata: Metadata = {
 }
 
 export default async function CareersPage() {
-  const jobs = await getActiveJobs()
-  return <CareersPageClient jobs={jobs} />
+  const [jobs, pageSettings] = await Promise.all([
+    getActiveJobs(),
+    getCareersPageSettings(),
+  ])
+  return <CareersPageClient jobs={jobs} pageSettings={pageSettings} />
 }

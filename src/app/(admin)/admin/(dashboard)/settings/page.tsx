@@ -5,11 +5,11 @@ import { Input } from '@/components/admin/ui/Input'
 import { Button } from '@/components/admin/ui/Button'
 import { LocalizedInput } from '@/components/admin/ui/LocalizedInput'
 import { ImageUpload } from '@/components/admin/ui/ImageUpload'
-import { Save, Building2, Phone, FileText, Plus, X, GripVertical, Image as ImageIcon, Briefcase, Link as LinkIcon, MessageSquare, Users } from 'lucide-react'
-import type { HomepageStat, HomepageProcessStep, HomepageGalleryImage, ServicesPageStat, ServicesPageWhyItem, AboutUsStat, AboutUsValue, AboutUsMilestone, Locale, FooterSettings } from '@/types'
+import { Save, Building2, Phone, FileText, Plus, X, GripVertical, Image as ImageIcon, Briefcase, Link as LinkIcon, MessageSquare, Users, Newspaper } from 'lucide-react'
+import type { HomepageStat, HomepageProcessStep, HomepageGalleryImage, ServicesPageStat, ServicesPageWhyItem, AboutUsStat, AboutUsValue, AboutUsMilestone, Locale, FooterSettings, DoctorsPageStat } from '@/types'
 import { PanelBottom } from 'lucide-react'
 
-type Tab = 'contact' | 'homepage' | 'services' | 'about' | 'footer' | 'contact_page' | 'doctors_page'
+type Tab = 'contact' | 'homepage' | 'services' | 'about' | 'footer' | 'contact_page' | 'doctors_page' | 'careers_page' | 'blog_page'
 
 const emptyLocalized = (): Record<Locale, string> => ({ 'hr-HR': '', 'en-US': '', 'de-DE': '' })
 
@@ -50,6 +50,7 @@ export default function SettingsPage() {
   const [contact, setContact] = useState({
     clinicName: '',
     phone: '',
+    mobilePhone: '',
     email: '',
     address: '',
     city: '',
@@ -105,22 +106,51 @@ export default function SettingsPage() {
   const [contactPageHeroLabel, setContactPageHeroLabel] = useState<Record<string, string>>(emptyLocalized())
   const [contactPageHeroTitle, setContactPageHeroTitle] = useState<Record<string, string>>(emptyLocalized())
   const [contactPageHeroSubtitle, setContactPageHeroSubtitle] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageFormTitle, setContactPageFormTitle] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageFormSubtitle, setContactPageFormSubtitle] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageWorkingHoursWeekdays, setContactPageWorkingHoursWeekdays] = useState('')
+  const [contactPageWorkingHoursSaturday, setContactPageWorkingHoursSaturday] = useState('')
+  const [contactPageWorkingHoursSunday, setContactPageWorkingHoursSunday] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageBookingLine1, setContactPageBookingLine1] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageBookingLine2, setContactPageBookingLine2] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageByCarTitle, setContactPageByCarTitle] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageByCarText, setContactPageByCarText] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageByTransportTitle, setContactPageByTransportTitle] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageByTransportText, setContactPageByTransportText] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageAccessibilityTitle, setContactPageAccessibilityTitle] = useState<Record<string, string>>(emptyLocalized())
+  const [contactPageAccessibilityText, setContactPageAccessibilityText] = useState<Record<string, string>>(emptyLocalized())
 
   // Doctors Page
   const [doctorsPageHeroLabel, setDoctorsPageHeroLabel] = useState<Record<string, string>>(emptyLocalized())
   const [doctorsPageHeroTitle, setDoctorsPageHeroTitle] = useState<Record<string, string>>(emptyLocalized())
   const [doctorsPageHeroSubtitle, setDoctorsPageHeroSubtitle] = useState<Record<string, string>>(emptyLocalized())
+  const [doctorsPageStats, setDoctorsPageStats] = useState<DoctorsPageStat[]>([])
+
+  // Careers Page
+  const [careersPageHeroLabel, setCareersPageHeroLabel] = useState<Record<string, string>>(emptyLocalized())
+  const [careersPageHeroTitleLine1, setCareersPageHeroTitleLine1] = useState<Record<string, string>>(emptyLocalized())
+  const [careersPageHeroTitleLine2, setCareersPageHeroTitleLine2] = useState<Record<string, string>>(emptyLocalized())
+  const [careersPageHeroSubtitle, setCareersPageHeroSubtitle] = useState<Record<string, string>>(emptyLocalized())
+
+  // Blog Page
+  const [blogNewsletterTitle, setBlogNewsletterTitle] = useState<Record<string, string>>(emptyLocalized())
+  const [blogNewsletterSubtitle, setBlogNewsletterSubtitle] = useState<Record<string, string>>(emptyLocalized())
+  const [blogNewsletterPlaceholder, setBlogNewsletterPlaceholder] = useState<Record<string, string>>(emptyLocalized())
+  const [blogNewsletterButtonText, setBlogNewsletterButtonText] = useState<Record<string, string>>(emptyLocalized())
+  const [blogNewsletterDisclaimer, setBlogNewsletterDisclaimer] = useState<Record<string, string>>(emptyLocalized())
 
   useEffect(() => {
     const load = async () => {
-      const [contactData, homepageData, servicesData, aboutData, footerData, contactPageData, doctorsPageData] = await Promise.all([
+      const [contactData, homepageData, servicesData, aboutData, footerData, contactPageData, doctorsPageData, careersPageData, blogPageData] = await Promise.all([
         getSetting('contact_info'),
         getSetting('homepage'),
         getSetting('services_page'),
         getSetting('about_us'),
         getSetting('footer'),
         getSetting('contact_page'),
-        getSetting('doctors_page')
+        getSetting('doctors_page'),
+        getSetting('careers_page'),
+        getSetting('blog_page')
       ])
       if (contactData) setContact({
         ...contactData,
@@ -172,11 +202,38 @@ export default function SettingsPage() {
         setContactPageHeroLabel(contactPageData.heroLabel || emptyLocalized())
         setContactPageHeroTitle(contactPageData.heroTitle || emptyLocalized())
         setContactPageHeroSubtitle(contactPageData.heroSubtitle || emptyLocalized())
+        setContactPageFormTitle(contactPageData.formSectionTitle || emptyLocalized())
+        setContactPageFormSubtitle(contactPageData.formSectionSubtitle || emptyLocalized())
+        setContactPageWorkingHoursWeekdays(contactPageData.workingHoursWeekdays || '')
+        setContactPageWorkingHoursSaturday(contactPageData.workingHoursSaturday || '')
+        setContactPageWorkingHoursSunday(contactPageData.workingHoursSunday || emptyLocalized())
+        setContactPageBookingLine1(contactPageData.bookingCardLine1 || emptyLocalized())
+        setContactPageBookingLine2(contactPageData.bookingCardLine2 || emptyLocalized())
+        setContactPageByCarTitle(contactPageData.directionsByCarTitle || emptyLocalized())
+        setContactPageByCarText(contactPageData.directionsByCarText || emptyLocalized())
+        setContactPageByTransportTitle(contactPageData.directionsByTransportTitle || emptyLocalized())
+        setContactPageByTransportText(contactPageData.directionsByTransportText || emptyLocalized())
+        setContactPageAccessibilityTitle(contactPageData.directionsAccessibilityTitle || emptyLocalized())
+        setContactPageAccessibilityText(contactPageData.directionsAccessibilityText || emptyLocalized())
       }
       if (doctorsPageData) {
         setDoctorsPageHeroLabel(doctorsPageData.heroLabel || emptyLocalized())
         setDoctorsPageHeroTitle(doctorsPageData.heroTitle || emptyLocalized())
         setDoctorsPageHeroSubtitle(doctorsPageData.heroSubtitle || emptyLocalized())
+        setDoctorsPageStats(doctorsPageData.stats || [])
+      }
+      if (careersPageData) {
+        setCareersPageHeroLabel(careersPageData.heroLabel || emptyLocalized())
+        setCareersPageHeroTitleLine1(careersPageData.heroTitleLine1 || emptyLocalized())
+        setCareersPageHeroTitleLine2(careersPageData.heroTitleLine2 || emptyLocalized())
+        setCareersPageHeroSubtitle(careersPageData.heroSubtitle || emptyLocalized())
+      }
+      if (blogPageData) {
+        setBlogNewsletterTitle(blogPageData.newsletterTitle || emptyLocalized())
+        setBlogNewsletterSubtitle(blogPageData.newsletterSubtitle || emptyLocalized())
+        setBlogNewsletterPlaceholder(blogPageData.newsletterPlaceholder || emptyLocalized())
+        setBlogNewsletterButtonText(blogPageData.newsletterButtonText || emptyLocalized())
+        setBlogNewsletterDisclaimer(blogPageData.newsletterDisclaimer || emptyLocalized())
       }
     }
     load()
@@ -232,11 +289,38 @@ export default function SettingsPage() {
       heroLabel: contactPageHeroLabel,
       heroTitle: contactPageHeroTitle,
       heroSubtitle: contactPageHeroSubtitle,
+      formSectionTitle: contactPageFormTitle,
+      formSectionSubtitle: contactPageFormSubtitle,
+      workingHoursWeekdays: contactPageWorkingHoursWeekdays,
+      workingHoursSaturday: contactPageWorkingHoursSaturday,
+      workingHoursSunday: contactPageWorkingHoursSunday,
+      bookingCardLine1: contactPageBookingLine1,
+      bookingCardLine2: contactPageBookingLine2,
+      directionsByCarTitle: contactPageByCarTitle,
+      directionsByCarText: contactPageByCarText,
+      directionsByTransportTitle: contactPageByTransportTitle,
+      directionsByTransportText: contactPageByTransportText,
+      directionsAccessibilityTitle: contactPageAccessibilityTitle,
+      directionsAccessibilityText: contactPageAccessibilityText,
     })
     if (tab === 'doctors_page') await updateSetting('doctors_page', {
       heroLabel: doctorsPageHeroLabel,
       heroTitle: doctorsPageHeroTitle,
       heroSubtitle: doctorsPageHeroSubtitle,
+      stats: doctorsPageStats,
+    })
+    if (tab === 'careers_page') await updateSetting('careers_page', {
+      heroLabel: careersPageHeroLabel,
+      heroTitleLine1: careersPageHeroTitleLine1,
+      heroTitleLine2: careersPageHeroTitleLine2,
+      heroSubtitle: careersPageHeroSubtitle,
+    })
+    if (tab === 'blog_page') await updateSetting('blog_page', {
+      newsletterTitle: blogNewsletterTitle,
+      newsletterSubtitle: blogNewsletterSubtitle,
+      newsletterPlaceholder: blogNewsletterPlaceholder,
+      newsletterButtonText: blogNewsletterButtonText,
+      newsletterDisclaimer: blogNewsletterDisclaimer,
     })
     setLoading(false)
     setSaved(true)
@@ -384,12 +468,31 @@ export default function SettingsPage() {
     setAboutValues(newValues)
   }
 
+  // Doctors Page Stats handlers
+  const addDoctorsStat = () => {
+    setDoctorsPageStats([...doctorsPageStats, { number: '', label: emptyLocalized() }])
+  }
+  const removeDoctorsStat = (index: number) => {
+    setDoctorsPageStats(doctorsPageStats.filter((_, i) => i !== index))
+  }
+  const updateDoctorsStat = (index: number, field: 'number' | 'label', value: string | Record<Locale, string>) => {
+    const newStats = [...doctorsPageStats]
+    if (field === 'number') {
+      newStats[index].number = value as string
+    } else {
+      newStats[index].label = value as Record<Locale, string>
+    }
+    setDoctorsPageStats(newStats)
+  }
+
   const tabs = [
     { id: 'contact' as Tab, label: 'Kontakt info', icon: Phone },
     { id: 'homepage' as Tab, label: 'Pocetna', icon: Building2 },
     { id: 'services' as Tab, label: 'Usluge', icon: Briefcase },
     { id: 'about' as Tab, label: 'O nama', icon: FileText },
     { id: 'doctors_page' as Tab, label: 'Liječnici', icon: Users },
+    { id: 'careers_page' as Tab, label: 'Karijere', icon: Briefcase },
+    { id: 'blog_page' as Tab, label: 'Novosti', icon: Newspaper },
     { id: 'contact_page' as Tab, label: 'Kontakt stranica', icon: MessageSquare },
     { id: 'footer' as Tab, label: 'Footer', icon: PanelBottom },
   ]
@@ -425,8 +528,9 @@ export default function SettingsPage() {
         {tab === 'contact' && (
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
             <Input label="Naziv klinike" value={contact.clinicName} onChange={e => setContact({ ...contact, clinicName: e.target.value })} />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <Input label="Telefon" value={contact.phone} onChange={e => setContact({ ...contact, phone: e.target.value })} />
+              <Input label="Mobitel" value={contact.mobilePhone} onChange={e => setContact({ ...contact, mobilePhone: e.target.value })} />
               <Input label="Email" value={contact.email} onChange={e => setContact({ ...contact, email: e.target.value })} />
             </div>
             <Input label="Adresa" value={contact.address} onChange={e => setContact({ ...contact, address: e.target.value })} />
@@ -901,6 +1005,119 @@ export default function SettingsPage() {
                 placeholder="Iskusni liječnici s ljudskim pristupom. Svaki član našeg tima donosi jedinstvenu kombinaciju stručnosti, iskustva i strasti za pomoć ljudima."
               />
             </div>
+
+            {/* Stats Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Statistike</h2>
+                <Button type="button" variant="outline" onClick={addDoctorsStat}>
+                  <Plus className="w-4 h-4" /> Dodaj
+                </Button>
+              </div>
+              {doctorsPageStats.length === 0 && (
+                <p className="text-sm text-gray-500 text-center py-4">Nema statistika. Kliknite "Dodaj" za dodavanje.</p>
+              )}
+              {doctorsPageStats.map((stat, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <GripVertical className="w-4 h-4" />
+                      <span className="text-sm font-medium">Statistika {index + 1}</span>
+                    </div>
+                    <button type="button" onClick={() => removeDoctorsStat(index)} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <Input label="Broj/Vrijednost" value={stat.number} onChange={(e) => updateDoctorsStat(index, 'number', e.target.value)} placeholder="15+" />
+                  <LocalizedInput label="Oznaka" name={`doctors-stat-label-${index}`} value={stat.label} onChange={(value) => updateDoctorsStat(index, 'label', value)} placeholder="Prosječno godina iskustva" />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {tab === 'careers_page' && (
+          <>
+            {/* Hero Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Hero sekcija</h2>
+              <LocalizedInput
+                label="Oznaka (mala slova iznad naslova)"
+                name="careersPageHeroLabel"
+                value={careersPageHeroLabel}
+                onChange={setCareersPageHeroLabel}
+                placeholder="KARIJERE"
+              />
+              <LocalizedInput
+                label="Naslov - prvi red"
+                name="careersPageHeroTitleLine1"
+                value={careersPageHeroTitleLine1}
+                onChange={setCareersPageHeroTitleLine1}
+                placeholder="Pridružite se"
+              />
+              <LocalizedInput
+                label="Naslov - drugi red"
+                name="careersPageHeroTitleLine2"
+                value={careersPageHeroTitleLine2}
+                onChange={setCareersPageHeroTitleLine2}
+                placeholder="našem timu"
+              />
+              <LocalizedInput
+                label="Podnaslov"
+                name="careersPageHeroSubtitle"
+                value={careersPageHeroSubtitle}
+                onChange={setCareersPageHeroSubtitle}
+                type="textarea"
+                rows={3}
+                placeholder="Gradimo budućnost zdravstva zajedno. Tražimo passionate profesionalce koji dijele našu viziju."
+              />
+            </div>
+          </>
+        )}
+
+        {tab === 'blog_page' && (
+          <>
+            {/* Newsletter Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Newsletter sekcija</h2>
+              <LocalizedInput
+                label="Naslov"
+                name="blogNewsletterTitle"
+                value={blogNewsletterTitle}
+                onChange={setBlogNewsletterTitle}
+                placeholder="Pretplatite se na newsletter"
+              />
+              <LocalizedInput
+                label="Podnaslov"
+                name="blogNewsletterSubtitle"
+                value={blogNewsletterSubtitle}
+                onChange={setBlogNewsletterSubtitle}
+                type="textarea"
+                rows={2}
+                placeholder="Primajte najnovije zdravstvene savjete i članke direktno u svoj inbox. Besplatno."
+              />
+              <LocalizedInput
+                label="Placeholder za email"
+                name="blogNewsletterPlaceholder"
+                value={blogNewsletterPlaceholder}
+                onChange={setBlogNewsletterPlaceholder}
+                placeholder="Vaša email adresa"
+              />
+              <LocalizedInput
+                label="Tekst gumba"
+                name="blogNewsletterButtonText"
+                value={blogNewsletterButtonText}
+                onChange={setBlogNewsletterButtonText}
+                placeholder="Pretplati se"
+              />
+              <LocalizedInput
+                label="Napomena (ispod forme)"
+                name="blogNewsletterDisclaimer"
+                value={blogNewsletterDisclaimer}
+                onChange={setBlogNewsletterDisclaimer}
+                placeholder="Bez spam-a. Odjava u bilo kojem trenutku."
+              />
+            </div>
           </>
         )}
 
@@ -934,6 +1151,135 @@ export default function SettingsPage() {
                 rows={3}
                 placeholder="Imate pitanja? Trebate savjet? Želite zakazati pregled? Kontaktirajte nas - odgovorit ćemo vam u najkraćem roku."
               />
+            </div>
+
+            {/* Form Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Sekcija forme</h2>
+              <LocalizedInput
+                label="Naslov"
+                name="contactPageFormTitle"
+                value={contactPageFormTitle}
+                onChange={setContactPageFormTitle}
+                placeholder="Pošaljite poruku"
+              />
+              <LocalizedInput
+                label="Podnaslov"
+                name="contactPageFormSubtitle"
+                value={contactPageFormSubtitle}
+                onChange={setContactPageFormSubtitle}
+                type="textarea"
+                rows={2}
+                placeholder="Popunite formu ispod i javit ćemo vam se u roku od 24 sata."
+              />
+            </div>
+
+            {/* Working Hours */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Radno vrijeme</h2>
+              <Input
+                label="Radni dani (sati)"
+                value={contactPageWorkingHoursWeekdays}
+                onChange={(e) => setContactPageWorkingHoursWeekdays(e.target.value)}
+                placeholder="8:00 - 20:00"
+              />
+              <Input
+                label="Subota (sati)"
+                value={contactPageWorkingHoursSaturday}
+                onChange={(e) => setContactPageWorkingHoursSaturday(e.target.value)}
+                placeholder="9:00 - 14:00"
+              />
+              <LocalizedInput
+                label="Nedjelja"
+                name="contactPageWorkingHoursSunday"
+                value={contactPageWorkingHoursSunday}
+                onChange={setContactPageWorkingHoursSunday}
+                placeholder="Zatvoreno"
+              />
+            </div>
+
+            {/* Booking Card */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Kartica rezervacije</h2>
+              <LocalizedInput
+                label="Prvi red"
+                name="contactPageBookingLine1"
+                value={contactPageBookingLine1}
+                onChange={setContactPageBookingLine1}
+                placeholder="Online booking"
+              />
+              <LocalizedInput
+                label="Drugi red"
+                name="contactPageBookingLine2"
+                value={contactPageBookingLine2}
+                onChange={setContactPageBookingLine2}
+                placeholder="Dostupno 24/7"
+              />
+            </div>
+
+            {/* Directions Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Kako doći</h2>
+
+              <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+                <h3 className="font-medium text-gray-700">Automobilom</h3>
+                <LocalizedInput
+                  label="Naslov"
+                  name="contactPageByCarTitle"
+                  value={contactPageByCarTitle}
+                  onChange={setContactPageByCarTitle}
+                  placeholder="🚗 Automobilom"
+                />
+                <LocalizedInput
+                  label="Tekst"
+                  name="contactPageByCarText"
+                  value={contactPageByCarText}
+                  onChange={setContactPageByCarText}
+                  type="textarea"
+                  rows={2}
+                  placeholder="Besplatan parking dostupan ispred zgrade. 10 min od autoceste."
+                />
+              </div>
+
+              <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+                <h3 className="font-medium text-gray-700">Javni prijevoz</h3>
+                <LocalizedInput
+                  label="Naslov"
+                  name="contactPageByTransportTitle"
+                  value={contactPageByTransportTitle}
+                  onChange={setContactPageByTransportTitle}
+                  placeholder="🚌 Javni prijevoz"
+                />
+                <LocalizedInput
+                  label="Tekst"
+                  name="contactPageByTransportText"
+                  value={contactPageByTransportText}
+                  onChange={setContactPageByTransportText}
+                  type="textarea"
+                  rows={2}
+                  placeholder="Autobus 273 od Glavnog kolodvora. Stanica 'Dugo Selo Centar'."
+                />
+              </div>
+
+              <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+                <h3 className="font-medium text-gray-700">Pristupačnost</h3>
+                <LocalizedInput
+                  label="Naslov"
+                  name="contactPageAccessibilityTitle"
+                  value={contactPageAccessibilityTitle}
+                  onChange={setContactPageAccessibilityTitle}
+                  placeholder="♿ Pristupačnost"
+                />
+                <LocalizedInput
+                  label="Tekst"
+                  name="contactPageAccessibilityText"
+                  value={contactPageAccessibilityText}
+                  onChange={setContactPageAccessibilityText}
+                  type="textarea"
+                  rows={2}
+                  placeholder="Zgrada je potpuno pristupačna osobama s invaliditetom."
+                />
+              </div>
             </div>
           </>
         )}

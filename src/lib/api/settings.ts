@@ -6,6 +6,8 @@ import type {
   ContactInfo,
   ContactPageSettings,
   DoctorsPageSettings,
+  CareersPageSettings,
+  BlogPageSettings,
   AboutUsSettings,
   LegalPageSettings,
   FooterSettings,
@@ -88,6 +90,20 @@ export async function getContactPageSettings(): Promise<ContactPageSettings | nu
  */
 export async function getDoctorsPageSettings(): Promise<DoctorsPageSettings | null> {
   return getSetting<DoctorsPageSettings>('doctors_page')
+}
+
+/**
+ * Get careers page settings
+ */
+export async function getCareersPageSettings(): Promise<CareersPageSettings | null> {
+  return getSetting<CareersPageSettings>('careers_page')
+}
+
+/**
+ * Get blog page settings
+ */
+export async function getBlogPageSettings(): Promise<BlogPageSettings | null> {
+  return getSetting<BlogPageSettings>('blog_page')
 }
 
 /**

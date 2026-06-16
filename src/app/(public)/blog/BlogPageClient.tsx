@@ -7,14 +7,15 @@ import { Calendar, Clock, Search, Tag, ArrowRight } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
 import { getImageUrl } from '@/lib/utils/image'
-import type { Post } from '@/types'
+import type { Post, BlogPageSettings } from '@/types'
 
 interface BlogPageClientProps {
   initialPosts: Post[]
   featuredPosts: Post[]
+  pageSettings: BlogPageSettings | null
 }
 
-export function BlogPageClient({ initialPosts, featuredPosts }: BlogPageClientProps) {
+export function BlogPageClient({ initialPosts, featuredPosts, pageSettings }: BlogPageClientProps) {
   const { locale } = useLocale()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -434,25 +435,25 @@ export function BlogPageClient({ initialPosts, featuredPosts }: BlogPageClientPr
           </div>
 
           <h2 className="text-4xl md:text-5xl font-bold mb-6 font-serif">
-            {locale === 'hr-HR'
+            {getLocalizedContent(pageSettings?.newsletterTitle, locale) || (locale === 'hr-HR'
               ? 'Pretplatite se na newsletter'
               : locale === 'en-US'
               ? 'Subscribe to newsletter'
-              : 'Newsletter abonnieren'}
+              : 'Newsletter abonnieren')}
           </h2>
 
           <p className="text-xl text-gray-300 mb-10 leading-relaxed">
-            {locale === 'hr-HR'
+            {getLocalizedContent(pageSettings?.newsletterSubtitle, locale) || (locale === 'hr-HR'
               ? 'Primajte najnovije zdravstvene savjete i članke direktno u svoj inbox. Besplatno.'
               : locale === 'en-US'
               ? 'Receive the latest health tips and articles directly to your inbox. Free.'
-              : 'Erhalten Sie die neuesten Gesundheitstipps und Artikel direkt in Ihr Postfach. Kostenlos.'}
+              : 'Erhalten Sie die neuesten Gesundheitstipps und Artikel direkt in Ihr Postfach. Kostenlos.')}
           </p>
 
           <form className="max-w-md mx-auto relative">
             <input
               type="email"
-              placeholder={locale === 'hr-HR' ? 'Vaša email adresa' : locale === 'en-US' ? 'Your email address' : 'Ihre E-Mail-Adresse'}
+              placeholder={getLocalizedContent(pageSettings?.newsletterPlaceholder, locale) || (locale === 'hr-HR' ? 'Vaša email adresa' : locale === 'en-US' ? 'Your email address' : 'Ihre E-Mail-Adresse')}
               className="w-full px-6 py-4 pr-32 rounded-full bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
               required
             />
@@ -462,16 +463,16 @@ export function BlogPageClient({ initialPosts, featuredPosts }: BlogPageClientPr
               whileTap={{ scale: 0.95 }}
               className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-orangeCTA rounded-full font-medium"
             >
-              {locale === 'hr-HR' ? 'Pretplati se' : locale === 'en-US' ? 'Subscribe' : 'Abonnieren'}
+              {getLocalizedContent(pageSettings?.newsletterButtonText, locale) || (locale === 'hr-HR' ? 'Pretplati se' : locale === 'en-US' ? 'Subscribe' : 'Abonnieren')}
             </motion.button>
           </form>
 
           <p className="text-sm text-gray-400 mt-6">
-            {locale === 'hr-HR'
+            {getLocalizedContent(pageSettings?.newsletterDisclaimer, locale) || (locale === 'hr-HR'
               ? 'Bez spam-a. Odjava u bilo kojem trenutku.'
               : locale === 'en-US'
               ? 'No spam. Unsubscribe at any time.'
-              : 'Kein Spam. Jederzeit abmelden.'}
+              : 'Kein Spam. Jederzeit abmelden.')}
           </p>
         </motion.div>
       </section>

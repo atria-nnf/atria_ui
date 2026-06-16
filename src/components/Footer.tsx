@@ -74,6 +74,9 @@ export function Footer({ services: servicesProp = [], contactInfo, footerSetting
   }
   const phoneDisplay = formatPhoneDisplay(contactPhone)
   const phoneHref = `tel:${contactPhone.replace(/\s/g, '')}`
+  const mobilePhone = contactInfo?.mobilePhone
+  const mobilePhoneDisplay = mobilePhone ? formatPhoneDisplay(mobilePhone) : null
+  const mobilePhoneHref = mobilePhone ? `tel:${mobilePhone.replace(/\s/g, '')}` : null
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,6 +132,18 @@ export function Footer({ services: servicesProp = [], contactInfo, footerSetting
                   </div>
                   <span>{phoneDisplay}</span>
                 </a>
+
+                {mobilePhoneHref && mobilePhoneDisplay && (
+                  <a
+                    href={mobilePhoneHref}
+                    className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-white/5 group-hover:bg-white/10 flex items-center justify-center transition-colors">
+                      <Phone className="w-5 h-5" />
+                    </div>
+                    <span>{mobilePhoneDisplay}</span>
+                  </a>
+                )}
 
                 <div className="flex items-start gap-3 text-gray-400 group">
                   <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">

@@ -75,6 +75,8 @@ export {
   getContactInfo,
   getContactPageSettings,
   getDoctorsPageSettings,
+  getCareersPageSettings,
+  getBlogPageSettings,
   getFooterSettings,
   getAboutUsPage,
   getPrivacyPolicy,

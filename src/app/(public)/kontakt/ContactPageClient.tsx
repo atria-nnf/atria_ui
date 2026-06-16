@@ -106,7 +106,7 @@ export function ContactPageClient({ contactInfo, services, faqs, pageSettings }:
     {
       icon: Phone,
       title: locale === 'hr-HR' ? 'Telefon' : locale === 'en-US' ? 'Phone' : 'Telefon',
-      details: [contactInfo.phone],
+      details: [contactInfo.phone, ...(contactInfo.mobilePhone ? [contactInfo.mobilePhone] : [])],
       action: locale === 'hr-HR' ? 'Nazovi nas' : locale === 'en-US' ? 'Call us' : 'Rufen Sie uns an',
       href: `tel:${contactInfo.phone.replace(/\s/g, '')}`,
       color: 'from-blue-500 to-blue-600',
@@ -130,7 +130,10 @@ export function ContactPageClient({ contactInfo, services, faqs, pageSettings }:
     {
       icon: Calendar,
       title: locale === 'hr-HR' ? 'Rezervacija' : locale === 'en-US' ? 'Booking' : 'Buchung',
-      details: ['Online booking', locale === 'hr-HR' ? 'Dostupno 24/7' : locale === 'en-US' ? 'Available 24/7' : '24/7 verfügbar'],
+      details: [
+        getLocalizedContent(pageSettings?.bookingCardLine1, locale) || 'Online booking',
+        getLocalizedContent(pageSettings?.bookingCardLine2, locale) || (locale === 'hr-HR' ? 'Dostupno 24/7' : locale === 'en-US' ? 'Available 24/7' : '24/7 verfügbar'),
+      ],
       action: locale === 'hr-HR' ? 'Zakaži termin' : locale === 'en-US' ? 'Schedule appointment' : 'Termin vereinbaren',
       href: '/kontakt',
       color: 'from-orange-500 to-orange-600',
@@ -141,15 +144,15 @@ export function ContactPageClient({ contactInfo, services, faqs, pageSettings }:
   const workingHours = [
     {
       day: locale === 'hr-HR' ? 'Ponedjeljak - Petak' : locale === 'en-US' ? 'Monday - Friday' : 'Montag - Freitag',
-      hours: '8:00 - 20:00',
+      hours: pageSettings?.workingHoursWeekdays || '8:00 - 20:00',
     },
     {
       day: locale === 'hr-HR' ? 'Subota' : locale === 'en-US' ? 'Saturday' : 'Samstag',
-      hours: '9:00 - 14:00',
+      hours: pageSettings?.workingHoursSaturday || '9:00 - 14:00',
     },
     {
       day: locale === 'hr-HR' ? 'Nedjelja' : locale === 'en-US' ? 'Sunday' : 'Sonntag',
-      hours: locale === 'hr-HR' ? 'Zatvoreno' : locale === 'en-US' ? 'Closed' : 'Geschlossen',
+      hours: getLocalizedContent(pageSettings?.workingHoursSunday, locale) || (locale === 'hr-HR' ? 'Zatvoreno' : locale === 'en-US' ? 'Closed' : 'Geschlossen'),
     },
   ]
 
@@ -248,14 +251,14 @@ export function ContactPageClient({ contactInfo, services, faqs, pageSettings }:
             >
               <div className="mb-8">
                 <h2 className="text-5xl font-bold mb-4 font-serif">
-                  {locale === 'hr-HR' ? 'Pošaljite poruku' : locale === 'en-US' ? 'Send a Message' : 'Nachricht senden'}
+                  {getLocalizedContent(pageSettings?.formSectionTitle, locale) || (locale === 'hr-HR' ? 'Pošaljite poruku' : locale === 'en-US' ? 'Send a Message' : 'Nachricht senden')}
                 </h2>
                 <p className="text-gray-600 text-lg">
-                  {locale === 'hr-HR'
+                  {getLocalizedContent(pageSettings?.formSectionSubtitle, locale) || (locale === 'hr-HR'
                     ? 'Popunite formu ispod i javit ćemo vam se u roku od 24 sata.'
                     : locale === 'en-US'
                     ? 'Fill out the form below and we will get back to you within 24 hours.'
-                    : 'Füllen Sie das Formular aus und wir werden uns innerhalb von 24 Stunden bei Ihnen melden.'}
+                    : 'Füllen Sie das Formular aus und wir werden uns innerhalb von 24 Stunden bei Ihnen melden.')}
                 </p>
               </div>
 
@@ -566,40 +569,40 @@ export function ContactPageClient({ contactInfo, services, faqs, pageSettings }:
           >
             <div className="bg-white rounded-xl p-6 shadow-lg">
               <h4 className="font-bold mb-3">
-                {locale === 'hr-HR' ? '🚗 Automobilom' : locale === 'en-US' ? '🚗 By Car' : '🚗 Mit dem Auto'}
+                {getLocalizedContent(pageSettings?.directionsByCarTitle, locale) || (locale === 'hr-HR' ? '🚗 Automobilom' : locale === 'en-US' ? '🚗 By Car' : '🚗 Mit dem Auto')}
               </h4>
               <p className="text-sm text-gray-600">
-                {locale === 'hr-HR'
+                {getLocalizedContent(pageSettings?.directionsByCarText, locale) || (locale === 'hr-HR'
                   ? 'Besplatan parking dostupan ispred zgrade. 10 min od autoceste.'
                   : locale === 'en-US'
                   ? 'Free parking available in front of the building. 10 min from highway.'
-                  : 'Kostenlose Parkplätze vor dem Gebäude. 10 Min. von der Autobahn.'}
+                  : 'Kostenlose Parkplätze vor dem Gebäude. 10 Min. von der Autobahn.')}
               </p>
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg">
               <h4 className="font-bold mb-3">
-                {locale === 'hr-HR' ? '🚌 Javni prijevoz' : locale === 'en-US' ? '🚌 Public Transport' : '🚌 Öffentliche Verkehrsmittel'}
+                {getLocalizedContent(pageSettings?.directionsByTransportTitle, locale) || (locale === 'hr-HR' ? '🚌 Javni prijevoz' : locale === 'en-US' ? '🚌 Public Transport' : '🚌 Öffentliche Verkehrsmittel')}
               </h4>
               <p className="text-sm text-gray-600">
-                {locale === 'hr-HR'
+                {getLocalizedContent(pageSettings?.directionsByTransportText, locale) || (locale === 'hr-HR'
                   ? 'Autobus 273 od Glavnog kolodvora. Stanica "Dugo Selo Centar".'
                   : locale === 'en-US'
                   ? 'Bus 273 from the Main Station. Stop "Dugo Selo Center".'
-                  : 'Bus 273 vom Hauptbahnhof. Haltestelle "Dugo Selo Zentrum".'}
+                  : 'Bus 273 vom Hauptbahnhof. Haltestelle "Dugo Selo Zentrum".')}
               </p>
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg">
               <h4 className="font-bold mb-3">
-                {locale === 'hr-HR' ? '♿ Pristupačnost' : locale === 'en-US' ? '♿ Accessibility' : '♿ Barrierefreiheit'}
+                {getLocalizedContent(pageSettings?.directionsAccessibilityTitle, locale) || (locale === 'hr-HR' ? '♿ Pristupačnost' : locale === 'en-US' ? '♿ Accessibility' : '♿ Barrierefreiheit')}
               </h4>
               <p className="text-sm text-gray-600">
-                {locale === 'hr-HR'
+                {getLocalizedContent(pageSettings?.directionsAccessibilityText, locale) || (locale === 'hr-HR'
                   ? 'Zgrada je potpuno pristupačna osobama s invaliditetom.'
                   : locale === 'en-US'
                   ? 'The building is fully accessible to people with disabilities.'
-                  : 'Das Gebäude ist vollständig barrierefrei zugänglich.'}
+                  : 'Das Gebäude ist vollständig barrierefrei zugänglich.')}
               </p>
             </div>
           </motion.div>

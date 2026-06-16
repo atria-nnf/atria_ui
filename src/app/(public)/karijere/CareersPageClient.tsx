@@ -19,13 +19,14 @@ import {
 } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
-import type { JobPosting } from '@/types'
+import type { JobPosting, CareersPageSettings } from '@/types'
 
 interface CareersPageClientProps {
   jobs: JobPosting[]
+  pageSettings: CareersPageSettings | null
 }
 
-export function CareersPageClient({ jobs }: CareersPageClientProps) {
+export function CareersPageClient({ jobs, pageSettings }: CareersPageClientProps) {
   const { locale } = useLocale()
   const [selectedDepartment, setSelectedDepartment] = useState('all')
   const [selectedType, setSelectedType] = useState('all')
@@ -418,13 +419,17 @@ export function CareersPageClient({ jobs }: CareersPageClientProps) {
               transition={{ duration: 0.8 }}
               className="text-center max-w-4xl mx-auto"
             >
-              <div className="text-sm tracking-widest text-blue-300 mb-6">{t.careers}</div>
+              <div className="text-sm tracking-widest text-blue-300 mb-6">
+                {getLocalizedContent(pageSettings?.heroLabel, locale) || t.careers}
+              </div>
               <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight font-serif">
-                {t.bePartOf}
+                {getLocalizedContent(pageSettings?.heroTitleLine1, locale) || t.bePartOf}
                 <br />
-                {t.ourTeam}
+                {getLocalizedContent(pageSettings?.heroTitleLine2, locale) || t.ourTeam}
               </h1>
-              <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">{t.buildingFuture}</p>
+              <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">
+                {getLocalizedContent(pageSettings?.heroSubtitle, locale) || t.buildingFuture}
+              </p>
             </motion.div>
           </div>
         </section>
@@ -572,13 +577,17 @@ export function CareersPageClient({ jobs }: CareersPageClientProps) {
             transition={{ duration: 0.8 }}
             className="text-center max-w-4xl mx-auto"
           >
-            <div className="text-sm tracking-widest text-blue-300 mb-6">{t.careers}</div>
+            <div className="text-sm tracking-widest text-blue-300 mb-6">
+              {getLocalizedContent(pageSettings?.heroLabel, locale) || t.careers}
+            </div>
             <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight font-serif">
-              {t.joinTeam}
+              {getLocalizedContent(pageSettings?.heroTitleLine1, locale) || t.joinTeam}
               <br />
-              {t.ourTeam}
+              {getLocalizedContent(pageSettings?.heroTitleLine2, locale) || t.ourTeam}
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 leading-relaxed mb-8">{t.heroSubtitle}</p>
+            <p className="text-xl md:text-2xl text-gray-300 leading-relaxed mb-8">
+              {getLocalizedContent(pageSettings?.heroSubtitle, locale) || t.heroSubtitle}
+            </p>
             <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
               <Briefcase className="w-5 h-5" />
               <span className="font-semibold">
