@@ -181,7 +181,15 @@ export function ServiceDetailsClient({
               <div
                 className="w-20 h-20 rounded-2xl bg-orangeCTA flex items-center justify-center mb-6 shadow-2xl"
               >
-                <ServiceIcon className="w-10 h-10 text-white" />
+                {service.icon ? (
+                  <img
+                    src={getImageUrl(service.icon) || ''}
+                    alt=""
+                    className="w-10 h-10 object-contain invert"
+                  />
+                ) : (
+                  <ServiceIcon className="w-10 h-10 text-white" />
+                )}
               </div>
 
               <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight font-serif">

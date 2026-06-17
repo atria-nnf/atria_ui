@@ -40,6 +40,27 @@ export async function getFAQsByCategory(
 }
 
 /**
+ * Get general FAQs (not linked to any specific service)
+ * These are shown on the contact page
+ */
+export async function getGeneralFAQs(locale?: Locale): Promise<FAQ[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('faqs')
+    .select('*')
+    .is('service_id', null)
+    .order('order_index', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching general FAQs:', error)
+    return []
+  }
+
+  return (data as FAQ[]) || []
+}
+
+/**
  * Get FAQs by service
  */
 export async function getFAQsByService(

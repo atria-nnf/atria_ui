@@ -47,6 +47,7 @@ export {
   getFAQsByCategory,
   getFAQsByService,
   getFAQCategories,
+  getGeneralFAQs,
 } from './faqs'
 
 // Gallery

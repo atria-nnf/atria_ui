@@ -350,7 +350,15 @@ export function ServicesPageClient({ initialServices, settings }: ServicesPageCl
                       <div
                         className={`absolute top-6 left-6 w-16 h-16 rounded-2xl bg-gradient-to-br ${getColorForCategory()} flex items-center justify-center shadow-xl`}
                       >
-                        <ServiceIcon className="w-8 h-8 text-white" />
+                        {service.icon ? (
+                          <img
+                            src={getImageUrl(service.icon) || ''}
+                            alt=""
+                            className="w-8 h-8 object-contain invert"
+                          />
+                        ) : (
+                          <ServiceIcon className="w-8 h-8 text-white" />
+                        )}
                       </div>
                     </div>
 

@@ -37,9 +37,15 @@ export function NavBar({ services = [], contactInfo }: NavBarProps) {
   const formatPhoneDisplay = (phone: string) => {
     // Remove all non-digits
     const digits = phone.replace(/\D/g, '')
-    // Format as XX XXX XXXX for Croatian numbers
+    // Format Croatian numbers
     if (digits.startsWith('385')) {
       const local = digits.slice(3)
+      // Mobile numbers start with 9x (91, 92, 95, 97, 98, 99)
+      if (local.startsWith('9')) {
+        // Mobile: 0XX XXX XXXX
+        return `0${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5)}`
+      }
+      // Landline: 0X XXX XXXX
       return `0${local.slice(0, 1)} ${local.slice(1, 4)} ${local.slice(4)}`
     }
     return phone

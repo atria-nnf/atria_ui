@@ -70,6 +70,9 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
   // Featured image state
   const [featuredImage, setFeaturedImage] = useState(service?.featured_image || '')
 
+  // Icon state
+  const [icon, setIcon] = useState(service?.icon || '')
+
   // Categories state (multi-select)
   const [categories, setCategories] = useState<string[]>(
     service?.categories || (service?.category ? [service.category] : [])
@@ -236,6 +239,7 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
       description,
       categories: categories.length > 0 ? categories : null,
       featured_image: featuredImage || null,
+      icon: icon || null,
       partner_logos: partnerLogos.length > 0 ? partnerLogos : null,
       steps: steps.length > 0 ? steps : null,
       pricing: pricingList.length > 0 ? { items: pricingList } : null,
@@ -352,12 +356,14 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
               hint="Glavna slika usluge"
             />
 
-            <Input
+            <ImageUpload
               label="Ikona"
-              placeholder="Npr. stethoscope"
-              hint="Naziv Lucide ikone"
-              {...register('icon')}
-              error={errors.icon?.message}
+              value={icon}
+              onChange={setIcon}
+              bucket="images"
+              folder="service-icons"
+              aspectRatio="square"
+              hint="Uploadajte crnu PNG ikonu - automatski ce se prikazati bijela na tamnoj pozadini"
             />
           </div>
 
