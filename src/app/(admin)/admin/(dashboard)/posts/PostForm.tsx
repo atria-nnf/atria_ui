@@ -10,6 +10,8 @@ import { Select } from '@/components/admin/ui/Select'
 import { Button } from '@/components/admin/ui/Button'
 import { Switch } from '@/components/admin/ui/Switch'
 import { LocalizedInput } from '@/components/admin/ui/LocalizedInput'
+import { LocalizedRichText } from '@/components/admin/ui/LocalizedRichText'
+import { ImageUpload } from '@/components/admin/ui/ImageUpload'
 import { createPost, updatePost } from '@/lib/api/admin/posts'
 import { createClient } from '@/lib/supabase/client'
 import type { Post, Service } from '@/types'
@@ -231,14 +233,14 @@ export function PostForm({ post, isEditing }: PostFormProps) {
               Sadržaj
             </h2>
 
-            <LocalizedInput
-              label="Sadržaj (Markdown)"
+            <LocalizedRichText
+              label="Sadržaj"
               name="content"
               value={content}
               onChange={setContent}
-              type="textarea"
-              rows={15}
-              placeholder="Pišite sadržaj koristeći Markdown formatiranje..."
+              minHeight="400px"
+              imageFolder="posts"
+              placeholder="Pišite sadržaj posta... Možete dodavati slike klikom na ikonu slike ili copy-paste."
             />
           </div>
 
@@ -248,12 +250,12 @@ export function PostForm({ post, isEditing }: PostFormProps) {
               Mediji
             </h2>
 
-            <Input
-              label="URL naslovne slike"
-              placeholder="https://..."
-              hint="URL naslovne slike za post"
-              {...register('featured_image')}
-              error={errors.featured_image?.message}
+            <ImageUpload
+              label="Naslovna slika"
+              value={watch('featured_image') || ''}
+              onChange={(value) => setValue('featured_image', value)}
+              folder="posts"
+              hint="Uploadajte naslovnu sliku za post"
             />
           </div>
         </div>

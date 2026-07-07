@@ -27,7 +27,10 @@ export async function getSetting<T = object>(key: SettingKey): Promise<T | null>
     .single()
 
   if (error) {
-    console.error(`Error fetching setting "${key}":`, error)
+    // PGRST116 means no rows returned - this is expected for settings that haven't been created yet
+    if (error.code !== 'PGRST116') {
+      console.error(`Error fetching setting "${key}":`, error)
+    }
     return null
   }
 

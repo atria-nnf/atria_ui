@@ -6,7 +6,7 @@ import { Button } from '@/components/admin/ui/Button'
 import { LocalizedInput } from '@/components/admin/ui/LocalizedInput'
 import { ImageUpload } from '@/components/admin/ui/ImageUpload'
 import { Save, Building2, Phone, FileText, Plus, X, GripVertical, Image as ImageIcon, Briefcase, Link as LinkIcon, MessageSquare, Users, Newspaper } from 'lucide-react'
-import type { HomepageStat, HomepageProcessStep, HomepageGalleryImage, ServicesPageStat, ServicesPageWhyItem, AboutUsStat, AboutUsValue, AboutUsMilestone, Locale, FooterSettings, DoctorsPageStat } from '@/types'
+import type { HomepageStat, HomepageProcessStep, HomepageGalleryImage, ServicesPageStat, ServicesPageWhyItem, AboutUsStat, AboutUsValue, AboutUsMilestone, Locale, FooterSettings, DoctorsPageStat, DoctorsPageWhyItem } from '@/types'
 import { PanelBottom } from 'lucide-react'
 
 type Tab = 'contact' | 'homepage' | 'services' | 'about' | 'footer' | 'contact_page' | 'doctors_page' | 'careers_page' | 'blog_page'
@@ -27,6 +27,8 @@ const ICON_OPTIONS = [
   { value: 'Lightbulb', label: 'Žarulja' },
   { value: 'Shield', label: 'Štit' },
   { value: 'Award', label: 'Nagrada' },
+  { value: 'BookOpen', label: 'Knjiga' },
+  { value: 'Clock', label: 'Sat' },
 ]
 
 // Available colors for value items
@@ -125,6 +127,10 @@ export default function SettingsPage() {
   const [doctorsPageHeroTitle, setDoctorsPageHeroTitle] = useState<Record<string, string>>(emptyLocalized())
   const [doctorsPageHeroSubtitle, setDoctorsPageHeroSubtitle] = useState<Record<string, string>>(emptyLocalized())
   const [doctorsPageStats, setDoctorsPageStats] = useState<DoctorsPageStat[]>([])
+  // Why Our Doctors section
+  const [doctorsWhySectionTitle, setDoctorsWhySectionTitle] = useState<Record<string, string>>(emptyLocalized())
+  const [doctorsWhySectionSubtitle, setDoctorsWhySectionSubtitle] = useState<Record<string, string>>(emptyLocalized())
+  const [doctorsWhyItems, setDoctorsWhyItems] = useState<DoctorsPageWhyItem[]>([])
 
   // Careers Page
   const [careersPageHeroLabel, setCareersPageHeroLabel] = useState<Record<string, string>>(emptyLocalized())
@@ -221,6 +227,9 @@ export default function SettingsPage() {
         setDoctorsPageHeroTitle(doctorsPageData.heroTitle || emptyLocalized())
         setDoctorsPageHeroSubtitle(doctorsPageData.heroSubtitle || emptyLocalized())
         setDoctorsPageStats(doctorsPageData.stats || [])
+        setDoctorsWhySectionTitle(doctorsPageData.whySectionTitle || emptyLocalized())
+        setDoctorsWhySectionSubtitle(doctorsPageData.whySectionSubtitle || emptyLocalized())
+        setDoctorsWhyItems(doctorsPageData.whyOurDoctors || [])
       }
       if (careersPageData) {
         setCareersPageHeroLabel(careersPageData.heroLabel || emptyLocalized())
@@ -308,6 +317,9 @@ export default function SettingsPage() {
       heroTitle: doctorsPageHeroTitle,
       heroSubtitle: doctorsPageHeroSubtitle,
       stats: doctorsPageStats,
+      whySectionTitle: doctorsWhySectionTitle,
+      whySectionSubtitle: doctorsWhySectionSubtitle,
+      whyOurDoctors: doctorsWhyItems,
     })
     if (tab === 'careers_page') await updateSetting('careers_page', {
       heroLabel: careersPageHeroLabel,
@@ -483,6 +495,25 @@ export default function SettingsPage() {
       newStats[index].label = value as Record<Locale, string>
     }
     setDoctorsPageStats(newStats)
+  }
+
+  // Doctors Page "Why Our Doctors" handlers
+  const addDoctorsWhyItem = () => {
+    setDoctorsWhyItems([...doctorsWhyItems, { title: emptyLocalized(), description: emptyLocalized(), icon: 'Award' }])
+  }
+  const removeDoctorsWhyItem = (index: number) => {
+    setDoctorsWhyItems(doctorsWhyItems.filter((_, i) => i !== index))
+  }
+  const updateDoctorsWhyItem = (index: number, field: 'title' | 'description' | 'icon', value: string | Record<Locale, string>) => {
+    const newItems = [...doctorsWhyItems]
+    if (field === 'icon') {
+      newItems[index].icon = value as string
+    } else if (field === 'title') {
+      newItems[index].title = value as Record<Locale, string>
+    } else {
+      newItems[index].description = value as Record<Locale, string>
+    }
+    setDoctorsWhyItems(newItems)
   }
 
   const tabs = [
@@ -1030,6 +1061,63 @@ export default function SettingsPage() {
                   </div>
                   <Input label="Broj/Vrijednost" value={stat.number} onChange={(e) => updateDoctorsStat(index, 'number', e.target.value)} placeholder="15+" />
                   <LocalizedInput label="Oznaka" name={`doctors-stat-label-${index}`} value={stat.label} onChange={(value) => updateDoctorsStat(index, 'label', value)} placeholder="Prosječno godina iskustva" />
+                </div>
+              ))}
+            </div>
+
+            {/* Why Our Doctors Section - Title/Subtitle */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">Zašto naši liječnici - Tekst</h2>
+              <LocalizedInput
+                label="Naslov sekcije"
+                name="doctorsWhySectionTitle"
+                value={doctorsWhySectionTitle}
+                onChange={setDoctorsWhySectionTitle}
+                placeholder="Zašto naši liječnici?"
+              />
+              <LocalizedInput
+                label="Podnaslov sekcije"
+                name="doctorsWhySectionSubtitle"
+                value={doctorsWhySectionSubtitle}
+                onChange={setDoctorsWhySectionSubtitle}
+                type="textarea"
+                rows={2}
+                placeholder="Više od stručnosti - pristup koji stavlja pacijenta na prvo mjesto"
+              />
+            </div>
+
+            {/* Why Our Doctors Section - Items */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Zašto naši liječnici - Kartice</h2>
+                <Button type="button" variant="outline" onClick={addDoctorsWhyItem}>
+                  <Plus className="w-4 h-4" /> Dodaj
+                </Button>
+              </div>
+              {doctorsWhyItems.length === 0 && (
+                <p className="text-sm text-gray-500 text-center py-4">Nema stavki. Kliknite "Dodaj" za dodavanje.</p>
+              )}
+              {doctorsWhyItems.map((item, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <GripVertical className="w-4 h-4" />
+                      <span className="text-sm font-medium">Kartica {index + 1}</span>
+                    </div>
+                    <button type="button" onClick={() => removeDoctorsWhyItem(index)} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ikona</label>
+                    <select value={item.icon} onChange={(e) => updateDoctorsWhyItem(index, 'icon', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orangeCTA/50">
+                      {ICON_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <LocalizedInput label="Naslov" name={`doctors-why-title-${index}`} value={item.title} onChange={(value) => updateDoctorsWhyItem(index, 'title', value)} placeholder="Visoka stručnost" />
+                  <LocalizedInput label="Opis" name={`doctors-why-desc-${index}`} value={item.description} onChange={(value) => updateDoctorsWhyItem(index, 'description', value)} type="textarea" rows={2} placeholder="Svi naši liječnici su specijalizirani stručnjaci s godinama iskustva" />
                 </div>
               ))}
             </div>

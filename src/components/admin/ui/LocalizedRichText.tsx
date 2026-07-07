@@ -20,6 +20,7 @@ interface LocalizedRichTextProps {
   error?: string
   placeholder?: string
   minHeight?: string
+  imageFolder?: string
 }
 
 export function LocalizedRichText({
@@ -31,6 +32,7 @@ export function LocalizedRichText({
   error,
   placeholder,
   minHeight = '150px',
+  imageFolder = 'posts',
 }: LocalizedRichTextProps) {
   const [activeLocale, setActiveLocale] = useState<Locale>('hr-HR')
 
@@ -87,6 +89,7 @@ export function LocalizedRichText({
               onChange={(newValue) => handleChange(locale.code, newValue)}
               placeholder={placeholder}
               minHeight={minHeight}
+              imageFolder={imageFolder}
             />
           </div>
         ))}

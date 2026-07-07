@@ -1,8 +1,10 @@
 'use client'
 
-import { useRef, useCallback, useEffect } from 'react'
+import { useRef, useCallback, useEffect, useState } from 'react'
 import { cn } from '@/lib/utils/cn'
-import { Bold, Italic, List, ListOrdered, Heading2, Heading3, Undo, Redo } from 'lucide-react'
+import { Bold, Italic, List, ListOrdered, Heading2, Heading3, Undo, Redo, Image as ImageIcon, Link, Loader2 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import { uploadImage, getImageUrl } from '@/lib/utils/image'
 
 interface RichTextEditorProps {
   value: string
@@ -10,6 +12,7 @@ interface RichTextEditorProps {
   placeholder?: string
   className?: string
   minHeight?: string
+  imageFolder?: string
 }
 
 export function RichTextEditor({
@@ -18,9 +21,12 @@ export function RichTextEditor({
   placeholder = '',
   className,
   minHeight = '150px',
+  imageFolder = 'posts',
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const isInternalChange = useRef(false)
+  const [uploading, setUploading] = useState(false)
 
   // Sync external value changes to editor
   useEffect(() => {
@@ -58,6 +64,72 @@ export function RichTextEditor({
     }
   }, [execCommand])
 
+  // Handle image upload
+  const handleImageUpload = useCallback(async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Molimo odaberite sliku')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Slika mora biti manja od 5MB')
+      return
+    }
+
+    setUploading(true)
+    const supabase = createClient()
+    const result = await uploadImage(supabase, file, 'images', imageFolder)
+    setUploading(false)
+
+    if (result.error) {
+      alert(result.error)
+      return
+    }
+
+    if (result.path) {
+      const imageUrl = getImageUrl(result.path)
+      if (imageUrl) {
+        // Insert image at cursor position
+        const img = `<img src="${imageUrl}" alt="" class="max-w-full h-auto rounded-lg my-4" />`
+        execCommand('insertHTML', img)
+      }
+    }
+  }, [imageFolder, execCommand])
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleImageUpload(file)
+    }
+    // Reset input so same file can be selected again
+    e.target.value = ''
+  }, [handleImageUpload])
+
+  // Handle paste with images
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        e.preventDefault()
+        const file = items[i].getAsFile()
+        if (file) {
+          handleImageUpload(file)
+        }
+        return
+      }
+    }
+  }, [handleImageUpload])
+
+  // Insert link
+  const insertLink = useCallback(() => {
+    const url = prompt('Unesite URL:')
+    if (url) {
+      execCommand('createLink', url)
+    }
+  }, [execCommand])
+
   const ToolbarButton = ({
     onClick,
     icon: Icon,
@@ -79,8 +151,17 @@ export function RichTextEditor({
 
   return (
     <div className={cn('border border-gray-300 rounded-lg overflow-hidden', className)}>
+      {/* Hidden file input for image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
       {/* Toolbar */}
-      <div className="flex items-center gap-0.5 px-2 py-1.5 bg-gray-50 border-b border-gray-200">
+      <div className="flex items-center gap-0.5 px-2 py-1.5 bg-gray-50 border-b border-gray-200 flex-wrap">
         <ToolbarButton
           onClick={() => execCommand('bold')}
           icon={Bold}
@@ -115,6 +196,25 @@ export function RichTextEditor({
         />
         <div className="w-px h-5 bg-gray-300 mx-1" />
         <ToolbarButton
+          onClick={insertLink}
+          icon={Link}
+          title="Umetni link"
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          title="Umetni sliku"
+          className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors disabled:opacity-50"
+        >
+          {uploading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <ImageIcon className="w-4 h-4" />
+          )}
+        </button>
+        <div className="w-px h-5 bg-gray-300 mx-1" />
+        <ToolbarButton
           onClick={() => execCommand('undo')}
           icon={Undo}
           title="Poništi"
@@ -132,6 +232,7 @@ export function RichTextEditor({
         contentEditable
         onInput={handleInput}
         onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
         data-placeholder={placeholder}
         className={cn(
           'px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-inset',
@@ -142,11 +243,19 @@ export function RichTextEditor({
           '[&_p]:my-2',
           '[&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2',
           '[&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2',
-          '[&_li]:my-1'
+          '[&_li]:my-1',
+          '[&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-4',
+          '[&_a]:text-orangeCTA [&_a]:underline'
         )}
         style={{ minHeight }}
         suppressContentEditableWarning
       />
+
+      {uploading && (
+        <div className="px-3 py-2 bg-orange-50 text-orange-700 text-sm border-t border-orange-200">
+          Učitavanje slike...
+        </div>
+      )}
     </div>
   )
 }

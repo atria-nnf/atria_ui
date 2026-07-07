@@ -56,6 +56,7 @@ export function ServiceDetailsClient({
 }: ServiceDetailsClientProps) {
   const { locale } = useLocale()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [showAllPricing, setShowAllPricing] = useState(false)
 
   const ServiceIcon = CATEGORY_ICONS[service.category || ''] || Heart
   const categoryColor = CATEGORY_COLORS[service.category || ''] || 'from-gray-500 to-gray-600'
@@ -307,7 +308,7 @@ export function ServiceDetailsClient({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="text-center mb-16"
+              className="text-center mb-12"
             >
               <h2 className="text-4xl md:text-5xl font-bold mb-4 font-serif">
                 {locale === 'hr-HR' ? 'Cjenik' : locale === 'en-US' ? 'Pricing' : 'Preisliste'}
@@ -321,44 +322,66 @@ export function ServiceDetailsClient({
               </p>
             </motion.div>
 
-            <div className="max-w-3xl mx-auto">
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                {pricingList.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className={`flex items-center justify-between p-6 ${
-                      index !== pricingList.length - 1 ? 'border-b border-gray-100' : ''
-                    }`}
-                  >
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {getLocalizedContent(item.title, locale)}
-                      </h3>
-                      {getLocalizedContent(item.description, locale) && (
-                        <p className="text-sm text-gray-500 mt-1">
-                          {getLocalizedContent(item.description, locale)}
-                        </p>
-                      )}
-                    </div>
-                    <div className="ml-4 text-right">
-                      <span className="text-2xl font-bold text-orangeCTA">{item.price}€</span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+            {/* Show initial items or all items based on state */}
+            {(() => {
+              const INITIAL_ITEMS = 8
+              const hasMore = pricingList.length > INITIAL_ITEMS
+              const displayedItems = showAllPricing ? pricingList : pricingList.slice(0, INITIAL_ITEMS)
 
-              <p className="text-center text-sm text-gray-500 mt-6">
-                {locale === 'hr-HR'
-                  ? '* Cijene su izražene u eurima (EUR). Za više informacija kontaktirajte nas.'
-                  : locale === 'en-US'
-                  ? '* Prices are in euros (EUR). Contact us for more information.'
-                  : '* Preise sind in Euro (EUR) angegeben. Kontaktieren Sie uns für weitere Informationen.'}
-              </p>
-            </div>
+              return (
+                <>
+                  <div className="grid md:grid-cols-2 gap-4 max-w-5xl mx-auto">
+                    {displayedItems.map((item, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
+                        className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between gap-4"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-900 truncate">
+                            {getLocalizedContent(item.title, locale)}
+                          </h3>
+                          {getLocalizedContent(item.description, locale) && (
+                            <p className="text-sm text-gray-500 truncate">
+                              {getLocalizedContent(item.description, locale)}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex-shrink-0">
+                          <span className="text-xl font-bold text-orangeCTA">{item.price}€</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Show more/less button */}
+                  {hasMore && (
+                    <div className="text-center mt-8">
+                      <button
+                        onClick={() => setShowAllPricing(!showAllPricing)}
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-full text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+                      >
+                        <ChevronDown className={`w-5 h-5 transition-transform ${showAllPricing ? 'rotate-180' : ''}`} />
+                        {showAllPricing
+                          ? (locale === 'hr-HR' ? 'Prikaži manje' : locale === 'en-US' ? 'Show less' : 'Weniger anzeigen')
+                          : (locale === 'hr-HR' ? `Prikaži sve (${pricingList.length})` : locale === 'en-US' ? `Show all (${pricingList.length})` : `Alle anzeigen (${pricingList.length})`)}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )
+            })()}
+
+            <p className="text-center text-sm text-gray-500 mt-8">
+              {locale === 'hr-HR'
+                ? '* Cijene su izražene u eurima (EUR). Za više informacija kontaktirajte nas.'
+                : locale === 'en-US'
+                ? '* Prices are in euros (EUR). Contact us for more information.'
+                : '* Preise sind in Euro (EUR) angegeben. Kontaktieren Sie uns für weitere Informationen.'}
+            </p>
           </div>
         </section>
       )}

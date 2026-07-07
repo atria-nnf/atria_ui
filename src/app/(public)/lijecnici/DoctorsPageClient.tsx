@@ -11,6 +11,17 @@ import {
   Star,
   Clock,
   Play,
+  Users,
+  Microscope,
+  User,
+  Zap,
+  Building2,
+  DollarSign,
+  Stethoscope,
+  Target,
+  Lightbulb,
+  Shield,
+  type LucideIcon,
 } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
@@ -21,6 +32,25 @@ import type { Doctor, DoctorsPageSettings } from '@/types'
 interface DoctorsPageClientProps {
   initialDoctors: Doctor[]
   pageSettings: DoctorsPageSettings | null
+}
+
+// Icon map for dynamic icon rendering
+const ICON_MAP: Record<string, LucideIcon> = {
+  Award,
+  Heart,
+  BookOpen,
+  Clock,
+  Users,
+  Microscope,
+  User,
+  Zap,
+  Building2,
+  DollarSign,
+  Stethoscope,
+  Target,
+  Lightbulb,
+  Shield,
+  Star,
 }
 
 // Specialty display names
@@ -143,69 +173,91 @@ export function DoctorsPageClient({ initialDoctors, pageSettings }: DoctorsPageC
         },
       ]
 
-  // Why our doctors items
-  const whyOurDoctors = [
-    {
-      icon: Award,
-      title:
-        locale === 'hr-HR'
-          ? 'Visoka stručnost'
-          : locale === 'en-US'
-          ? 'High Expertise'
-          : 'Hohe Fachkompetenz',
-      description:
-        locale === 'hr-HR'
-          ? 'Svi naši liječnici su specijalizirani stručnjaci s godinama iskustva'
-          : locale === 'en-US'
-          ? 'All our doctors are specialized experts with years of experience'
-          : 'Alle unsere Ärzte sind spezialisierte Experten mit jahrelanger Erfahrung',
-    },
-    {
-      icon: Heart,
-      title:
-        locale === 'hr-HR'
-          ? 'Ljudski pristup'
-          : locale === 'en-US'
-          ? 'Human Approach'
-          : 'Menschlicher Ansatz',
-      description:
-        locale === 'hr-HR'
-          ? 'Empatija i razumijevanje su jednako važni kao i medicinska znanje'
-          : locale === 'en-US'
-          ? 'Empathy and understanding are just as important as medical knowledge'
-          : 'Empathie und Verständnis sind genauso wichtig wie medizinisches Wissen',
-    },
-    {
-      icon: BookOpen,
-      title:
-        locale === 'hr-HR'
-          ? 'Kontinuirana edukacija'
-          : locale === 'en-US'
-          ? 'Continuous Education'
-          : 'Kontinuierliche Weiterbildung',
-      description:
-        locale === 'hr-HR'
-          ? 'Redovna usavršavanja i praćenje najnovijih medicinskih dostignuća'
-          : locale === 'en-US'
-          ? 'Regular training and keeping up with the latest medical advances'
-          : 'Regelmäßige Schulungen und Nachverfolgung der neuesten medizinischen Fortschritte',
-    },
-    {
-      icon: Clock,
-      title:
-        locale === 'hr-HR'
-          ? 'Posvećeno vrijeme'
-          : locale === 'en-US'
-          ? 'Dedicated Time'
-          : 'Zeit für Sie',
-      description:
-        locale === 'hr-HR'
-          ? 'Dovoljno vremena za svakog pacijenta - bez žurbe'
-          : locale === 'en-US'
-          ? 'Enough time for each patient - without rushing'
-          : 'Genug Zeit für jeden Patienten - ohne Eile',
-    },
-  ]
+  // Why our doctors items - use settings if available, otherwise use defaults
+  const whyOurDoctors = pageSettings?.whyOurDoctors && pageSettings.whyOurDoctors.length > 0
+    ? pageSettings.whyOurDoctors.map(item => ({
+        icon: ICON_MAP[item.icon] || Award,
+        title: getLocalizedContent(item.title, locale) || '',
+        description: getLocalizedContent(item.description, locale) || '',
+      }))
+    : [
+        {
+          icon: Award,
+          title:
+            locale === 'hr-HR'
+              ? 'Visoka stručnost'
+              : locale === 'en-US'
+              ? 'High Expertise'
+              : 'Hohe Fachkompetenz',
+          description:
+            locale === 'hr-HR'
+              ? 'Svi naši liječnici su specijalizirani stručnjaci s godinama iskustva'
+              : locale === 'en-US'
+              ? 'All our doctors are specialized experts with years of experience'
+              : 'Alle unsere Ärzte sind spezialisierte Experten mit jahrelanger Erfahrung',
+        },
+        {
+          icon: Heart,
+          title:
+            locale === 'hr-HR'
+              ? 'Ljudski pristup'
+              : locale === 'en-US'
+              ? 'Human Approach'
+              : 'Menschlicher Ansatz',
+          description:
+            locale === 'hr-HR'
+              ? 'Empatija i razumijevanje su jednako važni kao i medicinska znanje'
+              : locale === 'en-US'
+              ? 'Empathy and understanding are just as important as medical knowledge'
+              : 'Empathie und Verständnis sind genauso wichtig wie medizinisches Wissen',
+        },
+        {
+          icon: BookOpen,
+          title:
+            locale === 'hr-HR'
+              ? 'Kontinuirana edukacija'
+              : locale === 'en-US'
+              ? 'Continuous Education'
+              : 'Kontinuierliche Weiterbildung',
+          description:
+            locale === 'hr-HR'
+              ? 'Redovna usavršavanja i praćenje najnovijih medicinskih dostignuća'
+              : locale === 'en-US'
+              ? 'Regular training and keeping up with the latest medical advances'
+              : 'Regelmäßige Schulungen und Nachverfolgung der neuesten medizinischen Fortschritte',
+        },
+        {
+          icon: Clock,
+          title:
+            locale === 'hr-HR'
+              ? 'Posvećeno vrijeme'
+              : locale === 'en-US'
+              ? 'Dedicated Time'
+              : 'Zeit für Sie',
+          description:
+            locale === 'hr-HR'
+              ? 'Dovoljno vremena za svakog pacijenta - bez žurbe'
+              : locale === 'en-US'
+              ? 'Enough time for each patient - without rushing'
+              : 'Genug Zeit für jeden Patienten - ohne Eile',
+        },
+      ]
+
+  // Why section title and subtitle
+  const whySectionTitle = getLocalizedContent(pageSettings?.whySectionTitle, locale) || (
+    locale === 'hr-HR'
+      ? 'Zašto naši liječnici?'
+      : locale === 'en-US'
+      ? 'Why Our Doctors?'
+      : 'Warum unsere Ärzte?'
+  )
+  const whySectionSubtitle = getLocalizedContent(pageSettings?.whySectionSubtitle, locale) || (
+    locale === 'hr-HR'
+      ? 'Više od stručnosti - pristup koji stavlja pacijenta na prvo mjesto'
+      : locale === 'en-US'
+      ? 'More than expertise - an approach that puts the patient first'
+      : 'Mehr als Fachwissen - ein Ansatz, der den Patienten in den Mittelpunkt stellt'
+  )
 
   return (
     <div className="bg-white text-black font-sans">
@@ -550,18 +602,10 @@ export function DoctorsPageClient({ initialDoctors, pageSettings }: DoctorsPageC
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4 font-serif">
-              {locale === 'hr-HR'
-                ? 'Zašto naši liječnici?'
-                : locale === 'en-US'
-                ? 'Why Our Doctors?'
-                : 'Warum unsere Ärzte?'}
+              {whySectionTitle}
             </h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              {locale === 'hr-HR'
-                ? 'Više od stručnosti - pristup koji stavlja pacijenta na prvo mjesto'
-                : locale === 'en-US'
-                ? 'More than expertise - an approach that puts the patient first'
-                : 'Mehr als Fachwissen - ein Ansatz, der den Patienten in den Mittelpunkt stellt'}
+              {whySectionSubtitle}
             </p>
           </motion.div>
 

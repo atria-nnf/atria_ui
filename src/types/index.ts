@@ -149,12 +149,23 @@ export interface DoctorsPageStat {
   label: Record<Locale, string>
 }
 
+// Doctors page "Why Our Doctors" item
+export interface DoctorsPageWhyItem {
+  title: Record<Locale, string>
+  description: Record<Locale, string>
+  icon: string
+}
+
 // Doctors page settings structure
 export interface DoctorsPageSettings {
   heroLabel?: Record<Locale, string>
   heroTitle?: Record<Locale, string>
   heroSubtitle?: Record<Locale, string>
   stats?: DoctorsPageStat[]
+  // Why Our Doctors section
+  whySectionTitle?: Record<Locale, string>
+  whySectionSubtitle?: Record<Locale, string>
+  whyOurDoctors?: DoctorsPageWhyItem[]
 }
 
 // Careers page settings structure
