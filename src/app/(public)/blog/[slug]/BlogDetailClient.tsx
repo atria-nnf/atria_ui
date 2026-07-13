@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Calendar, Clock, ChevronLeft, Share2, Eye, ArrowRight } from 'lucide-react'
 import { FaFacebookF, FaTwitter, FaLinkedinIn } from 'react-icons/fa'
-import ReactMarkdown from 'react-markdown'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
 import { getImageUrl } from '@/lib/utils/image'
@@ -178,7 +177,7 @@ export function BlogDetailClient({ post, relatedPosts }: BlogDetailClientProps) 
             className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:font-bold prose-a:text-orange-500 prose-a:no-underline hover:prose-a:underline"
           >
             {content ? (
-              <ReactMarkdown>{content}</ReactMarkdown>
+              <div dangerouslySetInnerHTML={{ __html: content }} />
             ) : (
               <p className="text-gray-500 italic">
                 {locale === 'hr-HR' ? 'Sadržaj nije dostupan.' : locale === 'en-US' ? 'Content not available.' : 'Inhalt nicht verfügbar.'}

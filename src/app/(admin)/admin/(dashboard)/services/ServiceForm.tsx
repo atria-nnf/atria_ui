@@ -114,6 +114,7 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
     title: Record<string, string>
     description: Record<string, string>
     price: number
+    category?: Record<string, string>
   }
   const [pricingList, setPricingList] = useState<PricingItem[]>(
     (service?.pricing as { items?: PricingItem[] })?.items || []
@@ -158,7 +159,12 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
   const addPricingItem = () => {
     setPricingList([
       ...pricingList,
-      { title: { 'hr-HR': '', 'en-US': '', 'de-DE': '' }, description: { 'hr-HR': '', 'en-US': '', 'de-DE': '' }, price: 0 },
+      {
+        title: { 'hr-HR': '', 'en-US': '', 'de-DE': '' },
+        description: { 'hr-HR': '', 'en-US': '', 'de-DE': '' },
+        price: 0,
+        category: { 'hr-HR': '', 'en-US': '', 'de-DE': '' },
+      },
     ])
   }
 
@@ -192,6 +198,26 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
     }
     setPricingList(newList)
   }
+
+  const updatePricingCategory = (index: number, locale: string, value: string) => {
+    const newList = [...pricingList]
+    newList[index] = {
+      ...newList[index],
+      category: { ...(newList[index].category || {}), [locale]: value },
+    }
+    setPricingList(newList)
+  }
+
+  // Existing category values (per locale) used to suggest reuse in the editor,
+  // so chips on the public page dedupe cleanly.
+  const pricingCategorySuggestions = (locale: string): string[] =>
+    Array.from(
+      new Set(
+        pricingList
+          .map((item) => item.category?.[locale]?.trim())
+          .filter((v): v is string => !!v)
+      )
+    )
 
   const {
     register,
@@ -567,7 +593,25 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
 
             <p className="text-sm text-gray-500">
               Dodajte stavke cjenika za ovu uslugu. Svaka stavka ima naziv, kratki opis i cijenu u eurima.
+              Kategorija je opcionalna — ako je dodate, na stranici usluge prikazat će se filteri.
             </p>
+
+            {/* Category suggestions shared across all pricing items (for reuse/consistency) */}
+            <datalist id="pricing-categories-hr">
+              {pricingCategorySuggestions('hr-HR').map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+            <datalist id="pricing-categories-en">
+              {pricingCategorySuggestions('en-US').map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+            <datalist id="pricing-categories-de">
+              {pricingCategorySuggestions('de-DE').map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
 
             {pricingList.length > 0 ? (
               <div className="space-y-6">
@@ -601,6 +645,48 @@ export function ServiceForm({ service, isEditing }: ServiceFormProps) {
                         step="0.01"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       />
+                    </div>
+
+                    {/* Category (optional — enables filter chips on the public page) */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Kategorija <span className="text-xs font-normal text-gray-400">(za filtere, opcionalno)</span>
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <span className="text-xs text-gray-500 mb-1 block">HR</span>
+                          <input
+                            type="text"
+                            list="pricing-categories-hr"
+                            value={item.category?.['hr-HR'] || ''}
+                            onChange={(e) => updatePricingCategory(index, 'hr-HR', e.target.value)}
+                            placeholder="Npr. Pregledi"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-xs text-gray-500 mb-1 block">EN</span>
+                          <input
+                            type="text"
+                            list="pricing-categories-en"
+                            value={item.category?.['en-US'] || ''}
+                            onChange={(e) => updatePricingCategory(index, 'en-US', e.target.value)}
+                            placeholder="e.g. Examinations"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-xs text-gray-500 mb-1 block">DE</span>
+                          <input
+                            type="text"
+                            list="pricing-categories-de"
+                            value={item.category?.['de-DE'] || ''}
+                            onChange={(e) => updatePricingCategory(index, 'de-DE', e.target.value)}
+                            placeholder="z.B. Untersuchungen"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     {/* Title */}

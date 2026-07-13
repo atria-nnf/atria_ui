@@ -12,6 +12,7 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import VideoModal from '@/components/VideoModal'
 import { getImageUrl } from '@/lib/utils/image'
+import { getEmbedUrl, isYouTubeUrl } from '@/lib/utils/youtube'
 import { useCookieConsent } from '@/config/cookie-consent-context'
 import { ConsentPlaceholder } from '@/components/cookies'
 import type { Service, Doctor, Testimonial, HomepageSettings } from '@/types'
@@ -93,30 +94,6 @@ function getLocalizedContent(content: unknown, locale: string = 'hr-HR'): string
     return (content as Record<string, string>)[locale] || (content as Record<string, string>)['hr-HR'] || ''
   }
   return ''
-}
-
-// Helper function to detect and convert YouTube URLs to embed format
-function getEmbedUrl(url: string | null): string | null {
-  if (!url) return null
-
-  const youtubePatterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/,
-    /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]+)/,
-  ]
-
-  for (const pattern of youtubePatterns) {
-    const match = url.match(pattern)
-    if (match && match[1]) {
-      return `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0`
-    }
-  }
-
-  return url
-}
-
-function isYouTubeUrl(url: string | null): boolean {
-  if (!url) return false
-  return url.includes('youtube.com') || url.includes('youtu.be')
 }
 
 export default function HomePageClient({ services, doctors, testimonials, settings }: HomePageClientProps) {

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useCookieConsent } from '@/config/cookie-consent-context'
 import { ConsentPlaceholder } from '@/components/cookies'
+import { getEmbedUrl, isYouTubeUrl } from '@/lib/utils/youtube'
 
 interface VideoModalProps {
   isOpen: boolean
@@ -39,33 +40,6 @@ export default function VideoModal({ isOpen, onClose, videoUrl }: VideoModalProp
       document.body.style.overflow = 'unset'
     }
   }, [isOpen])
-
-  // Helper function to detect and convert YouTube URLs to embed format
-  const getEmbedUrl = (url: string | null): string | null => {
-    if (!url) return null
-
-    // YouTube patterns
-    const youtubePatterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/,
-      /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]+)/,
-    ]
-
-    for (const pattern of youtubePatterns) {
-      const match = url.match(pattern)
-      if (match && match[1]) {
-        return `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0`
-      }
-    }
-
-    // If not YouTube, return the original URL (direct video file)
-    return url
-  }
-
-  // Helper function to check if URL is a YouTube embed
-  const isYouTubeUrl = (url: string | null): boolean => {
-    if (!url) return false
-    return url.includes('youtube.com') || url.includes('youtu.be')
-  }
 
   const embedUrl = getEmbedUrl(videoUrl)
   const isYouTube = isYouTubeUrl(videoUrl)

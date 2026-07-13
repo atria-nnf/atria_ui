@@ -57,6 +57,7 @@ export function ServiceDetailsClient({
   const { locale } = useLocale()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [showAllPricing, setShowAllPricing] = useState(false)
+  const [selectedPricingCategory, setSelectedPricingCategory] = useState<string | null>(null)
 
   const ServiceIcon = CATEGORY_ICONS[service.category || ''] || Heart
   const categoryColor = CATEGORY_COLORS[service.category || ''] || 'from-gray-500 to-gray-600'
@@ -66,6 +67,7 @@ export function ServiceDetailsClient({
     title: Record<string, string>
     description: Record<string, string>
     price: number
+    category?: Record<string, string>
   }
 
   const getPricingList = (pricing: unknown): PricingItem[] => {
@@ -79,6 +81,31 @@ export function ServiceDetailsClient({
   }
 
   const pricingList = getPricingList(service.pricing)
+
+  // Category filtering for the pricing list.
+  // A category's canonical key falls back across locales so chips stay stable.
+  const OTHER_CATEGORY = '__other__'
+  const getCategoryKey = (category?: Record<string, string>) =>
+    (category?.['hr-HR'] || category?.['en-US'] || category?.['de-DE'] || '').trim()
+
+  const pricingCategories: { key: string; label: Record<string, string> }[] = []
+  const seenCategoryKeys = new Set<string>()
+  for (const item of pricingList) {
+    const key = getCategoryKey(item.category)
+    if (key && !seenCategoryKeys.has(key)) {
+      seenCategoryKeys.add(key)
+      pricingCategories.push({ key, label: item.category! })
+    }
+  }
+  const hasUncategorizedPricing = pricingList.some((item) => !getCategoryKey(item.category))
+  const showPricingFilters = pricingCategories.length > 0
+
+  const filteredPricing =
+    selectedPricingCategory === null
+      ? pricingList
+      : selectedPricingCategory === OTHER_CATEGORY
+      ? pricingList.filter((item) => !getCategoryKey(item.category))
+      : pricingList.filter((item) => getCategoryKey(item.category) === selectedPricingCategory)
 
   // Parse pricing for packages (legacy)
   const getPricing = (pricing: unknown) => {
@@ -322,11 +349,48 @@ export function ServiceDetailsClient({
               </p>
             </motion.div>
 
+            {/* Category filter chips */}
+            {showPricingFilters && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-wrap justify-center gap-2 mb-10"
+              >
+                {[
+                  { key: null as string | null, label: locale === 'hr-HR' ? 'Sve' : locale === 'en-US' ? 'All' : 'Alle' },
+                  ...pricingCategories.map((c) => ({ key: c.key, label: getLocalizedContent(c.label, locale) })),
+                  ...(hasUncategorizedPricing
+                    ? [{ key: OTHER_CATEGORY, label: locale === 'hr-HR' ? 'Ostalo' : locale === 'en-US' ? 'Other' : 'Sonstiges' }]
+                    : []),
+                ].map((chip) => {
+                  const isActive = selectedPricingCategory === chip.key
+                  return (
+                    <button
+                      key={chip.key ?? 'all'}
+                      onClick={() => {
+                        setSelectedPricingCategory(chip.key)
+                        setShowAllPricing(false)
+                      }}
+                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                        isActive
+                          ? 'bg-orangeCTA text-white shadow-sm'
+                          : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                      }`}
+                    >
+                      {chip.label}
+                    </button>
+                  )
+                })}
+              </motion.div>
+            )}
+
             {/* Show initial items or all items based on state */}
             {(() => {
               const INITIAL_ITEMS = 8
-              const hasMore = pricingList.length > INITIAL_ITEMS
-              const displayedItems = showAllPricing ? pricingList : pricingList.slice(0, INITIAL_ITEMS)
+              const hasMore = filteredPricing.length > INITIAL_ITEMS
+              const displayedItems = showAllPricing ? filteredPricing : filteredPricing.slice(0, INITIAL_ITEMS)
 
               return (
                 <>
@@ -367,7 +431,7 @@ export function ServiceDetailsClient({
                         <ChevronDown className={`w-5 h-5 transition-transform ${showAllPricing ? 'rotate-180' : ''}`} />
                         {showAllPricing
                           ? (locale === 'hr-HR' ? 'Prikaži manje' : locale === 'en-US' ? 'Show less' : 'Weniger anzeigen')
-                          : (locale === 'hr-HR' ? `Prikaži sve (${pricingList.length})` : locale === 'en-US' ? `Show all (${pricingList.length})` : `Alle anzeigen (${pricingList.length})`)}
+                          : (locale === 'hr-HR' ? `Prikaži sve (${filteredPricing.length})` : locale === 'en-US' ? `Show all (${filteredPricing.length})` : `Alle anzeigen (${filteredPricing.length})`)}
                       </button>
                     </div>
                   )}
