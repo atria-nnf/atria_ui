@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Calendar, Clock, Search, Tag, ArrowRight } from 'lucide-react'
+import { Clock, Search, Tag, ArrowRight } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
 import { getImageUrl } from '@/lib/utils/image'
@@ -19,17 +19,6 @@ export function BlogPageClient({ initialPosts, featuredPosts, pageSettings }: Bl
   const { locale } = useLocale()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
-
-  // Format date
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return ''
-    const localeMap = { 'hr-HR': 'hr-HR', 'en-US': 'en-US', 'de-DE': 'de-DE' }
-    return new Date(dateString).toLocaleDateString(localeMap[locale], {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
 
   // Calculate read time
   const calculateReadTime = (content: string | null) => {
@@ -241,12 +230,6 @@ export function BlogPageClient({ initialPosts, featuredPosts, pageSettings }: Bl
 
                     {/* Meta Info */}
                     <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8">
-                      {featuredArticle.published_at && (
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          <span>{formatDate(featuredArticle.published_at)}</span>
-                        </div>
-                      )}
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4" />
                         <span>
@@ -352,8 +335,6 @@ export function BlogPageClient({ initialPosts, featuredPosts, pageSettings }: Bl
 
                       {/* Meta */}
                       <div className="flex items-center gap-4 text-xs text-gray-500">
-                        {article.published_at && <span>{formatDate(article.published_at)}</span>}
-                        <span>•</span>
                         <span>{calculateReadTime(getLocalizedContent(article.content, locale))}</span>
                       </div>
                     </div>

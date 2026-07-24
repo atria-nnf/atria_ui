@@ -3,13 +3,15 @@ import { getServices, getFeaturedServices } from '@/lib/api/services'
 import { getDoctors } from '@/lib/api/doctors'
 import { getTestimonials } from '@/lib/api/testimonials'
 import { getHomepageSettings } from '@/lib/api/settings'
+import { getRecentPosts } from '@/lib/api/posts'
 
 export default async function HomePage() {
-  const [services, doctors, testimonials, settings] = await Promise.all([
+  const [services, doctors, testimonials, settings, posts] = await Promise.all([
     getFeaturedServices(),
     getDoctors(),
     getTestimonials(),
     getHomepageSettings(),
+    getRecentPosts(3),
   ])
 
   // If no featured services, get all services
@@ -21,6 +23,7 @@ export default async function HomePage() {
       doctors={doctors}
       testimonials={testimonials}
       settings={settings}
+      posts={posts}
     />
   )
 }

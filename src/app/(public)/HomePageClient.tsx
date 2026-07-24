@@ -1,27 +1,22 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Play, X } from 'lucide-react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import type { Swiper as SwiperType } from 'swiper'
 import { Pagination, Autoplay } from 'swiper/modules'
 import Link from 'next/link'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
-import VideoModal from '@/components/VideoModal'
 import { getImageUrl } from '@/lib/utils/image'
-import { getEmbedUrl, isYouTubeUrl } from '@/lib/utils/youtube'
-import { useCookieConsent } from '@/config/cookie-consent-context'
-import { ConsentPlaceholder } from '@/components/cookies'
-import type { Service, Doctor, Testimonial, HomepageSettings } from '@/types'
+import type { Service, Doctor, Testimonial, HomepageSettings, Post } from '@/types'
 
 interface HomePageClientProps {
   services: Service[]
   doctors: Doctor[]
   testimonials: Testimonial[]
   settings: HomepageSettings | null
+  posts: Post[]
 }
 
 // Default static data (fallbacks when settings not configured)
@@ -53,38 +48,13 @@ const defaultHeroSubtitle = { 'hr-HR': 'Moderna medicina koja vas razumije. Isku
 const defaultCtaButtonText = { 'hr-HR': 'Rezerviraj termin', 'en-US': 'Book appointment', 'de-DE': 'Termin buchen' }
 const defaultHeroImage = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920&h=1080&fit=crop'
 
-const blogPosts = [
-  {
-    id: 1,
-    title: 'Važnost redovitih ginekoloških pregleda',
-    excerpt: 'Saznajte zašto je redoviti ginekološki pregled ključan za očuvanje ženskog zdravlja i prevenciju bolesti.',
-    category: 'Ginekologija',
-    readTime: 5,
-    publishedAt: '2024-01-15',
-    coverImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=750&fit=crop',
-    isFeatured: true,
-  },
-  {
-    id: 2,
-    title: 'Kako prepoznati rane znakove srčanih problema',
-    excerpt: 'Preventivni kardioški pregled može spasiti život. Pročitajte više o simptomima na koje trebate obratiti pažnju.',
-    category: 'Kardiologija',
-    readTime: 4,
-    publishedAt: '2024-01-10',
-    coverImage: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=600&h=400&fit=crop',
-    isFeatured: false,
-  },
-  {
-    id: 3,
-    title: 'Njega kože tijekom zimskih mjeseci',
-    excerpt: 'Dermatološki savjeti za održavanje zdrave i hidrirane kože tijekom hladnih zimskih dana.',
-    category: 'Dermatologija',
-    readTime: 3,
-    publishedAt: '2024-01-05',
-    coverImage: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=600&h=400&fit=crop',
-    isFeatured: false,
-  },
-]
+const defaultPostImage = 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=750&fit=crop'
+
+function calculateReadTime(content: string): number {
+  if (!content) return 5
+  const wordsPerMinute = 200
+  return Math.ceil(content.split(/\s+/).length / wordsPerMinute)
+}
 
 // Helper to get localized content
 function getLocalizedContent(content: unknown, locale: string = 'hr-HR'): string {
@@ -96,23 +66,7 @@ function getLocalizedContent(content: unknown, locale: string = 'hr-HR'): string
   return ''
 }
 
-export default function HomePageClient({ services, doctors, testimonials, settings }: HomePageClientProps) {
-  const [videoModalOpen, setVideoModalOpen] = useState(false)
-  const [selectedDoctorVideo, setSelectedDoctorVideo] = useState<string | null>(null)
-  const [playingDoctorId, setPlayingDoctorId] = useState<string | null>(null)
-  const [doctorsSwiperRef, setDoctorsSwiperRef] = useState<SwiperType | null>(null)
-
-  const { consent } = useCookieConsent()
-
-  // Stop/start autoplay when video is playing
-  useEffect(() => {
-    if (!doctorsSwiperRef) return
-    if (playingDoctorId) {
-      doctorsSwiperRef.autoplay?.stop()
-    } else {
-      doctorsSwiperRef.autoplay?.start()
-    }
-  }, [playingDoctorId, doctorsSwiperRef])
+export default function HomePageClient({ services, doctors, testimonials, settings, posts }: HomePageClientProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -163,22 +117,13 @@ export default function HomePageClient({ services, doctors, testimonials, settin
 
   // Transform doctors data for display
   const doctorsData = useMemo(() => {
-    return doctors.map((doctor) => {
-      // Get video URL - use getImageUrl for Supabase paths, keep YouTube URLs as-is
-      const rawVideoUrl = doctor.video_preview
-      const videoUrl = rawVideoUrl && isYouTubeUrl(rawVideoUrl)
-        ? rawVideoUrl
-        : getImageUrl(rawVideoUrl)
-
-      return {
-        id: doctor.id,
-        fullName: doctor.name,
-        title: getLocalizedContent(doctor.title) || getLocalizedContent(doctor.specialty),
-        experience: getLocalizedContent(doctor.specialty) || '',
-        image: getImageUrl(doctor.profile_image) || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=800&fit=crop',
-        videoUrl,
-      }
-    })
+    return doctors.map((doctor) => ({
+      id: doctor.id,
+      fullName: doctor.name,
+      title: getLocalizedContent(doctor.title) || getLocalizedContent(doctor.specialty),
+      experience: getLocalizedContent(doctor.specialty) || '',
+      image: getImageUrl(doctor.profile_image) || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=800&fit=crop',
+    }))
   }, [doctors])
 
   // Transform testimonials data for display
@@ -432,7 +377,6 @@ export default function HomePageClient({ services, doctors, testimonials, settin
             threshold={10}
             resistanceRatio={0}
             className="!pb-16"
-            onSwiper={setDoctorsSwiperRef}
           >
             {doctorsData.map((doctor, index) => (
               <SwiperSlide key={doctor.id}>
@@ -441,78 +385,24 @@ export default function HomePageClient({ services, doctors, testimonials, settin
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: index * 0.2 }}
-                  className="group cursor-pointer"
+                  className="group"
                 >
-                  <div className="relative aspect-[3/4] rounded-3xl overflow-hidden mb-6 bg-black">
-                    {playingDoctorId === doctor.id && doctor.videoUrl ? (
-                      <>
-                        {isYouTubeUrl(doctor.videoUrl) ? (
-                          consent.marketing ? (
-                            <iframe
-                              src={getEmbedUrl(doctor.videoUrl) || ''}
-                              className="absolute inset-0 w-full h-full"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              title={`Video - ${doctor.fullName}`}
-                            />
-                          ) : (
-                            <div className="absolute inset-0 w-full h-full bg-gray-900">
-                              <ConsentPlaceholder variant="video" className="h-full rounded-none" />
-                            </div>
-                          )
-                        ) : (
-                          <video
-                            src={doctor.videoUrl}
-                            className="absolute inset-0 w-full h-full object-cover"
-                            controls
-                            autoPlay
-                            controlsList="nodownload"
-                          />
-                        )}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            setPlayingDoctorId(null)
-                          }}
-                          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center z-20 hover:bg-white transition-colors"
-                          aria-label="Close video"
-                        >
-                          <X className="w-5 h-5 text-black" />
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <img
-                          src={doctor.image}
-                          alt={doctor.fullName}
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
-                        />
-                        {doctor.videoUrl && (
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              setPlayingDoctorId(doctor.id)
-                            }}
-                            className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-                            aria-label={`Play video for ${doctor.fullName}`}
-                          >
-                            <div className="w-20 h-20 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
-                              <Play className="w-8 h-8 text-orangeCTA ml-1" />
-                            </div>
-                          </button>
-                        )}
-                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-black text-sm font-medium">
-                          {doctor.experience}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-                    {doctor.fullName}
-                  </h3>
-                  <p className="text-gray-600">{doctor.title}</p>
+                  <Link href="/lijecnici" className="block cursor-pointer">
+                    <div className="relative aspect-[3/4] rounded-3xl overflow-hidden mb-6 bg-black">
+                      <img
+                        src={doctor.image}
+                        alt={doctor.fullName}
+                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
+                      />
+                      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-black text-sm font-medium">
+                        {doctor.experience}
+                      </div>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                      {doctor.fullName}
+                    </h3>
+                    <p className="text-gray-600">{doctor.title}</p>
+                  </Link>
                 </motion.div>
               </SwiperSlide>
             ))}
@@ -668,6 +558,7 @@ export default function HomePageClient({ services, doctors, testimonials, settin
       </section>
 
       {/* Blog/News Preview - Editorial Style */}
+      {posts.length > 0 && (
       <section className="bg-gradient-to-br from-slate-900 via-blue-950 to-purple-950 py-32">
         <div className="max-w-7xl mx-auto px-8">
           <motion.div
@@ -694,87 +585,87 @@ export default function HomePageClient({ services, doctors, testimonials, settin
 
           <div className="grid md:grid-cols-12 gap-8">
             {/* Featured Article - Large */}
-            {blogPosts[0] && (
-              <motion.article
-                initial={{ opacity: 0, y: 60 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="md:col-span-7 group cursor-pointer"
-              >
+            <motion.article
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="md:col-span-7 group"
+            >
+              <Link href={`/blog/${posts[0].slug}`} className="block cursor-pointer">
                 <div className="relative aspect-[16/10] rounded-3xl overflow-hidden mb-6">
                   <img
-                    src={blogPosts[0].coverImage}
-                    alt={blogPosts[0].title}
+                    src={getImageUrl(posts[0].featured_image) || defaultPostImage}
+                    alt={getLocalizedContent(posts[0].title)}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                  {blogPosts[0].isFeatured && (
+                  {posts[0].is_featured && (
                     <div className="absolute top-6 left-6 bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-medium">
                       Featured
                     </div>
                   )}
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <div className="text-sm text-gray-300 mb-2">
-                      {new Date(blogPosts[0].publishedAt).toLocaleDateString('hr-HR')}
-                    </div>
-                  </div>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                  <span>{blogPosts[0].category}</span>
-                  <span>•</span>
-                  <span>{blogPosts[0].readTime} min čitanja</span>
+                  {posts[0].category && (
+                    <>
+                      <span>{posts[0].category}</span>
+                      <span>•</span>
+                    </>
+                  )}
+                  <span>{calculateReadTime(getLocalizedContent(posts[0].content))} min čitanja</span>
                 </div>
                 <h3
                   className="text-4xl font-bold mb-4 leading-tight group-hover:text-orange-500 transition-colors"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
-                  {blogPosts[0].title}
+                  {getLocalizedContent(posts[0].title)}
                 </h3>
-                <p className="text-gray-400 text-lg leading-relaxed mb-6">{blogPosts[0].excerpt}</p>
+                <p className="text-gray-400 text-lg leading-relaxed mb-6">{getLocalizedContent(posts[0].excerpt)}</p>
                 <motion.div whileHover={{ x: 5 }} className="flex items-center gap-2 group/btn">
                   <span className="border-b border-white pb-1">Čitaj dalje</span>
                   <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
                 </motion.div>
-              </motion.article>
-            )}
+              </Link>
+            </motion.article>
 
             {/* Side Articles - Smaller */}
             <div className="md:col-span-5 space-y-8">
-              {blogPosts.slice(1).map((post, index) => (
+              {posts.slice(1).map((post, index) => (
                 <motion.article
                   key={post.id}
                   initial={{ opacity: 0, x: 60 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: index * 0.1 }}
-                  className="group cursor-pointer"
+                  className="group"
                 >
-                  <div className="grid grid-cols-5 gap-6">
+                  <Link href={`/blog/${post.slug}`} className="grid grid-cols-5 gap-6 cursor-pointer">
                     <div className="col-span-2 relative aspect-square rounded-2xl overflow-hidden">
                       <img
-                        src={post.coverImage}
-                        alt={post.title}
+                        src={getImageUrl(post.featured_image) || defaultPostImage}
+                        alt={getLocalizedContent(post.title)}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                     </div>
                     <div className="col-span-3">
                       <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                        <span className="text-orange-500">{post.category}</span>
-                        <span>•</span>
-                        <span>{post.readTime} min</span>
+                        {post.category && (
+                          <>
+                            <span className="text-orange-500">{post.category}</span>
+                            <span>•</span>
+                          </>
+                        )}
+                        <span>{calculateReadTime(getLocalizedContent(post.content))} min</span>
                       </div>
                       <h4
                         className="text-xl font-bold mb-2 leading-tight group-hover:text-orange-500 transition-colors"
                         style={{ fontFamily: 'Playfair Display, serif' }}
                       >
-                        {post.title}
+                        {getLocalizedContent(post.title)}
                       </h4>
-                      <p className="text-sm text-gray-500">
-                        {new Date(post.publishedAt).toLocaleDateString('hr-HR')}
-                      </p>
                     </div>
-                  </div>
+                  </Link>
                 </motion.article>
               ))}
             </div>
@@ -789,6 +680,7 @@ export default function HomePageClient({ services, doctors, testimonials, settin
           </motion.div>
         </div>
       </section>
+      )}
 
       {/* Interactive CTA */}
       <section className="min-h-screen bg-gradient-to-br from-orangeCTA via-orange-500 to-amber-500 flex items-center justify-center relative overflow-hidden">
@@ -833,9 +725,6 @@ export default function HomePageClient({ services, doctors, testimonials, settin
           </motion.div>
         </motion.div>
       </section>
-
-      {/* Video Modal */}
-      <VideoModal isOpen={videoModalOpen} onClose={() => setVideoModalOpen(false)} videoUrl={selectedDoctorVideo} />
     </div>
   )
 }

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Calendar, Clock, ChevronLeft, Share2, Eye, ArrowRight } from 'lucide-react'
+import { Clock, ChevronLeft, Share2, Eye, ArrowRight } from 'lucide-react'
 import { FaFacebookF, FaTwitter, FaLinkedinIn } from 'react-icons/fa'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
@@ -18,17 +18,6 @@ interface BlogDetailClientProps {
 export function BlogDetailClient({ post, relatedPosts }: BlogDetailClientProps) {
   const { locale } = useLocale()
   const [showShareMenu, setShowShareMenu] = useState(false)
-
-  // Format date
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return ''
-    const localeMap = { 'hr-HR': 'hr-HR', 'en-US': 'en-US', 'de-DE': 'de-DE' }
-    return new Date(dateString).toLocaleDateString(localeMap[locale], {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
 
   // Calculate read time
   const calculateReadTime = (content: string | null) => {
@@ -100,12 +89,6 @@ export function BlogDetailClient({ post, relatedPosts }: BlogDetailClientProps) 
 
               {/* Meta Info */}
               <div className="flex flex-wrap items-center gap-6 text-gray-600 mb-8">
-                {post.published_at && (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
-                    <span>{formatDate(post.published_at)}</span>
-                  </div>
-                )}
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5" />
                   <span>
@@ -229,10 +212,6 @@ export function BlogDetailClient({ post, relatedPosts }: BlogDetailClientProps) 
                     <h3 className="text-xl font-bold mb-3 leading-tight group-hover:text-orange-500 transition-colors font-serif">
                       {getLocalizedContent(article.title, locale)}
                     </h3>
-
-                    <div className="flex items-center gap-3 text-sm text-gray-500">
-                      {article.published_at && <span>{formatDate(article.published_at)}</span>}
-                    </div>
                   </Link>
                 </motion.article>
               ))}
