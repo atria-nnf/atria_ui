@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendContactNotification } from '@/lib/email'
 import type { ContactSubmission } from '@/types'
 
 export interface ContactFormData {
@@ -48,6 +49,16 @@ export async function submitContactForm(
       console.error('Error submitting contact form:', error)
       return { success: false, error: error.message }
     }
+
+    // Notify the clinic by email; the submission is already saved,
+    // so an email failure must not fail the request
+    await sendContactNotification({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      service: formData.service,
+      message: formData.message,
+    })
 
     return { success: true, data: data as ContactSubmission }
   } catch (err) {

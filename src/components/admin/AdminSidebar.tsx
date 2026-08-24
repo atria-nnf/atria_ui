@@ -15,6 +15,7 @@ import {
   Briefcase,
   Settings,
   Mail,
+  Send,
   FolderOpen,
   ChevronLeft,
   ChevronRight,
@@ -31,6 +32,7 @@ const navigation = [
   { name: 'Karijere', href: '/admin/jobs', icon: Briefcase },
   { name: 'Postavke', href: '/admin/settings', icon: Settings },
   { name: 'Poruke', href: '/admin/submissions', icon: Mail },
+  { name: 'Newsletter', href: '/admin/newsletter', icon: Send },
   { name: 'Mediji', href: '/admin/media', icon: FolderOpen },
 ]
 

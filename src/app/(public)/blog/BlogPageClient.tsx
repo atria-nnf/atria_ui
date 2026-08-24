@@ -19,6 +19,32 @@ export function BlogPageClient({ initialPosts, featuredPosts, pageSettings }: Bl
   const { locale } = useLocale()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setNewsletterStatus('loading')
+
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail, source: 'blog' }),
+      })
+      const result = await response.json()
+
+      if (result.success) {
+        setNewsletterStatus('success')
+        setNewsletterEmail('')
+        setTimeout(() => setNewsletterStatus('idle'), 3000)
+      } else {
+        setNewsletterStatus('error')
+      }
+    } catch {
+      setNewsletterStatus('error')
+    }
+  }
 
   // Calculate read time
   const calculateReadTime = (content: string | null) => {
@@ -431,22 +457,36 @@ export function BlogPageClient({ initialPosts, featuredPosts, pageSettings }: Bl
               : 'Erhalten Sie die neuesten Gesundheitstipps und Artikel direkt in Ihr Postfach. Kostenlos.')}
           </p>
 
-          <form className="max-w-md mx-auto relative">
+          <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto relative">
             <input
               type="email"
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
               placeholder={getLocalizedContent(pageSettings?.newsletterPlaceholder, locale) || (locale === 'hr-HR' ? 'Vaša email adresa' : locale === 'en-US' ? 'Your email address' : 'Ihre E-Mail-Adresse')}
               className="w-full px-6 py-4 pr-32 rounded-full bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
               required
             />
             <motion.button
               type="submit"
+              disabled={newsletterStatus === 'loading'}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-orangeCTA rounded-full font-medium"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-orangeCTA rounded-full font-medium disabled:opacity-60"
             >
               {getLocalizedContent(pageSettings?.newsletterButtonText, locale) || (locale === 'hr-HR' ? 'Pretplati se' : locale === 'en-US' ? 'Subscribe' : 'Abonnieren')}
             </motion.button>
           </form>
+
+          {newsletterStatus === 'success' && (
+            <p className="text-sm text-green-400 mt-4">
+              {locale === 'hr-HR' ? '✓ Uspješno ste se pretplatili!' : locale === 'en-US' ? '✓ You have successfully subscribed!' : '✓ Sie haben sich erfolgreich angemeldet!'}
+            </p>
+          )}
+          {newsletterStatus === 'error' && (
+            <p className="text-sm text-red-400 mt-4">
+              {locale === 'hr-HR' ? 'Došlo je do pogreške. Pokušajte ponovno.' : locale === 'en-US' ? 'Something went wrong. Please try again.' : 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.'}
+            </p>
+          )}
 
           <p className="text-sm text-gray-400 mt-6">
             {getLocalizedContent(pageSettings?.newsletterDisclaimer, locale) || (locale === 'hr-HR'

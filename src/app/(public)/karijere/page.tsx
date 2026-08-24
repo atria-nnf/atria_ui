@@ -1,16 +1,6 @@
-import { Metadata } from 'next'
-import { getActiveJobs, getCareersPageSettings } from '@/lib/api'
-import { CareersPageClient } from './CareersPageClient'
+import { redirect } from 'next/navigation'
 
-export const metadata: Metadata = {
-  title: 'Karijera',
-  description: 'Pridružite se timu Poliklinike Atria. Pregledajte otvorene pozicije i prijavite se.',
-}
-
-export default async function CareersPage() {
-  const [jobs, pageSettings] = await Promise.all([
-    getActiveJobs(),
-    getCareersPageSettings(),
-  ])
-  return <CareersPageClient jobs={jobs} pageSettings={pageSettings} />
+// Careers page is hidden for now — restore from git history to re-enable
+export default function CareersPage() {
+  redirect('/')
 }

@@ -19,7 +19,6 @@ const quickLinks = [
   { name: 'Naši doktori', href: '/lijecnici' },
   { name: 'Novosti', href: '/blog' },
   { name: 'Kontakt', href: '/kontakt' },
-  { name: 'Karijere', href: '/karijere' },
 ]
 
 const legal = [
@@ -86,14 +85,26 @@ export function Footer({ services: servicesProp = [], contactInfo, footerSetting
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setStatus('Subscribing...')
+    setStatus('Pretplaćujemo vas...')
 
-    // TODO: Implement actual newsletter subscription
-    setTimeout(() => {
-      setStatus('✓ Uspješno ste se pretplatili!')
-      setEmail('')
-      setTimeout(() => setStatus(''), 3000)
-    }, 1000)
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'footer' }),
+      })
+      const result = await response.json()
+
+      if (result.success) {
+        setStatus('✓ Uspješno ste se pretplatili!')
+        setEmail('')
+        setTimeout(() => setStatus(''), 3000)
+      } else {
+        setStatus('Došlo je do pogreške. Pokušajte ponovno.')
+      }
+    } catch {
+      setStatus('Došlo je do pogreške. Pokušajte ponovno.')
+    }
   }
 
   return (
@@ -196,7 +207,7 @@ export function Footer({ services: servicesProp = [], contactInfo, footerSetting
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-sm text-green-400"
+                  className={`text-sm ${status.startsWith('✓') ? 'text-green-400' : status.includes('pogreške') ? 'text-red-400' : 'text-gray-400'}`}
                 >
                   {status}
                 </motion.p>

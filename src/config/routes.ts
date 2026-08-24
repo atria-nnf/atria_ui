@@ -47,7 +47,6 @@ export const NAV_ITEMS = [
     dropdown: [
       { name: 'O nama', href: ROUTES.ABOUT_US },
       { name: 'Naši Doktori', href: ROUTES.DOCTORS },
-      { name: 'Karijere', href: ROUTES.CAREERS },
     ],
   },
   { name: 'Kontakt', href: ROUTES.CONTACT },

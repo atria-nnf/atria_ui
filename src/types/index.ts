@@ -271,3 +271,11 @@ export interface ApiResponse<T> {
   data: T | null
   error: string | null
 }
+
+// Newsletter subscriber (newsletter_subscribers table)
+export interface NewsletterSubscriber {
+  id: string
+  email: string
+  source: string | null
+  created_at: string
+}
