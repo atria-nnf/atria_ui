@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 
 const NOTIFICATION_EMAIL = process.env.CONTACT_NOTIFICATION_EMAIL || 'info@poliklinika-atria.hr'
-const FROM_EMAIL = process.env.EMAIL_FROM || 'Poliklinika Atria <onboarding@resend.dev>'
+const FROM_EMAIL = process.env.EMAIL_FROM || 'Poliklinika Atria <web@poliklinika-atria.hr>'
 
 export interface ContactNotification {
   name: string
