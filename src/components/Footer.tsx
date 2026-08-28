@@ -382,6 +382,18 @@ export function Footer({ services: servicesProp = [], contactInfo, footerSetting
                 ❤
               </motion.span>
               <span>u Hrvatskoj</span>
+              <span aria-hidden="true">·</span>
+              <span>
+                Izrada:{' '}
+                <a
+                  href="https://www.ninefold.eu"
+                  target="_blank"
+                  rel="noopener"
+                  className="hover:text-white transition-colors"
+                >
+                  Ninefold
+                </a>
+              </span>
             </div>
           </motion.div>
         </div>
