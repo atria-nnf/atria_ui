@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Target, Heart, Lightbulb, Shield, ArrowRight, Users, Microscope, User, Zap, Building2, DollarSign, Stethoscope, Award } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
@@ -219,9 +220,12 @@ export function AboutUsPageClient({ aboutData, doctors }: AboutUsPageClientProps
               className="relative"
             >
               <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
-                <img
+                <Image
                   src={storyImage}
                   alt="Atria Polyclinic"
+                  width={800}
+                  height={600}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -322,12 +326,15 @@ export function AboutUsPageClient({ aboutData, doctors }: AboutUsPageClientProps
                   className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all group"
                 >
                   <div className="aspect-[3/4] overflow-hidden">
-                    <img
+                    <Image
                       src={
                         getImageUrl(doctor.profile_image) ||
                         'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=500&fit=crop'
                       }
                       alt={doctor.name}
+                      width={400}
+                      height={500}
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                     />
                   </div>

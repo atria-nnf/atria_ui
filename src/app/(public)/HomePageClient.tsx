@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination, Autoplay } from 'swiper/modules'
 import Link from 'next/link'
+import Image from 'next/image'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
@@ -169,7 +170,15 @@ export default function HomePageClient({ services, doctors, testimonials, settin
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_rgba(0,0,0,0.4)_100%)]"></div>
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-30"></div>
           </div>
-          <img src={heroImage} alt="Clinic" className="w-full h-full object-cover" />
+          <Image
+            src={heroImage}
+            alt="Clinic"
+            width={1920}
+            height={1080}
+            sizes="100vw"
+            preload
+            className="w-full h-full object-cover"
+          />
         </motion.div>
 
         <div className="relative z-20 text-center px-4 sm:px-6 max-w-5xl mx-auto">
@@ -332,9 +341,12 @@ export default function HomePageClient({ services, doctors, testimonials, settin
                   transition={{ duration: 0.8 }}
                   className={`relative aspect-[4/5] rounded-3xl overflow-hidden group ${isReversed ? 'order-2 md:order-1' : ''}`}
                 >
-                  <img
+                  <Image
                     src={service.image}
                     alt={service.name}
+                    width={800}
+                    height={600}
+                    sizes="(max-width: 768px) 100vw, 33vw"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-blue-950/80 to-transparent"></div>
@@ -389,9 +401,12 @@ export default function HomePageClient({ services, doctors, testimonials, settin
                 >
                   <Link href="/lijecnici" className="block cursor-pointer">
                     <div className="relative aspect-[3/4] rounded-3xl overflow-hidden mb-6 bg-black">
-                      <img
+                      <Image
                         src={doctor.image}
                         alt={doctor.fullName}
+                        width={600}
+                        height={750}
+                        sizes="(max-width: 768px) 100vw, 33vw"
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
                       />
                       <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-black text-sm font-medium">
@@ -546,9 +561,12 @@ export default function HomePageClient({ services, doctors, testimonials, settin
                 whileHover={{ scale: 1.05 }}
                 className={`${item.span} rounded-2xl overflow-hidden aspect-square cursor-pointer`}
               >
-                <img
+                <Image
                   src={item.image}
                   alt="Clinic space"
+                  width={800}
+                  height={600}
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                 />
               </motion.div>
@@ -594,9 +612,12 @@ export default function HomePageClient({ services, doctors, testimonials, settin
             >
               <Link href={`/blog/${posts[0].slug}`} className="block cursor-pointer">
                 <div className="relative aspect-[16/10] rounded-3xl overflow-hidden mb-6">
-                  <img
+                  <Image
                     src={getImageUrl(posts[0].featured_image) || defaultPostImage}
                     alt={getLocalizedContent(posts[0].title)}
+                    width={1200}
+                    height={750}
+                    sizes="(max-width: 1024px) 100vw, 60vw"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -642,9 +663,12 @@ export default function HomePageClient({ services, doctors, testimonials, settin
                 >
                   <Link href={`/blog/${post.slug}`} className="grid grid-cols-5 gap-6 cursor-pointer">
                     <div className="col-span-2 relative aspect-square rounded-2xl overflow-hidden">
-                      <img
+                      <Image
                         src={getImageUrl(post.featured_image) || defaultPostImage}
                         alt={getLocalizedContent(post.title)}
+                        width={400}
+                        height={300}
+                        sizes="(max-width: 768px) 40vw, 200px"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                     </div>

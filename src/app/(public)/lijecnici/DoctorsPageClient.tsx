@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   Calendar,
   Award,
@@ -390,12 +391,15 @@ export function DoctorsPageClient({ initialDoctors, pageSettings }: DoctorsPageC
                     <div className={`${index % 2 === 1 ? 'lg:order-2' : ''}`}>
                       <div className="relative group">
                         <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
-                          <img
+                          <Image
                             src={
                               getImageUrl(doctor.profile_image) ||
                               'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=600&fit=crop'
                             }
                             alt={doctor.name}
+                            width={600}
+                            height={800}
+                            sizes="(max-width: 1024px) 100vw, 50vw"
                             className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                           />
                         </div>
@@ -511,12 +515,15 @@ export function DoctorsPageClient({ initialDoctors, pageSettings }: DoctorsPageC
                 >
                   {/* Image */}
                   <div className="relative aspect-[4/5] overflow-hidden">
-                    <img
+                    <Image
                       src={
                         getImageUrl(doctor.profile_image) ||
                         'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=600&fit=crop'
                       }
                       alt={doctor.name}
+                      width={600}
+                      height={750}
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

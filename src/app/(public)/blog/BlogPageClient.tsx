@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Clock, Search, Tag, ArrowRight } from 'lucide-react'
 import { useLocale } from '@/config/locale-context'
 import { getLocalizedContent } from '@/lib/utils/locale'
@@ -223,12 +224,15 @@ export function BlogPageClient({ initialPosts, featuredPosts, pageSettings }: Bl
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                   {/* Image */}
                   <div className="relative aspect-[16/10] rounded-3xl overflow-hidden">
-                    <img
+                    <Image
                       src={
                         getImageUrl(featuredArticle.featured_image) ||
                         'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1400&h=900&fit=crop'
                       }
                       alt={getLocalizedContent(featuredArticle.title, locale)}
+                      width={1400}
+                      height={900}
+                      sizes="(max-width: 1024px) 100vw, 50vw"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
@@ -328,12 +332,15 @@ export function BlogPageClient({ initialPosts, featuredPosts, pageSettings }: Bl
                   <Link href={`/blog/${article.slug}`} className="block">
                     {/* Image */}
                     <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-6">
-                      <img
+                      <Image
                         src={
                           getImageUrl(article.featured_image) ||
                           'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop'
                         }
                         alt={getLocalizedContent(article.title, locale)}
+                        width={800}
+                        height={600}
+                        sizes="(max-width: 768px) 100vw, 33vw"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />

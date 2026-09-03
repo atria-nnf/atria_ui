@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
       },
     ],
     formats: ['image/avif', 'image/webp'],
+    qualities: [75],
+    // Cache optimized images for 31 days so each variant is transformed
+    // roughly once a month — keeps Vercel transformation count near zero
+    minimumCacheTTL: 2678400,
   },
 };
 

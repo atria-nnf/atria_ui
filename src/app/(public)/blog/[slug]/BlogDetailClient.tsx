@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Clock, ChevronLeft, Share2, Eye, ArrowRight } from 'lucide-react'
 import { FaFacebookF, FaTwitter, FaLinkedinIn } from 'react-icons/fa'
 import { useLocale } from '@/config/locale-context'
@@ -142,9 +143,13 @@ export function BlogDetailClient({ post, relatedPosts }: BlogDetailClientProps) 
               transition={{ duration: 0.8 }}
               className="aspect-[16/9] rounded-3xl overflow-hidden shadow-2xl"
             >
-              <img
+              <Image
                 src={getImageUrl(post.featured_image) || ''}
                 alt={title}
+                width={1280}
+                height={720}
+                sizes="(max-width: 1024px) 100vw, 1024px"
+                preload
                 className="w-full h-full object-cover"
               />
             </motion.div>
@@ -198,12 +203,15 @@ export function BlogDetailClient({ post, relatedPosts }: BlogDetailClientProps) 
                 >
                   <Link href={`/blog/${article.slug}`} className="block">
                     <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-6">
-                      <img
+                      <Image
                         src={
                           getImageUrl(article.featured_image) ||
                           'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop'
                         }
                         alt={getLocalizedContent(article.title, locale)}
+                        width={800}
+                        height={600}
+                        sizes="(max-width: 768px) 100vw, 33vw"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />

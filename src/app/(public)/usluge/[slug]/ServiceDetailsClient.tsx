@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   Heart,
   Calendar,
@@ -262,12 +263,16 @@ export function ServiceDetailsClient({
             {/* Image */}
             <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="relative">
               <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
-                <img
+                <Image
                   src={
                     getImageUrl(service.featured_image) ||
                     'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1400&h=800&fit=crop'
                   }
                   alt={getLocalizedContent(service.name, locale)}
+                  width={1400}
+                  height={1050}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  preload
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -487,12 +492,15 @@ export function ServiceDetailsClient({
                   <div className="relative flex-shrink-0">
                     <div className="absolute -inset-4 bg-gradient-to-br from-slate-900 to-blue-950 rounded-3xl opacity-10 group-hover:opacity-20 transition-opacity" />
                     <div className="relative w-72 aspect-[3/4] rounded-2xl overflow-hidden">
-                      <img
+                      <Image
                         src={
                           getImageUrl(doctor.profile_image) ||
                           'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop'
                         }
                         alt={doctor.name}
+                        width={400}
+                        height={533}
+                        sizes="288px"
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                       />
                     </div>
@@ -670,9 +678,12 @@ export function ServiceDetailsClient({
                   >
                     {post.featured_image && (
                       <div className="aspect-[16/10] overflow-hidden">
-                        <img
+                        <Image
                           src={getImageUrl(post.featured_image) || ''}
                           alt={getLocalizedContent(post.title, locale)}
+                          width={800}
+                          height={500}
+                          sizes="(max-width: 768px) 100vw, 33vw"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       </div>
