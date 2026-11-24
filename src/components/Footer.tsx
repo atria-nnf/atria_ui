@@ -15,6 +15,7 @@ interface FooterProps {
 }
 
 const quickLinks = [
+  { name: 'Cjenik', href: '/cjenik' },
   { name: 'O nama', href: '/o-nama' },
   { name: 'Naši doktori', href: '/lijecnici' },
   { name: 'Novosti', href: '/blog' },

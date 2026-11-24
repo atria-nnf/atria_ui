@@ -86,6 +86,10 @@ export {
   getAllSettings,
 } from './settings'
 
+// EasyBusy price list
+export { getEasyBusyPriceList, getEasyBusyServiceCategories } from './easybusy'
+export type { EasyBusyPriceListItem, EasyBusyServiceCategory } from './easybusy'
+
 // Contact
 export {
   submitContactForm,

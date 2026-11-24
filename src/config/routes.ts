@@ -3,6 +3,7 @@ export const ROUTES = {
   ABOUT_US: '/o-nama',
   SERVICES: '/usluge',
   SERVICES_DETAILS: '/usluge/:slug',
+  PRICE_LIST: '/cjenik',
   CONTACT: '/kontakt',
   PRIVACY: '/politika-privatnosti',
   TERMS: '/uvjeti-koristenja',
@@ -41,6 +42,7 @@ export const NAV_ITEMS = [
     href: ROUTES.SERVICES,
     dynamicDropdown: 'services' as const,
   },
+  { name: 'Cjenik', href: ROUTES.PRICE_LIST },
   {
     name: 'O nama',
     href: ROUTES.ABOUT_US,
